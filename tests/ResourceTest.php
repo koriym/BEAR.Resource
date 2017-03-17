@@ -155,6 +155,9 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, (string) $user);
     }
 
+    /**
+     * @requires PHP 7.0
+     */
     public function testShortSyntax()
     {
         $ro = $this->resource->get->uri('page://self/index')(['id' => 'koriym']);
@@ -163,6 +166,9 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('koriym', $ro->body);
     }
 
+    /**
+     * @requires PHP 7.0
+     */
     public function testShortSyntaxWithQuery()
     {
         $ro = $this->resource->get->uri('page://self/index?id=koriym')();
@@ -197,6 +203,9 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bear', $ro->body);
     }
 
+    /**
+     * @requires PHP 7.0
+     */
     public function testShortSyntaxFunctionWithDefaultGetMethod()
     {
         $ro = $this->resource->uri('page://self/index')();
