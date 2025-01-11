@@ -27,8 +27,6 @@ class RequestTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->invoker = (new InvokerFactory())();
         $entry = new Entry();
         $entry->uri = new Uri('test://self/path/to/resource');

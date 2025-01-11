@@ -10,7 +10,7 @@ use BEAR\Resource\ResourceObject;
 
 class Origin extends ResourceObject
 {
-    public function __construct(private ResourceInterface $resource)
+    public function __construct(private readonly ResourceInterface $resource)
     {
     }
 

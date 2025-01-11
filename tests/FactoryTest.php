@@ -21,8 +21,6 @@ class FactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $injector = new Injector();
         $scheme = (new SchemeCollection())
             ->scheme('app')->host('self')->toAdapter(new AppAdapter($injector, 'FakeVendor\Sandbox'))

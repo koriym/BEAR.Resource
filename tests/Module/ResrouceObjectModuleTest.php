@@ -23,8 +23,6 @@ final class ResrouceObjectModuleTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         @unlink(__DIR__ . '/tmp/compiled');
         array_map('unlink', (array) glob(__DIR__ . '/tmp/{*.php}', GLOB_BRACE)); // @phpstan-ignore-line
     }

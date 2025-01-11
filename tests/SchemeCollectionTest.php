@@ -13,8 +13,6 @@ class SchemeCollectionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->scheme = new SchemeCollection();
     }
 

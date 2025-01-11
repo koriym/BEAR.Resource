@@ -7,7 +7,7 @@ use BEAR\Resource\ResourceObject;
 
 class FakeLoop extends ResourceObject
 {
-    public function __construct(private ResourceInterface $resource)
+    public function __construct(private readonly ResourceInterface $resource)
     {
     }
 

@@ -23,7 +23,7 @@ class AppIteratorTest extends TestCase
 
     public function testForEach(): void
     {
-        foreach ($this->appIterator as $key => $meta) {
+        foreach ($this->appIterator as $meta) {
             $isValidUri = filter_var($meta->uri, FILTER_VALIDATE_URL);
             $this->assertTrue((bool) $isValidUri);
             $this->assertInstanceOf(Meta::class, $meta);

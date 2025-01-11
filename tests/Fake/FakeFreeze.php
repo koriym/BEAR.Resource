@@ -16,7 +16,7 @@ class FakeFreeze extends ResourceObject
 
     public function __construct()
     {
-        $this->closure = function () {
+        $this->closure = function (): void {
         };
         $module = new FakeSchemeModule(new ResourceModule('FakeVendor\Sandbox'));
         /* @var $resource ResourceInterface */

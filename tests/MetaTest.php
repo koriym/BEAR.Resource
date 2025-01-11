@@ -15,8 +15,6 @@ class MetaTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->meta = new Meta(Doc::class);
     }
 

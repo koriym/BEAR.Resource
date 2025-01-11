@@ -18,8 +18,6 @@ class AttributeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $injector = new Injector(new ResourceModule('FakeVendor\News'), __DIR__ . '/tmp');
         $this->resource = $injector->getInstance(ResourceInterface::class);
     }

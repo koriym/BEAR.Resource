@@ -9,7 +9,7 @@ use Ray\Di\AbstractModule;
 
 final class FakeLazyModule implements LazyModuleInterface
 {
-    public function __construct(private AbstractModule $module)
+    public function __construct(private readonly AbstractModule $module)
     {
     }
 
