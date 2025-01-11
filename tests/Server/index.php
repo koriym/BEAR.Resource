@@ -17,7 +17,7 @@ http_response_code(200);
 header('Content-Type: application/json; charset=utf-8');
 $requestHeaders = [];
 foreach ($_SERVER as $key => $value) {
-    if (strncmp($key, 'HTTP_', 5) !== 0) {
+    if (! str_starts_with($key, 'HTTP_')) {
         continue;
     }
 

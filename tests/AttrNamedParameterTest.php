@@ -15,8 +15,6 @@ class AttrNamedParameterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->params = new NamedParameter(new NamedParamMetas(), new Injector());
     }
 

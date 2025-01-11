@@ -13,7 +13,6 @@ class ResourceModuleTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
     }
 
     public function testConfigure(): void

@@ -3,27 +3,30 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Php74\Rector\FuncCall\ArraySpreadInsteadOfArrayMergeRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
-use Rector\Set\ValueObject\LevelSetList;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+return RectorConfig::configure()
+    ->withPaths([
+        __DIR__ . '/demo',
         __DIR__ . '/src',
         __DIR__ . '/src-files',
-        __DIR__ . '/tests/*Test.php',
-        __DIR__ . '/tests-php8/*Test.php',
+        __DIR__ . '/tests',
+        __DIR__ . '/tests-php8',
+    ])
+    // uncomment to reach your current PHP version
+     ->withPhpSets(php81: true)
+    ->withTypeCoverageLevel(0)
+    ->withDeadCodeLevel(0)
+    ->withCodeQualityLevel(0)
+    ->withSkip([
+        FirstClassCallableRector::class
+    ])
+    ->withSkip([
+        __DIR__ . '/src/ResourceObject.php'
+    ])
+    ->withSkip([
+        __DIR__ . '/src/*Interface.php'
+    ])
+    ->withSkip([
+        __DIR__ . '/src/Abstract*.php'
     ]);
-    $rectorConfig->skip([
-       __DIR__ . '/src/*Interface.php'
-    ]);
-
-    // define sets of rules
-    $rectorConfig->sets([
-        LevelSetList::UP_TO_PHP_81,
-    ]);
-    $rectorConfig->skip([
-        FirstClassCallableRector::class,
-        ArraySpreadInsteadOfArrayMergeRector::class
-    ]);
-};

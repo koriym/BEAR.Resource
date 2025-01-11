@@ -16,7 +16,7 @@ class PersonConstructor
         return $this->age;
     }
 
-    public function __construct(private int $age, private string $name)
+    public function __construct(private readonly int $age, private readonly string $name)
     {
     }
 }

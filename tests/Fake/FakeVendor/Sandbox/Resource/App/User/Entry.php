@@ -15,7 +15,7 @@ class Entry extends ResourceObject
         102 => ['id' => 102, 'title' => 'Entry3'],
     ];
 
-    public function __construct(private ?\BEAR\Resource\ResourceInterface $resource = null)
+    public function __construct(private readonly ?\BEAR\Resource\ResourceInterface $resource = null)
     {
     }
 

@@ -12,7 +12,7 @@ final class NoDefaultParam implements ParamInterface
     /**
      * {@inheritDoc}
      */
-    public function __invoke(string $varName, array $query, InjectorInterface $injector)
+    public function __invoke(string $varName, array $query, InjectorInterface $injector): never
     {
         unset($query, $injector);
 
