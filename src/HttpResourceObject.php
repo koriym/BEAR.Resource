@@ -21,7 +21,7 @@ use function strtoupper;
 final class HttpResourceObject extends ResourceObject implements InvokeRequestInterface
 {
     public function __construct(
-        private HttpRequestInterface $httpRequest,
+        private readonly HttpRequestInterface $httpRequest,
     ) {
     }
 

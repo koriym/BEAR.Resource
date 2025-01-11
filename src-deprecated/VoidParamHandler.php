@@ -19,7 +19,7 @@ class VoidParamHandler implements ParamHandlerInterface
      *
      * @throws ParameterException
      */
-    public function handle(\ReflectionParameter $parameter)
+    public function handle(\ReflectionParameter $parameter): never
     {
         $class = $parameter->getDeclaringClass();
         $className = $class->implementsInterface(WeavedInterface::class) ? $class->getParentClass()->getName() : $class->name;

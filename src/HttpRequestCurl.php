@@ -15,7 +15,7 @@ use function curl_setopt;
 use function explode;
 use function http_build_query;
 use function json_decode;
-use function strpos;
+use function str_contains;
 use function strtolower;
 use function substr;
 use function trim;
@@ -40,7 +40,7 @@ use const CURLOPT_URL;
 final class HttpRequestCurl implements HttpRequestInterface
 {
     public function __construct(
-        private HttpRequestHeaders $requestHeaders,
+        private readonly HttpRequestHeaders $requestHeaders,
     ) {
     }
 
@@ -112,7 +112,7 @@ final class HttpRequestCurl implements HttpRequestInterface
     {
         $responseBody = [];
         $contentType = (string) curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
-        if (strpos(strtolower($contentType), 'application/json') !== false) {
+        if (str_contains(strtolower($contentType), 'application/json')) {
             return (array) json_decode($view, true);
         }
 

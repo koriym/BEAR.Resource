@@ -36,11 +36,8 @@ final class AssistedWebContextParam implements ParamInterface
         assert(is_string($webContextParam::GLOBAL_KEY));
         /** @psalm-suppress MixedArrayOffset */
         $phpWebContext = $superGlobals[$webContextParam::GLOBAL_KEY];
-        if (isset($phpWebContext[$this->webContextParam->key])) {
-            return $phpWebContext[$this->webContextParam->key];
-        }
 
-        return ($this->defaultParam)($varName, $query, $injector);
+        return $phpWebContext[$this->webContextParam->key] ?? ($this->defaultParam)($varName, $query, $injector);
     }
 
     /** @param array<string, array<string, mixed>> $globals */

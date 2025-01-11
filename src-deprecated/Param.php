@@ -12,29 +12,11 @@ namespace BEAR\Resource;
 final class Param
 {
     /**
-     * @var string
-     */
-    public $class;
-
-    /**
-     * @var string
-     */
-    public $method;
-
-    /**
-     * @var string
-     */
-    public $param;
-
-    /**
      * @param string $class
      * @param string $method
      * @param string $param
      */
-    public function __construct($class, $method, $param)
+    public function __construct(public $class, public $method, public $param)
     {
-        $this->class = $class;
-        $this->method = $method;
-        $this->param = $param;
     }
 }

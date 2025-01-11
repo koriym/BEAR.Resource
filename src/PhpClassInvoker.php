@@ -12,9 +12,9 @@ use function ucfirst;
 final class PhpClassInvoker implements InvokerInterface
 {
     public function __construct(
-        private NamedParameterInterface $params,
-        private ExtraMethodInvoker $extraMethod,
-        private LoggerInterface $logger,
+        private readonly NamedParameterInterface $params,
+        private readonly ExtraMethodInvoker $extraMethod,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

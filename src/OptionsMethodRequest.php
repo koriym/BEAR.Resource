@@ -41,11 +41,7 @@ final class OptionsMethodRequest
             return $this->getType($parameter);
         }
 
-        if (isset($paramDoc[$name]['type'])) {
-            return $paramDoc[$name]['type'];
-        }
-
-        return null;
+        return $paramDoc[$name]['type'] ?? null;
     }
 
     /**

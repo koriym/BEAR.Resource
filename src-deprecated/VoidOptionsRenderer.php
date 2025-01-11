@@ -14,8 +14,8 @@ final class VoidOptionsRenderer implements RenderInterface
     /**
      * {@inheritdoc}
      */
-    public function render(ResourceObject $ro)
+    public function render(ResourceObject $ro): never
     {
-        throw new MethodNotAllowedException(get_class($ro) . '::options', 405);
+        throw new MethodNotAllowedException($ro::class . '::options', 405);
     }
 }
