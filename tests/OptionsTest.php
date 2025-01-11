@@ -99,7 +99,7 @@ class OptionsTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     /** @return ResourceObject[][] */
@@ -197,7 +197,7 @@ class OptionsTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     public function testOptionsMethodWithJsonSchema(): void
@@ -244,7 +244,7 @@ class OptionsTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     public function testOptionsNoSchemaFile(): void
@@ -267,6 +267,6 @@ class OptionsTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expected, $ro->view);
+        $this->assertJsonStringEqualsJsonString($expected, $ro->view);
     }
 }

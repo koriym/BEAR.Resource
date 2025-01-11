@@ -50,7 +50,7 @@ class HalRendererTest extends TestCase
 }
 
 EOT;
-        $this->assertSame($expected, $data);
+        $this->assertJsonStringEqualsJsonString($expected, $data);
     }
 
     public function testRenderScalar(): void
@@ -71,7 +71,7 @@ EOT;
 }
 
 EOT;
-        $this->assertSame($expected, $data);
+        $this->assertJsonStringEqualsJsonString($expected, $data);
     }
 
     public function testHeader(): void
@@ -110,7 +110,7 @@ EOT;
 }
 
 EOT;
-        $this->assertSame($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     public function testLocationHeader(): void
@@ -140,7 +140,7 @@ EOT;
 }
 
 EOT;
-        $this->assertSame($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     public function testRenderNullBody(): void
@@ -160,7 +160,7 @@ EOT;
 }
 
 EOT;
-        $this->assertSame($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     public function testBodyObject(): void

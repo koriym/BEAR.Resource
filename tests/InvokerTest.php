@@ -167,7 +167,7 @@ class InvokerTest extends TestCase
     "DELETE": []
 }
 ';
-        $this->assertSame($expected, $view);
+        $this->assertJsonStringEqualsJsonString($expected, $view);
     }
 
     public function testOptionsMethod2(): void

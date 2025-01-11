@@ -21,7 +21,7 @@ class Greeting extends ResourceObject
      * @Named("appName=BEAR\Resource\Annotation\AppName")
      */
     #[ResourceParam(uri: 'app://self/rparam/login#login_id', param: 'name')]
-    public function onGet(string $name = null, string $appName = null)
+    public function onGet(?string $name = null, ?string $appName = null)
     {
         $this->body = [
             'name' => $name,

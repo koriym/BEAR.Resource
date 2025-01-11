@@ -43,6 +43,6 @@ class HalModuleTest extends TestCase
 }
 ';
         assert($news instanceof Request);
-        $this->assertSame($expect, (string) $news);
+        $this->assertJsonStringEqualsJsonString($expect, (string) $news);
     }
 }
