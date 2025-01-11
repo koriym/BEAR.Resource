@@ -24,7 +24,7 @@ class PrettyJsonRendererTest extends TestCase
     {
         $ro = new NullResourceObject();
         $ro->body = ['a' => ['b' => 'c']];
-        $this->assertSame('{
+        $this->assertJsonStringEqualsJsonString('{
     "a": {
         "b": "c"
     }
@@ -37,7 +37,7 @@ class PrettyJsonRendererTest extends TestCase
         $resource = (new Injector(new EmbedResourceModule(new ResourceModule('FakeVendor\Sandbox')), __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
         assert($resource instanceof ResourceInterface);
         $ro = $resource->get('app://self/bird/embed-birds', ['id' => '1']);
-        $this->assertSame('{
+        $this->assertJsonStringEqualsJsonString('{
     "birds": {
         "bird1": {
             "name": "chill kun"

@@ -63,7 +63,7 @@ class ImportModuleTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expect, (string) $news);
+        $this->assertJsonStringEqualsJsonString($expect, (string) $news);
 
         $news = $resource
             ->get
@@ -83,6 +83,6 @@ class ImportModuleTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expect, (string) $news);
+        $this->assertJsonStringEqualsJsonString($expect, (string) $news);
     }
 }

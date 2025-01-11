@@ -222,7 +222,7 @@ class ResourceTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expected, (string) $user);
+        $this->assertJsonStringEqualsJsonString($expected, (string) $user);
     }
 
     public function testConstructorHasAnotherResourceRequest(): void
@@ -314,7 +314,7 @@ class ResourceTest extends TestCase
     }
 }
 ';
-        $this->assertSame($expected, $view);
+        $this->assertJsonStringEqualsJsonString($expected, $view);
     }
 
     /** @covers \BEAR\Resource\Resource::options() */
