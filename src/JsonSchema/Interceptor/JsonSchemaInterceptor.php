@@ -10,6 +10,7 @@ use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
+use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
@@ -40,6 +41,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
         #[Named('json_validate_dir')]
         private readonly string $validateDir,
         private readonly JsonSchemaExceptionHandlerInterface $handler,
+        private readonly JsonSchemaRequestExceptionHandlerInterface $requestHandler,
         #[Named('json_schema_host')]
         private readonly string|null $schemaHost = null,
     ) {
@@ -55,7 +57,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
         assert($jsonSchema instanceof JsonSchema);
         if ($jsonSchema->params) {
             $arguments = $this->getNamedArguments($invocation);
-            $this->validateRequest($jsonSchema, $arguments);
+            $this->validateRequest($invocation, $jsonSchema, $arguments);
         }
 
         $ro = $invocation->proceed();
@@ -68,11 +70,18 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
     }
 
     /** @param array<string, mixed> $arguments */
-    private function validateRequest(JsonSchema $jsonSchema, array $arguments): void
+    private function validateRequest(MethodInvocation $invocation, JsonSchema $jsonSchema, array $arguments): void // @phpstan-ignore-line
     {
-        $schemaFile = $this->validateDir . '/' . $jsonSchema->params;
-        $this->validateFileExists($schemaFile);
-        $this->validate($arguments, $schemaFile);
+        try {
+            $schemaFile = $this->validateDir . '/' . $jsonSchema->params;
+            $this->validateFileExists($schemaFile);
+            $this->validate($arguments, $schemaFile);
+        } catch (JsonSchemaException $e) {
+            $ro = $invocation->getThis();
+            assert($ro instanceof ResourceObject);
+            /** @psalm-suppress PossiblyUndefinedVariable */
+            $this->requestHandler->handleRequestException($ro, $e, $schemaFile);
+        }
     }
 
     private function validateResponse(ResourceObject $ro, JsonSchema $jsonSchema): void
