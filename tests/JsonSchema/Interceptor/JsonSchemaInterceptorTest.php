@@ -9,6 +9,7 @@ use BEAR\Resource\Interceptor\JsonSchemaInterceptor;
 use BEAR\Resource\JsonSchema\FakeUser;
 use BEAR\Resource\JsonSchema\FakeView;
 use BEAR\Resource\JsonSchemaExceptionNullHandler;
+use BEAR\Resource\JsonSchemaRequestExceptionNullHandler;
 use BEAR\Resource\ResourceObject;
 use PHPUnit\Framework\TestCase;
 use Ray\Aop\MethodInterceptor;
@@ -27,6 +28,7 @@ class JsonSchemaInterceptorTest extends TestCase
             $fakeDir . '/Fake/json_schema',
             $fakeDir . '/Fake/json_validate',
             new JsonSchemaExceptionNullHandler(),
+            new JsonSchemaRequestExceptionNullHandler(),
             'http://example.com/schema/',
         );
     }
