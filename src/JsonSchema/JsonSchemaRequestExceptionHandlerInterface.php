@@ -11,7 +11,14 @@ interface JsonSchemaRequestExceptionHandlerInterface
     /**
      * Handle invalid request object
      *
+     * @param array<string, mixed> $arguments
+     *
      * @return void
      */
-    public function handleRequestException(ResourceObject $ro, JsonSchemaException $e, string $schemaFile);
+    public function handleRequestException(
+        ResourceObject $ro,
+        JsonSchemaException $e,
+        string $schemaFile,
+        array $arguments,
+    );
 }
