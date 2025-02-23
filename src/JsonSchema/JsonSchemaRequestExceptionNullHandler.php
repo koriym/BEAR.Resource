@@ -15,7 +15,7 @@ class JsonSchemaRequestExceptionNullHandler implements JsonSchemaRequestExceptio
         ResourceObject $ro,
         JsonSchemaException $e,
         string $schemaFile,
-        array $arguments
+        array $arguments,
     ) {
         throw $e;
     }
