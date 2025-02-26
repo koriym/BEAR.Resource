@@ -60,7 +60,7 @@ final class ClassParam implements ParamInterface
         }
 
         assert(class_exists($this->type));
-        $refClass = (new ReflectionClass($this->type));
+        $refClass = new ReflectionClass($this->type);
 
         if ($refClass->isEnum()) {
             return $this->enum($this->type, $props, $varName);
