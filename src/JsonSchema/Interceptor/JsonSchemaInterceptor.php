@@ -80,7 +80,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
             $ro = $invocation->getThis();
             assert($ro instanceof ResourceObject);
             /** @psalm-suppress PossiblyUndefinedVariable */
-            $this->requestHandler->handleRequestException($ro, $e, $schemaFile, $arguments);
+            $this->requestHandler->handleRequestException($arguments, $ro, $e, $schemaFile);
         }
     }
 

@@ -16,9 +16,9 @@ interface JsonSchemaRequestExceptionHandlerInterface
      * @return void
      */
     public function handleRequestException(
+        array $arguments,
         ResourceObject $ro,
         JsonSchemaException $e,
         string $schemaFile,
-        array $arguments,
     );
 }

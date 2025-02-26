@@ -12,10 +12,10 @@ class JsonSchemaRequestExceptionNullHandler implements JsonSchemaRequestExceptio
      * {@inheritDoc}
      */
     public function handleRequestException(
+        array $arguments,
         ResourceObject $ro,
         JsonSchemaException $e,
         string $schemaFile,
-        array $arguments,
     ) {
         throw $e;
     }
