@@ -7,6 +7,7 @@ namespace BEAR\Resource;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionMethod;
+use function is_string;
 
 final class OptionsMethodDocBolck
 {
@@ -19,7 +20,7 @@ final class OptionsMethodDocBolck
     {
         $docComment = $method->getDocComment();
         $doc = $paramDoc = [];
-        if ($docComment) {
+        if (is_string($docComment)) {
             [$doc, $paramDoc] = $this->docBlock($docComment);
         }
 

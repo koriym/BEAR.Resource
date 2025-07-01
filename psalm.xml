@@ -16,12 +16,9 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <PossiblyNullArgument errorLevel="suppress" />
-        <PossiblyNullArrayOffset errorLevel="suppress" />
         <PossiblyUnusedMethod errorLevel="suppress" />
         <PossiblyUnusedProperty errorLevel="suppress" />
         <PossiblyUnusedReturnValue errorLevel="suppress" />
-        <RiskyTruthyFalsyComparison errorLevel="suppress" />
         <UnusedClass errorLevel="suppress" />
         <UnusedMethod errorLevel="suppress" />
     </issueHandlers>
