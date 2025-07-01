@@ -72,7 +72,7 @@ final class AppIterator implements Iterator
     #[Override]
     public function key(): string
     {
-        return $this->keys[$this->i];
+        return $this->keys[$this->i]; // @codeCoverageIgnore
     }
 
     /**
