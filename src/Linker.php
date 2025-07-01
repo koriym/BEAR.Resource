@@ -71,12 +71,14 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * How next linked resource treated (add ? replace ?)
+     * @param array<mixed> $nextResource
+     *
+     * @return ResourceObject
      */
     private function nextLink(LinkType $link, ResourceObject $ro, array $nextResource): ResourceObject
     {
         /** @var ResourceObject|mixed $nextResource */
-        $nextBody = $nextResource instanceof ResourceObject ? $nextResource->body : $nextResource;
+        $nextBody = $nextResource;
 
         if ($link->type === LinkType::SELF_LINK) {
             $ro->body = $nextBody;
