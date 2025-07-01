@@ -6,6 +6,6 @@ namespace BEAR\Resource\Exception;
 
 use RuntimeException;
 
-class IlligalAccessException extends RuntimeException implements ExceptionInterface
+final class IlligalAccessException extends RuntimeException implements ExceptionInterface
 {
 }

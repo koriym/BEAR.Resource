@@ -6,6 +6,6 @@ namespace BEAR\Resource\Exception;
 
 use LogicException;
 
-class JsonSchemaException extends LogicException implements ExceptionInterface
+final class JsonSchemaException extends LogicException implements ExceptionInterface
 {
 }

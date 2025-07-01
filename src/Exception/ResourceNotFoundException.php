@@ -7,7 +7,7 @@ namespace BEAR\Resource\Exception;
 use BEAR\Resource\Code;
 use Throwable;
 
-class ResourceNotFoundException extends BadRequestException
+final class ResourceNotFoundException extends BadRequestException
 {
     public function __construct(string $message = '', int $code = Code::NOT_FOUND, Throwable|null $previous = null)
     {

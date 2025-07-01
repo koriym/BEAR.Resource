@@ -14,7 +14,7 @@ use stdClass;
 use function class_exists;
 use function is_object;
 
-class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandlerInterface
+final class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandlerInterface
 {
     final public const X_FAKE_JSON = 'X-Fake-JSON';
     final public const X_JSON_SCHEMA_EXCEPTION = 'X-JSON-Schema-Exception';

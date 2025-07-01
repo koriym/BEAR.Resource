@@ -11,7 +11,7 @@ use Ray\Di\AbstractModule;
 /**
  * Bind resource object for compile
  */
-class ResourceObjectModule extends AbstractModule
+final class ResourceObjectModule extends AbstractModule
 {
     /** @param iterable<class-string<ResourceObject>> $resourceObjects */
     public function __construct(

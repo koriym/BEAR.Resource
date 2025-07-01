@@ -7,7 +7,7 @@ namespace BEAR\Resource;
 use BEAR\Resource\Exception\JsonSchemaException;
 use Override;
 
-class JsonSchemaRequestExceptionNullHandler implements JsonSchemaRequestExceptionHandlerInterface
+final class JsonSchemaRequestExceptionNullHandler implements JsonSchemaRequestExceptionHandlerInterface
 {
     /**
      * {@inheritDoc}

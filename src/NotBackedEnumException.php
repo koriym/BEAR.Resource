@@ -6,6 +6,6 @@ namespace BEAR\Resource;
 
 use LogicException;
 
-class NotBackedEnumException extends LogicException
+final class NotBackedEnumException extends LogicException
 {
 }

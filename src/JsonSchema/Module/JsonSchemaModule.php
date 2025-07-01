@@ -15,7 +15,7 @@ use BEAR\Resource\ResourceObject;
 use Override;
 use Ray\Di\AbstractModule;
 
-class JsonSchemaModule extends AbstractModule
+final class JsonSchemaModule extends AbstractModule
 {
     /**
      * @param string $jsonSchemaDir   Json-schema json file directory
