@@ -16,7 +16,6 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <MethodSignatureMustProvideReturnType errorLevel="suppress" />
         <MixedAssignment errorLevel="suppress" />
         <MixedMethodCall errorLevel="suppress" />
         <MissingConstructor errorLevel="suppress" />

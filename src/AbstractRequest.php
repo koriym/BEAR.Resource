@@ -300,9 +300,9 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
 
     /**
      * @return never
-     * @psalm-return never-returns
      *
      * @codeCoverageIgnore
+     * @psalm-suppress MethodSignatureMustProvideReturnType - method not supported
      */
     #[Override]
     public function serialize()
@@ -314,6 +314,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      * @param string $data
      *
      * @codeCoverageIgnore
+     * @psalm-suppress MethodSignatureMustProvideReturnType - method not supported
      */
     #[Override]
     public function unserialize($data)
