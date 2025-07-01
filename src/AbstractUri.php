@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
 use Stringable;
 
 use function http_build_query;
@@ -30,6 +31,7 @@ abstract class AbstractUri implements Stringable
     public $method = 'get';
 
     /** @return string */
+    #[Override]
     public function __toString()
     {
         return "{$this->scheme}://{$this->host}{$this->path}" . ($this->query ? '?' . http_build_query($this->query) : '');

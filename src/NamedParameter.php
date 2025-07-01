@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
 use Ray\Di\InjectorInterface;
 
 final class NamedParameter implements NamedParameterInterface
@@ -17,6 +18,7 @@ final class NamedParameter implements NamedParameterInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function getParameters(callable $callable, array $query): array
     {
         $metas = ($this->paramMetas)($callable);

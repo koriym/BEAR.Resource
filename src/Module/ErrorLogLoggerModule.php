@@ -6,6 +6,7 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\ErrorLogLogger;
 use BEAR\Resource\LoggerInterface;
+use Override;
 use Ray\Di\AbstractModule;
 
 /**
@@ -13,6 +14,7 @@ use Ray\Di\AbstractModule;
  */
 final class ErrorLogLoggerModule extends AbstractModule
 {
+    #[Override]
     protected function configure(): void
     {
         $this->bind(LoggerInterface::class)->to(ErrorLogLogger::class);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use Nocarrier\Hal;
+use Override;
 use Ray\Aop\ReflectionMethod;
 use RuntimeException;
 
@@ -34,6 +35,7 @@ final class HalRenderer implements RenderInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function render(ResourceObject $ro)
     {
         $this->renderHal($ro);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use CurlHandle;
+use Override;
 
 use function count;
 use function curl_close;
@@ -45,6 +46,7 @@ final class HttpRequestCurl implements HttpRequestInterface
     }
 
     /** @inheritDoc */
+    #[Override]
     public function request(string $method, string $uri, array $query): array
     {
         $body = http_build_query($query);

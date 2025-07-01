@@ -8,6 +8,7 @@ use BEAR\Resource\Annotation\Embed;
 use BEAR\Resource\Exception\BadRequestException;
 use BEAR\Resource\Exception\EmbedException;
 use BEAR\Resource\Exception\LinkException;
+use Override;
 use Ray\Aop\MethodInterceptor;
 use Ray\Aop\MethodInvocation;
 
@@ -34,6 +35,7 @@ final class EmbedInterceptor implements MethodInterceptor
      *
      * @throws EmbedException
      */
+    #[Override]
     public function invoke(MethodInvocation $invocation)
     {
         $ro = $invocation->getThis();

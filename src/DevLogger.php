@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -17,6 +18,7 @@ final class DevLogger implements LoggerInterface
     ) {
     }
 
+    #[Override]
     public function __invoke(ResourceObject $ro): void
     {
         $unsafeMethod = ['post', 'put', 'patch', 'delete'];

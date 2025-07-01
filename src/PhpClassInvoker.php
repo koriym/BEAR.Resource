@@ -21,6 +21,7 @@ final class PhpClassInvoker implements InvokerInterface
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function invoke(AbstractRequest $request): ResourceObject
     {
         $callable = [$request->resourceObject, 'on' . ucfirst($request->method)];

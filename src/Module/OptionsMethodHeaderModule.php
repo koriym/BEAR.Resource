@@ -8,6 +8,7 @@ use BEAR\Resource\Annotation\OptionsBody;
 use BEAR\Resource\OptionsMethods;
 use BEAR\Resource\OptionsRenderer;
 use BEAR\Resource\RenderInterface;
+use Override;
 use Ray\Di\AbstractModule;
 
 /**
@@ -24,6 +25,7 @@ final class OptionsMethodHeaderModule extends AbstractModule
     /**
      * {@inheritDoc}
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind(OptionsMethods::class);

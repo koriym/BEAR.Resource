@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\RequestParamInterface;
 use BEAR\Resource\Annotation\ResourceParam;
+use Override;
 use Ray\Aop\ReflectionMethod;
 use Ray\Di\Di\Assisted;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
@@ -18,6 +19,7 @@ final class NamedParamMetas implements NamedParamMetasInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function __invoke(callable $callable): array
     {
         /** @var array{0:object, 1:string} $callable */

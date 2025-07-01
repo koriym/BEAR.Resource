@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
 use Ray\Di\InjectorInterface;
 
 use function ltrim;
@@ -22,6 +23,7 @@ final class OptionalParam implements ParamInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function __invoke(string $varName, array $query, InjectorInterface $injector)
     {
         unset($injector);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\OptionsBody;
+use Override;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -39,6 +40,7 @@ final class OptionsRenderer implements RenderInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function render(ResourceObject $ro)
     {
         $ro->headers['Content-Type'] = 'application/json';

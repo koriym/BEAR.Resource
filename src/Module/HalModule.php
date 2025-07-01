@@ -6,6 +6,7 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\HalRenderer;
 use BEAR\Resource\RenderInterface;
+use Override;
 use Ray\Di\AbstractModule;
 
 /**
@@ -16,6 +17,7 @@ final class HalModule extends AbstractModule
     /**
      * {@inheritDoc}
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind(RenderInterface::class)->to(HalRenderer::class);

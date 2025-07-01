@@ -6,6 +6,7 @@ use BackedEnum;
 use BEAR\Resource\Exception\ParameterEnumTypeException;
 use BEAR\Resource\Exception\ParameterException;
 use BEAR\Resource\Exception\ParameterInvalidEnumException;
+use Override;
 use Ray\Di\InjectorInterface;
 use ReflectionClass;
 use ReflectionEnum;
@@ -46,6 +47,7 @@ final class ClassParam implements ParamInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function __invoke(string $varName, array $query, InjectorInterface $injector)
     {
         try {

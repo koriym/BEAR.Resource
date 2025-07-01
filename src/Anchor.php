@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link as LinkAnnotation;
 use BEAR\Resource\Exception\LinkException;
+use Override;
 use Ray\Aop\ReflectionMethod;
 
 use function array_merge;
@@ -21,6 +22,7 @@ final class Anchor implements AnchorInterface
      *
      * @throws LinkException
      */
+    #[Override]
     public function href(string $rel, AbstractRequest $request, array $query): array
     {
         $classMethod = 'on' . ucfirst($request->method);

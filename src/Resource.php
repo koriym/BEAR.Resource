@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\MethodException;
+use Override;
 
 use function assert;
 use function is_string;
@@ -51,6 +52,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function newInstance($uri): ResourceObject
     {
         if (is_string($uri)) {
@@ -65,6 +67,7 @@ final class Resource implements ResourceInterface
      *
      * @throws MethodException
      */
+    #[Override]
     public function object(ResourceObject $ro): RequestInterface
     {
         return new Request($this->invoker, $ro, $this->method);
@@ -73,6 +76,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function uri($uri): RequestInterface
     {
         $method = $this->method; // save method, this may change on newInstance(), this is singleton!
@@ -89,6 +93,7 @@ final class Resource implements ResourceInterface
      *
      * @psalm-suppress MixedPropertyFetch
      */
+    #[Override]
     public function href(string $rel, array $query = []): ResourceObject
     {
         [$method, $uri] = $this->anchor->href($rel, $this->request, $query);
@@ -102,6 +107,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function get(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::GET, $uri)($query);
@@ -110,6 +116,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function post(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::POST, $uri)($query);
@@ -118,6 +125,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function put(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::PUT, $uri)($query);
@@ -126,6 +134,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function patch(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::PATCH, $uri)($query);
@@ -134,6 +143,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function delete(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::DELETE, $uri)($query);
@@ -142,6 +152,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function options(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::OPTIONS, $uri)($query);
@@ -150,6 +161,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function head(string $uri, array $query = []): ResourceObject
     {
         return $this->methodUri(Request::HEAD, $uri)($query);

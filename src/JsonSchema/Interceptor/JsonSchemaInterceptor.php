@@ -14,6 +14,7 @@ use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
+use Override;
 use Ray\Aop\MethodInvocation;
 use Ray\Di\Di\Named;
 use ReflectionClass;
@@ -50,6 +51,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function invoke(MethodInvocation $invocation): ResourceObject
     {
         $method = $invocation->getMethod();

@@ -6,10 +6,12 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\LoggerInterface;
 use BEAR\Resource\ProdLogger;
+use Override;
 use Ray\Di\AbstractModule;
 
 final class ProdLoggerModule extends AbstractModule
 {
+    #[Override]
     protected function configure(): void
     {
         $this->bind(LoggerInterface::class)->to(ProdLogger::class);

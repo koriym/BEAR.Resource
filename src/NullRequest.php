@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
+
 final class NullRequest implements RequestInterface
 {
     /** @param array<string, mixed> $query */
+    #[Override]
     public function __invoke(array|null $query = null): ResourceObject
     {
         return new NullResourceObject();
     }
 
+    #[Override]
     public function hash(): string
     {
         return '';
     }
 
+    #[Override]
     public function request(): ResourceObject
     {
         return new NullResourceObject();
@@ -25,6 +30,7 @@ final class NullRequest implements RequestInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function withQuery(array $query): RequestInterface
     {
         unset($query);
@@ -35,6 +41,7 @@ final class NullRequest implements RequestInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function addQuery(array $query): RequestInterface
     {
         unset($query);
@@ -42,17 +49,20 @@ final class NullRequest implements RequestInterface
         return $this;
     }
 
+    #[Override]
     public function toUri(): string
     {
         return (string) new NullUri();
     }
 
+    #[Override]
     public function toUriWithMethod(): string
     {
         return 'get ' . (string) new NullUri();
     }
 
     /** @return self */
+    #[Override]
     public function linkSelf(string $linkKey): RequestInterface
     {
         unset($linkKey);
@@ -61,6 +71,7 @@ final class NullRequest implements RequestInterface
     }
 
     /** @return self */
+    #[Override]
     public function linkNew(string $linkKey): RequestInterface
     {
         unset($linkKey);
@@ -69,6 +80,7 @@ final class NullRequest implements RequestInterface
     }
 
     /** @return self */
+    #[Override]
     public function linkCrawl(string $linkKey): RequestInterface
     {
         unset($linkKey);

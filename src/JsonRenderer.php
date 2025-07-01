@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
+
 use function array_key_exists;
 use function error_log;
 use function json_encode;
@@ -15,6 +17,7 @@ final class JsonRenderer implements RenderInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function render(ResourceObject $ro)
     {
         if (! array_key_exists('Content-Type', $ro->headers)) {

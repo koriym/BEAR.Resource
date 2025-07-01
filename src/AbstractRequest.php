@@ -11,6 +11,7 @@ use BEAR\Resource\Exception\OutOfBoundsException;
 use IteratorAggregate;
 use JsonSerializable;
 use LogicException;
+use Override;
 use ReturnTypeWillChange;
 use Serializable;
 use Stringable;
@@ -106,6 +107,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     }
 
     /** @psalm-suppress UnevaluatedCode */
+    #[Override]
     public function __toString(): string
     {
         try {
@@ -125,6 +127,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      *
      * @param array<string, mixed> $query
      */
+    #[Override]
     public function __invoke(array|null $query = null): ResourceObject
     {
         if (is_array($query)) {
@@ -158,6 +161,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      *
      * @throws OutOfBoundsException
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
@@ -169,6 +173,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      *
      * @throws OutOfBoundsException
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
@@ -180,6 +185,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function request()
     {
         if ($this->in === 'eager') {
@@ -200,6 +206,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      *
      * @throws OutOfBoundsException
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
@@ -215,6 +222,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * {@inheritDoc}
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetExists($offset): bool
     {
@@ -230,6 +238,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      * @psalm-return ArrayIterator
      * @phpstan-return ArrayIterator<string, mixed>
      */
+    #[Override]
     public function getIterator(): ArrayIterator
     {
         $this->invoke();
@@ -241,6 +250,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function hash(): string
     {
         return md5($this->resourceObject::class . $this->method . serialize($this->query) . serialize($this->links));
@@ -278,6 +288,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
         return $this->result;
     }
 
+    #[Override]
     public function jsonSerialize(): ResourceObject
     {
         return $this->invoke();
@@ -289,6 +300,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      *
      * @codeCoverageIgnore
      */
+    #[Override]
     public function serialize()
     {
         $this->__serialize();
@@ -299,6 +311,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
      *
      * @codeCoverageIgnore
      */
+    #[Override]
     public function unserialize($data)
     {
         unset($data);

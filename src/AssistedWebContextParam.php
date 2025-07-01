@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
 use Ray\Di\InjectorInterface;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 
@@ -28,6 +29,7 @@ final class AssistedWebContextParam implements ParamInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function __invoke(string $varName, array $query, InjectorInterface $injector)
     {
         $superGlobals = static::$globals ?: $GLOBALS;

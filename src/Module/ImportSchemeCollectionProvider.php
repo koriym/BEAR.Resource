@@ -9,6 +9,7 @@ use BEAR\Resource\Annotation\ImportAppConfig;
 use BEAR\Resource\AppAdapter;
 use BEAR\Resource\ImportApp;
 use BEAR\Resource\SchemeCollection;
+use Override;
 use Ray\Di\InjectorInterface;
 use Ray\Di\ProviderInterface;
 
@@ -28,6 +29,7 @@ final class ImportSchemeCollectionProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function get(): SchemeCollection
     {
         $schemeCollection = (new SchemeCollectionProvider($this->appName, $this->injector))->get();

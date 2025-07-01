@@ -34,6 +34,7 @@ use BEAR\Resource\ReverseLinkerInterface;
 use BEAR\Resource\ReverseLinkInterface;
 use BEAR\Resource\SchemeCollectionInterface;
 use BEAR\Resource\UriFactory;
+use Override;
 use Ray\Di\AbstractModule;
 use Ray\Di\Exception\NotFound;
 use Ray\Di\Scope;
@@ -71,6 +72,7 @@ final class ResourceClientModule extends AbstractModule
      *
      * @throws NotFound
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind(UriFactory::class);

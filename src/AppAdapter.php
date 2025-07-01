@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\ResourceNotFoundException;
+use Override;
 use Ray\Di\Exception\Unbound;
 use Ray\Di\InjectorInterface;
 use Throwable;
@@ -35,6 +36,7 @@ final class AppAdapter implements AdapterInterface
      * @throws ResourceNotFoundException
      * @throws Unbound
      */
+    #[Override]
     public function get(AbstractUri $uri): ResourceObject
     {
         if (str_ends_with($uri->path, '/')) {

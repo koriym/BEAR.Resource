@@ -13,6 +13,7 @@ final class Invoker implements InvokerInterface
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function invoke(AbstractRequest $request): ResourceObject
     {
         return $request->resourceObject->_invokeRequest($this->classInvoker, $request);
