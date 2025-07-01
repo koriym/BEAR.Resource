@@ -6,7 +6,7 @@ build:
                     - php-scrutinizer-run
             environment:
                 php:
-                    version: 8.2
+                    version: 8.3.16
 
 filter:
     paths: ["src/*"]
