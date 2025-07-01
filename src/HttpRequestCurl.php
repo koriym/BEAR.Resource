@@ -73,6 +73,9 @@ final class HttpRequestCurl implements HttpRequestInterface
     private function initializeCurl(string $method, string $uri, string $body): CurlHandle
     {
         $curl = curl_init();
+        if ($curl === false) {
+            throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
+        }
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $uri);
 
@@ -87,9 +90,6 @@ final class HttpRequestCurl implements HttpRequestInterface
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, true);
-        if ($curl === false) {
-            throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
-        }
 
         return $curl;
     }
