@@ -76,6 +76,7 @@ final class HttpRequestCurl implements HttpRequestInterface
         if ($curl === false) {
             throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
         }
+
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $uri);
 

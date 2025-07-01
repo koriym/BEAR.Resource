@@ -67,7 +67,7 @@ final class EmbedInterceptor implements MethodInterceptor
                 $templateUri = $this->getFullUri($embed->src, $ro);
                 $uri = uri_template($templateUri, $query);
                 /** @var Request $request */ // phpcs:ignore SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion
-                $request = $this->resource->get->uri($uri);
+                $request = $this->resource->get->uri($uri); // @phpstan-ignore-line
                 $this->prepareBody($ro, $embed);
 
                 if ($embed->rel === self::SELF_LINK) {
@@ -106,7 +106,11 @@ final class EmbedInterceptor implements MethodInterceptor
         }
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @param MethodInvocation<object> $invocation
+     *
+     * @return array<string, mixed>
+     */
     private function getArgsByInvocation(MethodInvocation $invocation): array
     {
         /** @var list<scalar> $args */

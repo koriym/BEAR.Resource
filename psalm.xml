@@ -9,16 +9,13 @@
     <projectFiles>
         <directory name="src" />
         <ignoreFiles>
-            <file name="src/OptionsMethods.php"/>
             <file name="src/OptionsMethodRequest.php"/>
             <directory name="vendor" />
             <directory name="tests" />
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <PossiblyUnusedMethod errorLevel="suppress" />
         <PossiblyUnusedProperty errorLevel="suppress" />
-        <PossiblyUnusedReturnValue errorLevel="suppress" />
         <UnusedClass errorLevel="suppress" />
         <UnusedMethod errorLevel="suppress" />
     </issueHandlers>

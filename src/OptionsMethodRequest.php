@@ -19,8 +19,8 @@ final class OptionsMethodRequest
     /**
      * Parameter #2 $paramMetas of method BEAR\Resource\OptionsMethodRequest::ignoreAnnotatedPrameter() expects array('parameters' => array<string, array('type' =>
      *
-     * @param array<string, array{type: string, description?: string}> $paramDoc
-     * @param array<string, string>                                    $ins
+     * @param array<array-key, array{type: string, description?: string}> $paramDoc
+     * @param array<array-key, array-key>                                 $ins
      *
      * @return array{parameters?: array<string, array{type?: string, description?: string, default?: string}>, required?: array<int, string>}
      */

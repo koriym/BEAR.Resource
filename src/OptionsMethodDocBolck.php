@@ -7,6 +7,7 @@ namespace BEAR\Resource;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionMethod;
+
 use function is_string;
 
 final class OptionsMethodDocBolck
