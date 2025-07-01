@@ -16,7 +16,6 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <ArgumentTypeCoercion errorLevel="suppress" />
         <FalsableReturnStatement errorLevel="suppress" />
         <InvalidPropertyAssignmentValue errorLevel="suppress" />
         <InvalidReturnStatement errorLevel="suppress" />
