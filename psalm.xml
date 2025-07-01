@@ -16,9 +16,7 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <MixedAssignment errorLevel="suppress" />
         <MixedMethodCall errorLevel="suppress" />
-        <MissingConstructor errorLevel="suppress" />
         <PossiblyFalseArgument errorLevel="suppress" />
         <PossiblyFalseOperand errorLevel="suppress" />
         <PossiblyNullArgument errorLevel="suppress" />

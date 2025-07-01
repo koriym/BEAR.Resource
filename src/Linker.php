@@ -77,7 +77,7 @@ final class Linker implements LinkerInterface
      */
     private function nextLink(LinkType $link, ResourceObject $ro, array $nextResource): ResourceObject
     {
-        /** @var ResourceObject|mixed $nextResource */
+        /** @psalm-suppress MixedAssignment */
         $nextBody = $nextResource;
 
         if ($link->type === LinkType::SELF_LINK) {
