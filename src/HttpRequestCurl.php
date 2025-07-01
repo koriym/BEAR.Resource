@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use CurlHandle;
 use Override;
+use RuntimeException;
 
 use function count;
 use function curl_close;
@@ -86,6 +87,9 @@ final class HttpRequestCurl implements HttpRequestInterface
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, true);
+        if ($curl === false) {
+            throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
+        }
 
         return $curl;
     }
