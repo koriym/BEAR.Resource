@@ -10,12 +10,13 @@ use ReflectionMethod;
 
 use function is_string;
 
+/** @psalm-import-type OptionsDocBlock from Types */
 final class OptionsMethodDocBolck
 {
     /**
      * Return docBloc and parameter metas of method
      *
-     * @return array{0: array{summary?: string, description?: string}, 1: array<string, array{type: string, description?: string}>}
+     * @return OptionsDocBlock
      */
     public function __invoke(ReflectionMethod $method): array
     {
@@ -30,7 +31,7 @@ final class OptionsMethodDocBolck
 
     /**
      * @return (string|string[])[][]
-     * @psalm-return array{0: array{summary?: string, description?: string}, 1: array<string, array{type: string, description?: string}>}
+     * @psalm-return OptionsDocBlock
      */
     private function docBlock(string $docComment): array
     {

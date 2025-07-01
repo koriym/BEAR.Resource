@@ -16,6 +16,10 @@ use function str_starts_with;
 use function strtolower;
 use function substr;
 
+/**
+ * @psalm-import-type PackageMetadata from Types
+ * @psalm-import-type ResourceClassName from Types
+ */
 final class Meta
 {
     private const EXTRAS_VENDOR = 'vendor';
@@ -27,10 +31,10 @@ final class Meta
     /** @var Options */
     public $options;
 
-    /** @var array{vendor?: string, package?: string} */
+    /** @var PackageMetadata */
     public $extras = [];
 
-    /** @param class-string $class */
+    /** @param ResourceClassName $class */
     public function __construct(string $class)
     {
         $this->uri = $this->getUri($class);
@@ -51,6 +55,8 @@ final class Meta
 
     /**
      * Return available resource request method
+     *
+     * @param ResourceClassName $class
      */
     private function getOptions(string $class): Options
     {
@@ -89,7 +95,7 @@ final class Meta
         return $allows;
     }
 
-    /** @param class-string $class */
+    /** @param ResourceClassName $class */
     private function getParams(string $class, string $method): Params
     {
         $refMethod = new ReflectionMethod($class, 'on' . $method);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+/** @psalm-import-type MethodUri from Types */
 interface AnchorInterface
 {
     /**
@@ -13,7 +14,7 @@ interface AnchorInterface
      * @param AbstractRequest      $request Resource request
      * @param array<string, mixed> $query   Resource parameters
      *
-     * @return array{0:string, 1:string} [$method, $uri]
+     * @return MethodUri [$method, $uri]
      */
     public function href(string $rel, AbstractRequest $request, array $query);
 }

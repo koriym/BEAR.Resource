@@ -15,6 +15,7 @@ use function is_array;
 use function ucfirst;
 use function uri_template;
 
+/** @psalm-import-type MethodUri from Types */
 final class Anchor implements AnchorInterface
 {
     /**
@@ -47,7 +48,7 @@ final class Anchor implements AnchorInterface
     /**
      * @param array<string, mixed> $query
      *
-     * @return array{0:string, 1:string}
+     * @return MethodUri
      */
     private function getMethodUri(AbstractRequest $request, array $query, LinkAnnotation $annotation): array
     {

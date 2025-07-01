@@ -25,6 +25,11 @@ use function json_decode;
 
 use const JSON_THROW_ON_ERROR;
 
+/**
+ * @psalm-import-type InsMap from Types
+ * @psalm-import-type OptionsMethodsResponse from Types
+ * @psalm-import-type OptionsResponse from Types
+ */
 final class OptionsMethods
 {
     /**
@@ -45,11 +50,7 @@ final class OptionsMethods
     ) {
     }
 
-    /**
-     * return array{summary?: string, description?: string, request: array, links: array, embed: array}
-     *
-     * @return array<int|string, array<mixed>|string>
-     */
+    /** @return OptionsMethodsResponse */
     public function __invoke(ResourceObject $ro, string $requestMethod): array
     {
         $method = new ReflectionMethod($ro::class, 'on' . $requestMethod);
@@ -58,7 +59,7 @@ final class OptionsMethods
         $methodOption = $doc;
         $paramMetas = (new OptionsMethodRequest())($method, $paramDoc, $ins);
         $schema = $this->getJsonSchema($method);
-        $request = $paramMetas ? ['request' => $paramMetas] : [];
+        $request = ! empty($paramMetas) ? ['request' => $paramMetas] : [];
         $methodOption += $request;
         if (! empty($schema)) {
             $methodOption += ['schema' => $schema];
@@ -69,7 +70,7 @@ final class OptionsMethods
             $methodOption += $extras;
         }
 
-        return $methodOption;
+        return $methodOption; // @phpstan-ignore-line
     }
 
     /**
@@ -96,7 +97,7 @@ final class OptionsMethods
         return $extras;
     }
 
-    /** @return array<array-key, array-key> */
+    /** @return InsMap */
     private function getInMap(ReflectionMethod $method): array
     {
         $ins = [];
@@ -110,10 +111,7 @@ final class OptionsMethods
             // @codeCoverageIgnoreEnd
         }
 
-        /** @var array<string, string> $insParam */
-        $insParam = $this->getInsFromParameterAttributes($method, $ins);
-
-        return $insParam;
+        return $this->getInsFromParameterAttributes($method, $ins);
     }
 
     /** @return array<array-key, mixed> */
@@ -133,10 +131,10 @@ final class OptionsMethods
     }
 
     /**
-     * @param array<object>            $annotations
-     * @param array<array-key, string> $ins
+     * @param array<object> $annotations
+     * @param InsMap        $ins
      *
-     * @return array<array-key, array-key>
+     * @return InsMap
      *
      * @codeCoverageIgnore BC for annotation
      */
@@ -160,11 +158,11 @@ final class OptionsMethods
     }
 
     /**
-     * @param array<array-key, array-key> $ins
+     * @param InsMap $ins
      *
-     * @return array<array-key, array-key>
+     * @return InsMap
      */
-    public function getInsFromParameterAttributes(ReflectionMethod $method, array $ins): array|null
+    public function getInsFromParameterAttributes(ReflectionMethod $method, array $ins): array
     {
         $parameters = $method->getParameters();
         foreach ($parameters as $parameter) {
