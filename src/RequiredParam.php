@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\ParameterException;
+use Override;
 use Ray\Di\InjectorInterface;
 
 use function array_key_exists;
@@ -17,6 +18,7 @@ final class RequiredParam implements ParamInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function __invoke(string $varName, array $query, InjectorInterface $injector)
     {
         if (array_key_exists($varName, $query)) {

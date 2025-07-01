@@ -7,13 +7,14 @@ namespace BEAR\Resource;
 use BEAR\Resource\Exception\JsonSchemaException;
 use JSONSchemaFaker\Faker;
 use LogicException;
+use Override;
 use SplFileInfo;
 use stdClass;
 
 use function class_exists;
 use function is_object;
 
-class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandlerInterface
+final class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandlerInterface
 {
     final public const X_FAKE_JSON = 'X-Fake-JSON';
     final public const X_JSON_SCHEMA_EXCEPTION = 'X-JSON-Schema-Exception';
@@ -21,6 +22,7 @@ class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandlerInterf
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function handle(ResourceObject $ro, JsonSchemaException $e, string $schemaFile)
     {
         $ro->headers[self::X_FAKE_JSON] = $schemaFile;

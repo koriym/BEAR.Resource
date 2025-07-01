@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Exception;
 
-class LinkQueryException extends BadRequestException
+final class LinkQueryException extends BadRequestException
 {
 }

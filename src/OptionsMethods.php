@@ -96,7 +96,7 @@ final class OptionsMethods
         return $extras;
     }
 
-    /** @return array<string, string> */
+    /** @return array<array-key, array-key> */
     private function getInMap(ReflectionMethod $method): array
     {
         $ins = [];
@@ -116,7 +116,7 @@ final class OptionsMethods
         return $insParam;
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<array-key, mixed> */
     private function getJsonSchema(ReflectionMethod $method): array
     {
         $schema = $method->getAnnotation(JsonSchema::class);
@@ -133,10 +133,10 @@ final class OptionsMethods
     }
 
     /**
-     * @param array<object>         $annotations
-     * @param array<string, string> $ins
+     * @param array<object>            $annotations
+     * @param array<array-key, string> $ins
      *
-     * @return array<string, string>
+     * @return array<array-key, array-key>
      *
      * @codeCoverageIgnore BC for annotation
      */
@@ -149,16 +149,20 @@ final class OptionsMethods
 
             $class = $annotation::class;
             assert(class_exists($class));
-            $ins[$annotation->param] = self::WEB_CONTEXT_NAME[$class];
+            /** @var array-key $webKey */
+            assert($class === CookieParam::class || $class === EnvParam::class || $class === FormParam::class || $class === QueryParam::class || $class === ServerParam::class || $class === FilesParam::class);
+            $webKey = self::WEB_CONTEXT_NAME[$class];
+
+            $ins[$annotation->param] = $webKey;
         }
 
         return $ins;
     }
 
     /**
-     * @param array<string, string> $ins
+     * @param array<array-key, array-key> $ins
      *
-     * @return array<string, string>
+     * @return array<array-key, array-key>
      */
     public function getInsFromParameterAttributes(ReflectionMethod $method, array $ins): array|null
     {
@@ -171,8 +175,8 @@ final class OptionsMethods
                     continue;
                 }
 
+                /** @var array-key $class */
                 $class = $instance::class;
-                assert(class_exists($class));
                 $ins[$parameter->name] = self::WEB_CONTEXT_NAME[$class];
             }
         }

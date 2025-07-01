@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
+
 use function strtoupper;
 
 /**
@@ -26,6 +28,7 @@ final class HttpResourceObject extends ResourceObject implements InvokeRequestIn
     }
 
     /** @SuppressWarnings(PHPMD.CamelCaseMethodName) */
+    #[Override]
     public function _invokeRequest(InvokerInterface $invoker, AbstractRequest $request): ResourceObject
     {
         unset($invoker);

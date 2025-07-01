@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use OutOfRangeException;
+use Override;
 
 use function array_merge;
 use function in_array;
@@ -25,6 +26,7 @@ final class Request extends AbstractRequest
     public const OPTIONS = 'options';
 
     /** @psalm-suppress ImplementedReturnTypeMismatch */
+    #[Override]
     public function __get(string $name): mixed
     {
         if ($name === 'eager' || $name === 'lazy') {
@@ -45,6 +47,7 @@ final class Request extends AbstractRequest
      *
      * @param array<string, mixed> $query
      */
+    #[Override]
     public function withQuery(array $query): RequestInterface
     {
         $this->query = $query;
@@ -55,6 +58,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function addQuery(array $query): RequestInterface
     {
         $this->query = array_merge($this->query, $query);
@@ -65,6 +69,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function toUriWithMethod(): string
     {
         $uri = $this->toUri();
@@ -75,6 +80,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function toUri(): string
     {
         $this->resourceObject->uri->query = $this->query;
@@ -85,6 +91,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function linkSelf(string $linkKey): RequestInterface
     {
         $this->links[] = new LinkType($linkKey, LinkType::SELF_LINK);
@@ -95,6 +102,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function linkNew(string $linkKey): RequestInterface
     {
         $this->links[] = new LinkType($linkKey, LinkType::NEW_LINK);
@@ -105,6 +113,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function linkCrawl(string $linkKey): RequestInterface
     {
         $this->links[] = new LinkType($linkKey, LinkType::CRAWL_LINK);

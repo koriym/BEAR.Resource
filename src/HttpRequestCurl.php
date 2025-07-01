@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use CurlHandle;
+use Override;
+use RuntimeException;
 
 use function count;
 use function curl_close;
@@ -45,6 +47,7 @@ final class HttpRequestCurl implements HttpRequestInterface
     }
 
     /** @inheritDoc */
+    #[Override]
     public function request(string $method, string $uri, array $query): array
     {
         $body = http_build_query($query);
@@ -70,6 +73,10 @@ final class HttpRequestCurl implements HttpRequestInterface
     private function initializeCurl(string $method, string $uri, string $body): CurlHandle
     {
         $curl = curl_init();
+        if ($curl === false) {
+            throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
+        }
+
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $uri);
 

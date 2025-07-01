@@ -8,6 +8,7 @@ use BEAR\Resource\Annotation\AppName;
 use BEAR\Resource\AppAdapter;
 use BEAR\Resource\HttpAdapter;
 use BEAR\Resource\SchemeCollection;
+use Override;
 use Ray\Di\InjectorInterface;
 use Ray\Di\ProviderInterface;
 
@@ -24,6 +25,7 @@ final class SchemeCollectionProvider implements ProviderInterface
     /**
      * Return instance
      */
+    #[Override]
     public function get(): SchemeCollection
     {
         $schemeCollection = new SchemeCollection();

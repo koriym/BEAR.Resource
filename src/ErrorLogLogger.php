@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
+
 use function error_log;
 use function sprintf;
 
 final class ErrorLogLogger implements LoggerInterface
 {
+    #[Override]
     public function __invoke(ResourceObject $ro): void
     {
         $requestLog = sprintf('request: %s %s', $ro->uri->method, (string) $ro->uri);

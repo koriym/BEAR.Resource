@@ -6,6 +6,7 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\OptionsRenderer;
 use BEAR\Resource\RenderInterface;
+use Override;
 use Ray\Di\AbstractModule;
 
 /**
@@ -16,6 +17,7 @@ final class OptionsMethodModule extends AbstractModule
     /**
      * {@inheritDoc}
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind(RenderInterface::class)->annotatedWith('options')->to(OptionsRenderer::class);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\Module;
 
 use BEAR\Resource\Exception\InvalidSchemaUriException;
+use Override;
 use Ray\Di\AbstractModule;
 
 use function filter_var;
@@ -28,6 +29,7 @@ final class JsonSchemaLinkHeaderModule extends AbstractModule
     /**
      * {@inheritDoc}
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind()->annotatedWith('json_schema_host')->toInstance($this->jsonSchemaHost);

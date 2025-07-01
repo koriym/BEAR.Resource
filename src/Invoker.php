@@ -12,7 +12,10 @@ final class Invoker implements InvokerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
+    #[\Override]
     public function invoke(AbstractRequest $request): ResourceObject
     {
         return $request->resourceObject->_invokeRequest($this->classInvoker, $request);

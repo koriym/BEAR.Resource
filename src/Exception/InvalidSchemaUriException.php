@@ -6,6 +6,6 @@ namespace BEAR\Resource\Exception;
 
 use LogicException;
 
-class InvalidSchemaUriException extends LogicException implements ExceptionInterface
+final class InvalidSchemaUriException extends LogicException implements ExceptionInterface
 {
 }

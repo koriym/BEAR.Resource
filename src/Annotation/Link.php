@@ -7,6 +7,7 @@ namespace BEAR\Resource\Annotation;
 use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use JsonSerializable;
+use Override;
 
 /**
  * @Annotation
@@ -56,6 +57,7 @@ final class Link implements JsonSerializable
      * @return string[]
      * @psalm-return array{rel: string, href: string, method: string, title?: string}
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         $json = [

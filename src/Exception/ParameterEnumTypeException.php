@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Exception;
 
-class ParameterEnumTypeException extends ParameterException
+final class ParameterEnumTypeException extends ParameterException
 {
 }

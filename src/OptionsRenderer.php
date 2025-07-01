@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\OptionsBody;
+use Override;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -39,12 +40,13 @@ final class OptionsRenderer implements RenderInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function render(ResourceObject $ro)
     {
         $ro->headers['Content-Type'] = 'application/json';
         $allows = $this->getAllows((new ReflectionClass($ro))->getMethods());
         $ro->headers['Allow'] = implode(', ', $allows);
-        $ro->view = $this->optionsBody ? json_encode($this->getEntityBody($ro, $allows), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL : '';
+        $ro->view = $this->optionsBody ? (string) json_encode($this->getEntityBody($ro, $allows), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL : '';
 
         return $ro->view;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\SchemeException;
+use Override;
 
 use function array_key_exists;
 
@@ -19,6 +20,7 @@ final class SchemeCollection implements SchemeCollectionInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function scheme(string $scheme): SchemeCollectionInterface
     {
         $this->scheme = $scheme;
@@ -29,6 +31,7 @@ final class SchemeCollection implements SchemeCollectionInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function host(string $host): SchemeCollectionInterface
     {
         $this->appName = $host;
@@ -39,6 +42,7 @@ final class SchemeCollection implements SchemeCollectionInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function toAdapter(AdapterInterface $adapter): SchemeCollectionInterface
     {
         $this->collection[$this->scheme . '://' . $this->appName] = $adapter;
@@ -51,6 +55,7 @@ final class SchemeCollection implements SchemeCollectionInterface
      *
      * @throws SchemeException
      */
+    #[Override]
     public function getAdapter(AbstractUri $uri): AdapterInterface
     {
         $schemeIndex = $uri->scheme . '://' . $uri->host;

@@ -9,6 +9,6 @@ use RuntimeException;
 /**
  * Href not found in (HAL renderer) exception
  */
-class HrefNotFoundException extends RuntimeException implements ExceptionInterface
+final class HrefNotFoundException extends RuntimeException implements ExceptionInterface
 {
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 use function in_array;
@@ -16,6 +17,7 @@ final class ProdLogger implements LoggerInterface
     ) {
     }
 
+    #[Override]
     public function __invoke(ResourceObject $ro): void
     {
         $unsafeMethod = ['post', 'put', 'patch', 'delete'];

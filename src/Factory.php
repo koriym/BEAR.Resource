@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\UriException;
+use Override;
 use Ray\Di\Di\Inject;
 
 use function is_string;
@@ -33,6 +34,7 @@ final class Factory implements FactoryInterface
      *
      * @throws UriException
      */
+    #[Override]
     public function newInstance($uri): ResourceObject
     {
         if (is_string($uri)) {

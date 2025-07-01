@@ -6,6 +6,6 @@ namespace BEAR\Resource\Exception;
 
 use InvalidArgumentException;
 
-class ResourceDirException extends InvalidArgumentException implements ExceptionInterface
+final class ResourceDirException extends InvalidArgumentException implements ExceptionInterface
 {
 }

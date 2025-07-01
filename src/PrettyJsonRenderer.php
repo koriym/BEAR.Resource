@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Override;
+
 use function array_key_exists;
 use function error_log;
 use function json_encode;
@@ -19,13 +21,14 @@ final class PrettyJsonRenderer implements RenderInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function render(ResourceObject $ro)
     {
         if (! array_key_exists('Content-Type', $ro->headers)) {
             $ro->headers['Content-Type'] = 'application/json';
         }
 
-        $ro->view = json_encode($ro, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL;
+        $ro->view = (string) json_encode($ro, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL;
         $e = json_last_error();
         if ($e) {
             // @codeCoverageIgnoreStart

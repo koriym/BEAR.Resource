@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\Module;
 
 use BEAR\Resource\Annotation\AppName;
+use Override;
 use Ray\Di\AbstractModule;
 
 /**
@@ -33,6 +34,7 @@ final class ResourceModule extends AbstractModule
     /**
      * {@inheritDoc}
      */
+    #[Override]
     protected function configure(): void
     {
         $this->install(new ResourceClientModule());

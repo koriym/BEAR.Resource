@@ -12,9 +12,10 @@ use BEAR\Resource\JsonSchemaExceptionNullHandler;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionNullHandler;
 use BEAR\Resource\ResourceObject;
+use Override;
 use Ray\Di\AbstractModule;
 
-class JsonSchemaModule extends AbstractModule
+final class JsonSchemaModule extends AbstractModule
 {
     /**
      * @param string $jsonSchemaDir   Json-schema json file directory
@@ -31,6 +32,7 @@ class JsonSchemaModule extends AbstractModule
     /**
      * {@inheritDoc}
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind()->annotatedWith('json_schema_dir')->toInstance($this->jsonSchemaDir);

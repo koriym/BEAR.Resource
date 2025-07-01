@@ -7,6 +7,7 @@ namespace BEAR\Resource\Module;
 use BEAR\Resource\Annotation\ImportAppConfig;
 use BEAR\Resource\ImportApp;
 use BEAR\Resource\SchemeCollectionInterface;
+use Override;
 use Ray\Di\AbstractModule;
 use Ray\Di\Exception\NotFound;
 
@@ -37,6 +38,7 @@ final class ImportAppModule extends AbstractModule
      *
      * @throws NotFound
      */
+    #[Override]
     protected function configure(): void
     {
         $this->bind()->annotatedWith(ImportAppConfig::class)->toInstance($this->importAppConfig);

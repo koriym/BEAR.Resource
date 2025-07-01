@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\ResourceDirException;
 use Iterator;
+use Override;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
@@ -50,6 +51,7 @@ final class AppIterator implements Iterator
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function current(): Meta
     {
         return $this->metaCollection[$this->keys[$this->i]];
@@ -58,6 +60,7 @@ final class AppIterator implements Iterator
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function next(): void
     {
         ++$this->i;
@@ -66,14 +69,16 @@ final class AppIterator implements Iterator
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function key(): string
     {
-        return $this->keys[$this->i];
+        return $this->keys[$this->i]; // @codeCoverageIgnore
     }
 
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function valid(): bool
     {
         return array_key_exists($this->i, $this->keys);
@@ -82,6 +87,7 @@ final class AppIterator implements Iterator
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function rewind(): void
     {
         $this->i = 0;

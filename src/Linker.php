@@ -9,6 +9,7 @@ use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
 use BEAR\Resource\Exception\UriException;
+use Override;
 use Ray\Aop\ReflectionMethod;
 
 use function array_filter;
@@ -40,6 +41,7 @@ final class Linker implements LinkerInterface
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function invoke(AbstractRequest $request)
     {
         $this->cache = [];
@@ -69,12 +71,14 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * How next linked resource treated (add ? replace ?)
+     * @param array<mixed> $nextResource
+     *
+     * @return ResourceObject
      */
-    private function nextLink(LinkType $link, ResourceObject $ro, mixed $nextResource): ResourceObject
+    private function nextLink(LinkType $link, ResourceObject $ro, array $nextResource): ResourceObject
     {
-        /** @var array<mixed> $nextBody */
-        $nextBody = $nextResource instanceof ResourceObject ? $nextResource->body : $nextResource;
+        /** @psalm-suppress MixedAssignment */
+        $nextBody = $nextResource;
 
         if ($link->type === LinkType::SELF_LINK) {
             $ro->body = $nextBody;

@@ -10,6 +10,7 @@ use BEAR\Resource\Exception\IlligalAccessException;
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
+use Override;
 use Ray\Di\Di\Inject;
 use ReturnTypeWillChange;
 use Stringable;
@@ -66,6 +67,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      *
      * @return string
      */
+    #[Override]
     public function __toString()
     {
         try {
@@ -104,6 +106,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      *
      * @return mixed
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
@@ -122,6 +125,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      *
      * @return void
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetSet($offset, mixed $value)
     {
@@ -143,6 +147,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      *
      * @return bool
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetExists($offset)
     {
@@ -158,6 +163,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      *
      * @param int|string $offset offset
      */
+    #[Override]
     #[ReturnTypeWillChange]
     public function offsetUnset($offset): void
     {
@@ -168,6 +174,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
     /**
      * Get the number of public properties in the ArrayObject
      */
+    #[Override]
     public function count(): int
     {
         if (is_countable($this->body)) {
@@ -206,6 +213,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      * @psalm-return ArrayIterator<empty, empty>|ArrayIterator<int|string, mixed>
      * @phpstan-return ArrayIterator<int|string, mixed>
      */
+    #[Override]
     public function getIterator(): ArrayIterator
     {
         return is_array($this->body) ? new ArrayIterator($this->body) : new ArrayIterator([]);
@@ -237,6 +245,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
     }
 
     /** @return array<int|string, mixed> */
+    #[Override]
     public function jsonSerialize(): array
     {
         /** @psalm-suppress MixedAssignment */
@@ -252,6 +261,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
     /**
      * {@inheritDoc}
      */
+    #[Override]
     public function transfer(TransferInterface $responder, array $server)
     {
         $responder($this, $server);
@@ -267,6 +277,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
      *
      * @SuppressWarnings(PHPMD.CamelCaseMethodName)
      */
+    #[Override]
     public function _invokeRequest(InvokerInterface $invoker, AbstractRequest $request): ResourceObject
     {
         return $invoker->invoke($request);

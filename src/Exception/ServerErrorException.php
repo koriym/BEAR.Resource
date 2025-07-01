@@ -8,7 +8,7 @@ use BEAR\Resource\Code;
 use ErrorException;
 use Throwable;
 
-class ServerErrorException extends ErrorException implements ExceptionInterface
+final class ServerErrorException extends ErrorException implements ExceptionInterface
 {
     public function __construct(string $message = '', int $code = Code::ERROR, Throwable|null $previous = null)
     {

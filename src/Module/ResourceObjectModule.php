@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace BEAR\Resource\Module;
 
 use BEAR\Resource\ResourceObject;
+use Override;
 use Ray\Di\AbstractModule;
 
 /**
  * Bind resource object for compile
  */
-class ResourceObjectModule extends AbstractModule
+final class ResourceObjectModule extends AbstractModule
 {
     /** @param iterable<class-string<ResourceObject>> $resourceObjects */
     public function __construct(
@@ -19,6 +20,7 @@ class ResourceObjectModule extends AbstractModule
         parent::__construct();
     }
 
+    #[Override]
     protected function configure(): void
     {
         foreach ($this->resourceObjects as $ro) {
