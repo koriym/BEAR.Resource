@@ -16,7 +16,6 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <InvalidPropertyAssignmentValue errorLevel="suppress" />
         <InvalidReturnStatement errorLevel="suppress" />
         <InvalidReturnType errorLevel="suppress" />
         <MethodSignatureMustProvideReturnType errorLevel="suppress" />
