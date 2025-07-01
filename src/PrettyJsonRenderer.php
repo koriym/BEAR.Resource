@@ -28,7 +28,7 @@ final class PrettyJsonRenderer implements RenderInterface
             $ro->headers['Content-Type'] = 'application/json';
         }
 
-        $ro->view = json_encode($ro, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL;
+        $ro->view = (string) json_encode($ro, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL;
         $e = json_last_error();
         if ($e) {
             // @codeCoverageIgnoreStart

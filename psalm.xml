@@ -16,7 +16,6 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <PossiblyFalseOperand errorLevel="suppress" />
         <PossiblyNullArgument errorLevel="suppress" />
         <PossiblyNullArrayOffset errorLevel="suppress" />
         <PossiblyUnusedMethod errorLevel="suppress" />

@@ -46,7 +46,7 @@ final class OptionsRenderer implements RenderInterface
         $ro->headers['Content-Type'] = 'application/json';
         $allows = $this->getAllows((new ReflectionClass($ro))->getMethods());
         $ro->headers['Allow'] = implode(', ', $allows);
-        $ro->view = $this->optionsBody ? json_encode($this->getEntityBody($ro, $allows), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL : '';
+        $ro->view = $this->optionsBody ? (string) json_encode($this->getEntityBody($ro, $allows), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL : '';
 
         return $ro->view;
     }
