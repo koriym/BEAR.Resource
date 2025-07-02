@@ -83,7 +83,7 @@ final class NamedParamMetas implements NamedParamMetasInterface
 
             // Check for Ray\InputQuery\Attribute\Input
             $inputAttribute = $parameter->getAttributes(Input::class);
-            if ($inputAttribute && $this->inputQuery !== null) {
+            if ($inputAttribute) {
                 $names[$parameter->name] = new InputParam($this->inputQuery, $parameter);
                 continue;
             }
