@@ -6,9 +6,10 @@ namespace BEAR\Resource;
 
 use Override;
 
+/** @psalm-import-type Query from Types */
 final class NullReverseLinker implements ReverseLinkerInterface
 {
-    /** @param array<string, mixed> $query */
+    /** @param Query $query */
     #[Override]
     public function __invoke(string $uri, array $query): string
     {

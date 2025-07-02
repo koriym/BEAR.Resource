@@ -13,6 +13,7 @@ use function ltrim;
 use function preg_replace;
 use function strtolower;
 
+/** @psalm-import-type Query from Types */
 final class RequiredParam implements ParamInterface
 {
     /**

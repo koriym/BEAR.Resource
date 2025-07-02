@@ -6,9 +6,10 @@ namespace BEAR\Resource;
 
 use Override;
 
+/** @psalm-import-type Query from Types */
 final class NullRequest implements RequestInterface
 {
-    /** @param array<string, mixed> $query */
+    /** @param Query $query */
     #[Override]
     public function __invoke(array|null $query = null): ResourceObject
     {

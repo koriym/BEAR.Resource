@@ -14,6 +14,7 @@ use function in_array;
  * @property $this $lazy
  * @property $this $eager
  * @psalm-suppress PropertyNotSetInConstructor for DSL
+ * @psalm-import-type Query from Types
  */
 final class Request extends AbstractRequest
 {
@@ -45,7 +46,7 @@ final class Request extends AbstractRequest
     /**
      * {@inheritDoc}
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     #[Override]
     public function withQuery(array $query): RequestInterface

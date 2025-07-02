@@ -38,6 +38,7 @@ use const PHP_EOL;
  * @phpstan-implements IteratorAggregate<string, mixed>
  * @phpstan-implements ArrayAccess<string, mixed>
  * @psalm-suppress PropertyNotSetInConstructor
+ * @psalm-import-type Query from Types
  */
 abstract class AbstractRequest implements RequestInterface, ArrayAccess, IteratorAggregate, Serializable, JsonSerializable, Stringable
 {
@@ -77,8 +78,8 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     protected $result;
 
     /**
-     * @param array<string, mixed> $query
-     * @param list<LinkType>       $links
+     * @param Query          $query
+     * @param list<LinkType> $links
      *
      * @throws MethodException
      */
@@ -86,16 +87,8 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
         protected InvokerInterface $invoker,
         public ResourceObject $resourceObject,
         string $method = Request::GET,
-        /**
-         * Query
-         *
-         * @var array<string, mixed>
-         */
         public array $query = [],
         // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint
-        /**
-         * Links
-         */
         public array $links = [],
         private readonly LinkerInterface|null $linker = null,
     ) {
@@ -125,7 +118,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * {@inheritDoc}
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     #[Override]
     public function __invoke(array|null $query = null): ResourceObject

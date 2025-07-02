@@ -6,15 +6,17 @@ namespace BEAR\Resource;
 
 /**
  * Sends a HTTP request
+ *
+ * @psalm-import-type Query from Types
  */
 interface HttpRequestInterface
 {
     /**
      * Sends a HTTP request
      *
-     * @param string               $method The HTTP method (GET, POST, PUT, DELETE, etc.).
-     * @param string               $uri    The URL of the request.
-     * @param array<string, mixed> $query  An associative array of query parameters.
+     * @param string $method The HTTP method (GET, POST, PUT, DELETE, etc.).
+     * @param string $uri    The URL of the request.
+     * @param Query  $query  An associative array of query parameters.
      *
      * @return array{body: array<mixed>, code: int, headers: array<string, string>, view: string}
      *      An associative array containing the response information.

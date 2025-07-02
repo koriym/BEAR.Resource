@@ -18,6 +18,7 @@ use function is_array;
 use function is_string;
 use function uri_template;
 
+/** @psalm-import-type Query from Types */
 final class EmbedInterceptor implements MethodInterceptor
 {
     private const SELF_LINK = '_self';
@@ -48,8 +49,8 @@ final class EmbedInterceptor implements MethodInterceptor
     }
 
     /**
-     * @param array<Embed|object>  $embeds
-     * @param array<string, mixed> $query
+     * @param array<Embed|object> $embeds
+     * @param Query               $query
      *
      * @throws EmbedException
      *

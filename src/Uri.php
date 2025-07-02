@@ -17,10 +17,11 @@ use function uri_template;
 use const FILTER_FLAG_PATH_REQUIRED;
 use const FILTER_VALIDATE_URL;
 
+/** @psalm-import-type Query from Types */
 final class Uri extends AbstractUri
 {
     /**
-     * @param array<string, mixed> $query
+     * @param Query $query
      *
      * @throws UriException
      */
@@ -39,7 +40,7 @@ final class Uri extends AbstractUri
         $parseQuery = $this->query;
         if (array_key_exists('query', $parts)) {
             parse_str($parts['query'], $parseQuery);
-            /** @var array<string, mixed> $parseQuery */ // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.NoAssignment
+            /** @var Query $parseQuery */ // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.NoAssignment
             $this->query = $parseQuery;
         }
 

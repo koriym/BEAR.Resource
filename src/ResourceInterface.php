@@ -12,6 +12,7 @@ namespace BEAR\Resource;
  * @property $this $delete
  * @property $this $head
  * @property $this $options
+ * @psalm-import-type Query from Types
  */
 interface ResourceInterface
 {
@@ -37,56 +38,56 @@ interface ResourceInterface
     /**
      * Hyper reference (Hypertext As The Engine Of Application State)
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function href(string $rel, array $query = []): ResourceObject;
 
     /**
      * Invoke GET request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function get(string $uri, array $query = []): ResourceObject;
 
     /**
      * Invoke POST request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function post(string $uri, array $query = []): ResourceObject;
 
     /**
      * Invoke PUT request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function put(string $uri, array $query = []): ResourceObject;
 
     /**
      * Invoke PATCH request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function patch(string $uri, array $query = []): ResourceObject;
 
     /**
      * Invoke DELETE request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function delete(string $uri, array $query = []): ResourceObject;
 
     /**
      * Invoke HEAD request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function head(string $uri, array $query = []): ResourceObject;
 
     /**
      * Invoke OPTIONS request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function options(string $uri, array $query = []): ResourceObject;
 }

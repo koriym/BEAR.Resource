@@ -15,7 +15,10 @@ use function is_array;
 use function ucfirst;
 use function uri_template;
 
-/** @psalm-import-type MethodUri from Types */
+/**
+ * @psalm-import-type MethodUri from Types
+ * @psalm-import-type Query from Types
+ */
 final class Anchor implements AnchorInterface
 {
     /**
@@ -46,7 +49,7 @@ final class Anchor implements AnchorInterface
     }
 
     /**
-     * @param array<string, mixed> $query
+     * @param Query $query
      *
      * @return MethodUri
      */
