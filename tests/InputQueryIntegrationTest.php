@@ -6,8 +6,10 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Fake\UserInput;
 use BEAR\Resource\Fake\UserResource;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\InputQuery\Attribute\Input;
 use Ray\InputQuery\InputQuery;
 use ReflectionMethod;
 
@@ -69,5 +71,53 @@ class InputQueryIntegrationTest extends TestCase
         $this->assertInstanceOf(UserInput::class, $parameters['user']);
         $this->assertSame('Jane Smith', $parameters['user']->name);
         $this->assertSame('jane@example.com', $parameters['user']->email);
+    }
+
+    public function testMissingRequiredParameterThrowsException(): void
+    {
+        // Test with a scalar parameter that is required
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector);
+
+        // Create a reflection parameter for a required string parameter
+        $testMethod = new class {
+            public function testMethod(#[Input]
+            string $requiredParam,): void
+            {
+            }
+        };
+
+        $reflection = new ReflectionMethod($testMethod, 'testMethod');
+        $parameter = $reflection->getParameters()[0];
+
+        $inputParam = new InputParam($inputQuery, $parameter);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required parameter: requiredParam');
+
+        $inputParam('requiredParam', [], $injector);
+    }
+
+    public function testOptionalParameterReturnsNull(): void
+    {
+        // Test with a nullable parameter
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector);
+
+        $testMethod = new class {
+            public function testMethod(#[Input]
+            string|null $optionalParam,): void
+            {
+            }
+        };
+
+        $reflection = new ReflectionMethod($testMethod, 'testMethod');
+        $parameter = $reflection->getParameters()[0];
+
+        $inputParam = new InputParam($inputQuery, $parameter);
+
+        $result = $inputParam('optionalParam', [], $injector);
+
+        $this->assertNull($result);
     }
 }

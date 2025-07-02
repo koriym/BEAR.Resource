@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use InvalidArgumentException;
 use Override;
 use Ray\Di\InjectorInterface;
 use Ray\InputQuery\InputQueryInterface;
 use ReflectionNamedType;
 use ReflectionParameter;
 
+use function array_key_exists;
 use function assert;
 use function class_exists;
 
@@ -37,7 +39,25 @@ final class InputParam implements ParamInterface
             return $this->inputQuery->create($inputClass, $query);
         }
 
-        // For built-in types, return from query directly
-        return $query[$varName] ?? null;
+        // For built-in types, handle missing values explicitly
+        if (array_key_exists($varName, $query)) {
+            return $query[$varName];
+        }
+
+        $type = $this->parameter->getType();
+        $isRequired = true;
+        if ($type instanceof ReflectionNamedType && $type->allowsNull()) {
+            $isRequired = false;
+        }
+
+        if ($this->parameter->isDefaultValueAvailable()) {
+            $isRequired = false;
+        }
+
+        if ($isRequired) {
+            throw new InvalidArgumentException("Missing required parameter: {$varName}");
+        }
+
+        return null;
     }
 }
