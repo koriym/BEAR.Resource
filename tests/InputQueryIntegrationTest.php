@@ -120,4 +120,51 @@ class InputQueryIntegrationTest extends TestCase
 
         $this->assertNull($result);
     }
+
+    public function testParameterWithDefaultValueReturnsNull(): void
+    {
+        // Test with a parameter that has a default value
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector);
+
+        $testMethod = new class {
+            public function testMethod(#[Input]
+            string $paramWithDefault = 'defaultValue',): void
+            {
+            }
+        };
+
+        $reflection = new ReflectionMethod($testMethod, 'testMethod');
+        $parameter = $reflection->getParameters()[0];
+
+        $inputParam = new InputParam($inputQuery, $parameter);
+
+        // Should return null for missing parameter with default value (not required)
+        $result = $inputParam('paramWithDefault', [], $injector);
+
+        $this->assertNull($result);
+    }
+
+    public function testParameterWithValueFromQuery(): void
+    {
+        // Test that existing values in query are returned correctly
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector);
+
+        $testMethod = new class {
+            public function testMethod(#[Input]
+            string $param,): void
+            {
+            }
+        };
+
+        $reflection = new ReflectionMethod($testMethod, 'testMethod');
+        $parameter = $reflection->getParameters()[0];
+
+        $inputParam = new InputParam($inputQuery, $parameter);
+
+        $result = $inputParam('param', ['param' => 'test_value'], $injector);
+
+        $this->assertSame('test_value', $result);
+    }
 }
