@@ -30,6 +30,7 @@ use function trigger_error;
 use const E_USER_WARNING;
 
 /**
+ * @psalm-import-type Headers from Types
  * @phpstan-implements ArrayAccess<string, mixed>
  * @phpstan-implements IteratorAggregate<(int|string), mixed>
  */
@@ -44,7 +45,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
     /** @var int */
     public $code = 200;
 
-    /** @var array<string, string> */
+    /** @var Headers */
     public $headers = [];
 
     /**

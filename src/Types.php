@@ -21,6 +21,7 @@ use BEAR\Resource\Annotation\Link;
  *
  * Base Types
  * @psalm-type Query = array<string, mixed>
+ * @psalm-type StringList = list<string>
  * @psalm-type Body = array<array-key, mixed>
  * @psalm-type ResourceLinks = array<string, mixed>
  * @psalm-type Embeds = array<string, mixed>
@@ -60,6 +61,7 @@ use BEAR\Resource\Annotation\Link;
  * }
  *
  * HTTP Request/Response Types
+ * @psalm-type Headers = array<string, string>
  * @psalm-type HttpHeaders = array<string, string>
  * @psalm-type HttpBody = array<mixed>
  * @psalm-type HttpResponse = array{
@@ -119,7 +121,7 @@ use BEAR\Resource\Annotation\Link;
  * Renderer Types
  * @psalm-type RenderView = array{
  *     status: string,
- *     headers: HttpHeaders,
+ *     headers: Headers,
  *     value: mixed,
  *     view: ViewName
  * }

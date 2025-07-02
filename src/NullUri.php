@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+/** @psalm-import-type Query from Types */
 final class NullUri extends AbstractUri
 {
     /** @var string */
@@ -18,7 +19,7 @@ final class NullUri extends AbstractUri
     /**
      * Associative query array
      *
-     * @var array<string, mixed>
+     * @var Query
      */
     public $query = [];
 
