@@ -8,6 +8,7 @@ use BEAR\Resource\Exception\ParameterException;
 use FakeVendor\News\Resource\App\AttrWebContext;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\InputQuery\InputQuery;
 
 class AttrNamedParameterTest extends TestCase
 {
@@ -15,7 +16,14 @@ class AttrNamedParameterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->params = new NamedParameter(new NamedParamMetas(), new Injector());
+        $this->params = new NamedParameter(
+            new NamedParamMetas(
+                new InputQuery(
+                    new Injector(),
+                ),
+            ),
+            new Injector(),
+        );
     }
 
     public function testGetParameters(): void

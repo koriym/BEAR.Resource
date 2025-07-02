@@ -9,6 +9,8 @@ use BEAR\Resource\Annotation\ResourceParam;
 use Override;
 use Ray\Aop\ReflectionMethod;
 use Ray\Di\Di\Assisted;
+use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\InputQueryInterface;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 use ReflectionAttribute;
 use ReflectionNamedType;
@@ -16,6 +18,12 @@ use ReflectionParameter;
 
 final class NamedParamMetas implements NamedParamMetasInterface
 {
+    /** @param InputQueryInterface<object> $inputQuery */
+    public function __construct(
+        private readonly InputQueryInterface $inputQuery,
+    ) {
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -70,6 +78,13 @@ final class NamedParamMetas implements NamedParamMetasInterface
                 $default = $this->getDefault($parameter);
                 $param = new AssistedWebContextParam($webParam, $default);
                 $names[$parameter->name] = $param;
+                continue;
+            }
+
+            // Check for Ray\InputQuery\Attribute\Input
+            $inputAttribute = $parameter->getAttributes(Input::class);
+            if ($inputAttribute && $this->inputQuery !== null) {
+                $names[$parameter->name] = new InputParam($this->inputQuery, $parameter);
                 continue;
             }
 
@@ -180,8 +195,8 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param array<string, AssistedResourceParam|AssistedWebContextParam> $names
-     * @param array<string, ReflectionParameter>                           $valueParams
+     * @param array<string, AssistedResourceParam|AssistedWebContextParam|InputParam> $names
+     * @param array<string, ReflectionParameter>                                      $valueParams
      *
      * @return array<string, ParamInterface>
      */
