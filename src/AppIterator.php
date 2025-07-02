@@ -17,6 +17,7 @@ use function array_key_exists;
 use function array_keys;
 use function array_values;
 use function assert;
+use function class_exists;
 use function file_exists;
 use function get_declared_classes;
 use function str_contains;
@@ -109,7 +110,7 @@ final class AppIterator implements Iterator
             }
 
             $resourceClass = $this->getResourceClassName($item);
-            if ($resourceClass === '') {
+            if ($resourceClass === '' || ! class_exists($resourceClass)) {
                 continue;
             }
 
