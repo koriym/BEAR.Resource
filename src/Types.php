@@ -17,7 +17,6 @@ use BEAR\Resource\Annotation\Link;
  * @psalm-type ResourceMethod = non-empty-string
  * @psalm-type ViewName = non-empty-string
  * @psalm-type ResourceClassName = class-string<ResourceObject>
- * @psalm-type SchemeHostPort = non-empty-string
  *
  * Base Types
  * @psalm-type Query = array<string, mixed>
