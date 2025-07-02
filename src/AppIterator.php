@@ -22,7 +22,10 @@ use function file_exists;
 use function get_declared_classes;
 use function str_contains;
 
-/** @implements Iterator<string, Meta> */
+/**
+ * @psalm-import-type ResourceClassName from Types
+ * @implements Iterator<string, Meta>
+ */
 final class AppIterator implements Iterator
 {
     private int $i = 0;
@@ -107,11 +110,10 @@ final class AppIterator implements Iterator
             }
 
             $resourceClass = $this->getResourceClassName($item);
-            if ($resourceClass === '') {
+            if ($resourceClass === '' || ! class_exists($resourceClass)) {
                 continue;
             }
 
-            assert(class_exists($resourceClass));
             $meta = new Meta($resourceClass);
             $metaCollection[$meta->uri] = $meta;
         }
@@ -128,6 +130,7 @@ final class AppIterator implements Iterator
         return ! $isPhp;
     }
 
+    /** @return ResourceClassName|'' */
     private function getResourceClassName(SplFileInfo $file): string
     {
         $pathName = $file->getPathname();
@@ -142,13 +145,14 @@ final class AppIterator implements Iterator
     /**
      * @param array<class-string> $newClasses
      *
-     * @return class-string|string
+     * @return ResourceClassName|''
      */
     private function getName(array $newClasses): string
     {
         foreach ($newClasses as $newClass) {
             $parent = (new ReflectionClass($newClass))->getParentClass();
             if ($parent && $parent->name === ResourceObject::class) {
+                /** @var ResourceClassName $newClass */
                 return $newClass;
             }
         }

@@ -6,10 +6,11 @@ namespace BEAR\Resource;
 
 use Ray\Di\InjectorInterface;
 
+/** @psalm-import-type Query from Types */
 interface ParamInterface
 {
     /**
-     * @param array<string, mixed> $query
+     * @param Query $query
      *
      * @return mixed
      */

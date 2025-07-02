@@ -14,15 +14,19 @@ use function is_array;
 use function is_string;
 use function method_exists;
 
+/**
+ * @psalm-import-type OptionsResponse from Types
+ * @psalm-import-type InsMap from Types
+ */
 final class OptionsMethodRequest
 {
     /**
      * Parameter #2 $paramMetas of method BEAR\Resource\OptionsMethodRequest::ignoreAnnotatedPrameter() expects array('parameters' => array<string, array('type' =>
      *
      * @param array<array-key, array{type: string, description?: string}> $paramDoc
-     * @param array<array-key, array-key>                                 $ins
+     * @param InsMap                                                      $ins
      *
-     * @return array{parameters?: array<string, array{type?: string, description?: string, default?: string}>, required?: array<int, string>}
+     * @return OptionsResponse
      */
     public function __invoke(ReflectionMethod $method, array $paramDoc, array $ins): array
     {
@@ -47,9 +51,9 @@ final class OptionsMethodRequest
     /**
      * @param array<ReflectionParameter>                               $parameters
      * @param array<string, array{type: string, description?: string}> $paramDoc
-     * @param array<string, string>                                    $ins
+     * @param InsMap                                                   $ins
      *
-     * @return array{parameters?: array<string, array{type?: string}>, required?: array<int, string>}
+     * @return OptionsResponse
      */
     private function getParamMetas(array $parameters, array $paramDoc, array $ins): array
     {
@@ -141,7 +145,7 @@ final class OptionsMethodRequest
      * @param array<string, array{type?: string}> $paramDoc
      * @param list<string>                        $required
      *
-     * @return array{parameters?: array<string, array{type?: string}>, required?: array<int, string>}
+     * @return OptionsResponse
      */
     private function setParamMetas(array $paramDoc, array $required): array
     {

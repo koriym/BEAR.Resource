@@ -9,6 +9,7 @@ use BEAR\Resource\Annotation\ContextScheme;
 use function array_key_exists;
 use function parse_url;
 
+/** @psalm-import-type Query from Types */
 final class UriFactory
 {
     public function __construct(
@@ -17,7 +18,7 @@ final class UriFactory
     ) {
     }
 
-    /** @param array<string, mixed> $query */
+    /** @param Query $query */
     public function __invoke(string $uri, array $query = []): Uri
     {
         $parsedUrl = (array) parse_url($uri);

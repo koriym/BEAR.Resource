@@ -22,7 +22,10 @@ use function is_array;
 use function ucfirst;
 use function uri_template;
 
-/** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @psalm-import-type Body from Types
+ */
 final class Linker implements LinkerInterface
 {
     /**
@@ -174,8 +177,8 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<object>        $annotations
-     * @param array<string, mixed> $body
+     * @param array<object> $annotations
+     * @param Body          $body
      *
      * @throws LinkQueryException
      * @throws MethodException

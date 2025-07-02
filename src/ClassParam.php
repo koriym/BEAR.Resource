@@ -25,6 +25,7 @@ use function ltrim;
 use function preg_replace;
 use function strtolower;
 
+/** @psalm-import-type Query from Types */
 final class ClassParam implements ParamInterface
 {
     private readonly string $type;
@@ -86,7 +87,7 @@ final class ClassParam implements ParamInterface
         return $obj;
     }
 
-    /** @param array<string, mixed> $query */
+    /** @param Query $query */
     private function getProps(string $varName, array $query, InjectorInterface $injector): mixed
     {
         if (isset($query[$varName])) {

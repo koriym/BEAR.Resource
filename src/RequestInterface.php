@@ -7,27 +7,28 @@ namespace BEAR\Resource;
 /**
  * @property AbstractRequest $eager
  * @property AbstractRequest $lazy
+ * @psalm-import-type Query from Types
  */
 interface RequestInterface
 {
     /**
      * InvokerInterface resource request
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function __invoke(array|null $query = null): ResourceObject;
 
     /**
      * Set query
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function withQuery(array $query): self;
 
     /**
      * Merge query
      *
-     * @param array<string, mixed> $query
+     * @param Query $query
      */
     public function addQuery(array $query): self;
 

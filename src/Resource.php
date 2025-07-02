@@ -18,6 +18,7 @@ use function is_string;
  * @property $this $delete
  * @property $this $head
  * @property $this $options
+ * @psalm-import-type Query from Types
  */
 final class Resource implements ResourceInterface
 {

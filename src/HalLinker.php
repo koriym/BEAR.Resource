@@ -10,6 +10,10 @@ use Nocarrier\Hal;
 use function is_string;
 use function uri_template;
 
+/**
+ * @psalm-import-type Query from Types
+ * @psalm-import-type Body from Types
+ */
 final class HalLinker
 {
     public function __construct(
@@ -17,14 +21,14 @@ final class HalLinker
     ) {
     }
 
-    /** @param array<string, mixed> $query */
+    /** @param Query $query */
     public function getReverseLink(string $uri, array $query): string
     {
         return ($this->link)($uri, $query);
     }
 
     /**
-     * @param array<mixed> $body
+     * @param Body         $body
      * @param list<object> $methodAnnotations
      */
     public function addHalLink(array $body, array $methodAnnotations, Hal $hal): Hal

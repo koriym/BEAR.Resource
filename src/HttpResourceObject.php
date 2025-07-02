@@ -19,6 +19,7 @@ use function strtoupper;
  * @property-read array<string, string> $headers
  * @property-read array<string, string> $body
  * @property-read string                $view
+ * @psalm-import-type Query from Types
  */
 final class HttpResourceObject extends ResourceObject implements InvokeRequestInterface
 {

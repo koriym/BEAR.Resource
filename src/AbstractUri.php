@@ -9,6 +9,7 @@ use Stringable;
 
 use function http_build_query;
 
+/** @psalm-import-type Query from Types */
 abstract class AbstractUri implements Stringable
 {
     /** @var string */
@@ -23,7 +24,7 @@ abstract class AbstractUri implements Stringable
     /**
      * Associative query array
      *
-     * @var array<string, mixed>
+     * @var Query
      */
     public $query = [];
 

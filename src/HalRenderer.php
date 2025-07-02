@@ -25,6 +25,7 @@ use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use const PHP_URL_QUERY;
 
+/** @psalm-import-type Body from Types */
 final class HalRenderer implements RenderInterface
 {
     public function __construct(
@@ -99,7 +100,7 @@ final class HalRenderer implements RenderInterface
     }
 
     /**
-     * @param array<array-key, mixed> $body
+     * @param Body $body
      * @psalm-param list<object>       $annotations
      * @phpstan-param array<object>    $annotations
      */
