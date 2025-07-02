@@ -17,6 +17,7 @@ use function method_exists;
 /**
  * @psalm-import-type OptionsResponse from Types
  * @psalm-import-type InsMap from Types
+ * @psalm-import-type ParameterMetadata from Types
  */
 final class OptionsMethodRequest
 {
@@ -115,9 +116,9 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<string, array{type?: string, description?: string, default?: string, in?: string}> $paramDoc
+     * @param ParameterMetadata $paramDoc
      *
-     * @return array<string, array{type?: string, description?: string, default?: string, in?: string}>
+     * @return ParameterMetadata
      */
     private function paramType(array $paramDoc, ReflectionParameter $parameter): array
     {
