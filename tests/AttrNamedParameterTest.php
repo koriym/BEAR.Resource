@@ -8,6 +8,7 @@ use BEAR\Resource\Exception\ParameterException;
 use FakeVendor\News\Resource\App\AttrWebContext;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\InputQuery\FileUploadFactory;
 use Ray\InputQuery\InputQuery;
 
 class AttrNamedParameterTest extends TestCase
@@ -20,7 +21,9 @@ class AttrNamedParameterTest extends TestCase
             new NamedParamMetas(
                 new InputQuery(
                     new Injector(),
+                    new FileUploadFactory(),
                 ),
+                new FileUploadFactory(),
             ),
             new Injector(),
         );

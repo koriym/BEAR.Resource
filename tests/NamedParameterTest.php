@@ -12,6 +12,7 @@ use DateTime;
 use FakeVendor\Sandbox\Resource\Page\EnumParam;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\InputQuery\FileUploadFactory;
 use Ray\InputQuery\InputQuery;
 
 use function assert;
@@ -27,7 +28,9 @@ class NamedParameterTest extends TestCase
             new NamedParamMetas(
                 new InputQuery(
                     new Injector(),
+                    new FileUploadFactory(),
                 ),
+                new FileUploadFactory(),
             ),
             new Injector(),
         );

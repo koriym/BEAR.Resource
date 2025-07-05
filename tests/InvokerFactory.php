@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use Ray\Di\Injector;
+use Ray\InputQuery\FileUploadFactory;
 use Ray\InputQuery\InputQuery;
 
 final class InvokerFactory
@@ -14,7 +15,7 @@ final class InvokerFactory
         return new Invoker(
             new PhpClassInvoker(
                 new NamedParameter(
-                    new NamedParamMetas(new InputQuery(new Injector())),
+                    new NamedParamMetas(new InputQuery(new Injector(), new FileUploadFactory()), new FileUploadFactory()),
                     new Injector(),
                 ),
                 new ExtraMethodInvoker(

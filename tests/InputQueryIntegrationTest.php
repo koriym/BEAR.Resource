@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\FileUploadFactory;
 use Ray\InputQuery\InputQuery;
 use ReflectionMethod;
 
@@ -18,8 +19,8 @@ class InputQueryIntegrationTest extends TestCase
     public function testNamedParamMetasDetectsInputAttribute(): void
     {
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
-        $namedParamMetas = new NamedParamMetas($inputQuery);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
         $callable = [new UserResource(), 'onPost'];
 
         $metas = $namedParamMetas($callable);
@@ -31,7 +32,7 @@ class InputQueryIntegrationTest extends TestCase
     public function testInputParamInvocation(): void
     {
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
 
         // Get the reflection parameter for UserInput
         $reflection = new ReflectionMethod(UserResource::class, 'onPost');
@@ -55,8 +56,8 @@ class InputQueryIntegrationTest extends TestCase
     {
         // Test complete flow: NamedParamMetas -> NamedParameter -> InputParam
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
-        $namedParamMetas = new NamedParamMetas($inputQuery);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
         $namedParameter = new NamedParameter($namedParamMetas, $injector);
 
         $callable = [new UserResource(), 'onPost'];
@@ -77,7 +78,7 @@ class InputQueryIntegrationTest extends TestCase
     {
         // Test with a scalar parameter that is required
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
 
         // Create a reflection parameter for a required string parameter
         $testMethod = new class {
@@ -102,7 +103,7 @@ class InputQueryIntegrationTest extends TestCase
     {
         // Test with a nullable parameter
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
 
         $testMethod = new class {
             public function testMethod(#[Input]
@@ -125,7 +126,7 @@ class InputQueryIntegrationTest extends TestCase
     {
         // Test with a parameter that has a default value
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
 
         $testMethod = new class {
             public function testMethod(#[Input]
@@ -149,7 +150,7 @@ class InputQueryIntegrationTest extends TestCase
     {
         // Test that existing values in query are returned correctly
         $injector = new Injector();
-        $inputQuery = new InputQuery($injector);
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
 
         $testMethod = new class {
             public function testMethod(#[Input]

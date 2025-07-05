@@ -24,7 +24,8 @@
         "ray/web-param-module": "^2.1.1",
         "rize/uri-template": "^0.4",
         "symfony/polyfill-php83": "^v1.32",
-        "ray/input-query": "1.x-dev"
+        "ray/input-query": "1.x-dev",
+        "koriym/file-upload": "^0.2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.10",
