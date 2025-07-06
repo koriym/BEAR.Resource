@@ -7,7 +7,7 @@ on:
 
 jobs:
   ci:
-    uses: ray-di/.github/.github/workflows/continuous-integration.yml@v1
+    uses: ray-di/.github/.github/workflows/continuous-integration.yml@bba8877c7f07899f195855009f6793d1b40b73e7
     with:
       old_stable: '[" 8.1.32", "8.2.28", "8.3"]'
       current_stable: 8.4
