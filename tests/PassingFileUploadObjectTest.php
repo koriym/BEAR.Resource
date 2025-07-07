@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
-namespace BEAR\Resource;
-
 /**
  * @psalm-import-type FileUploadSuccessResponse from Types
  * @psalm-import-type MultipleFileUploadResponse from Types
  */
+
+declare(strict_types=1);
+
+namespace BEAR\Resource;
 
 use BEAR\Resource\Module\ResourceModule;
 use InvalidArgumentException;
@@ -19,10 +19,7 @@ use function filesize;
 
 use const UPLOAD_ERR_OK;
 
-/**
- * Complete coverage tests for Service Locator pattern
- */
-class ServiceLocatorCoverageTest extends TestCase
+class PassingFileUploadObjectTest extends TestCase
 {
     private ResourceInterface $resource;
 
@@ -83,9 +80,7 @@ class ServiceLocatorCoverageTest extends TestCase
         // Test with non-numeric index (should be ignored)
         $file1 = FileUpload::fromFile(__DIR__ . '/Fake/app.svg');
 
-        $request = $this->resource->put('app://self/file-upload', [
-            'files[abc]' => $file1,  // Non-numeric index - should be ignored
-        ]);
+        $request = $this->resource->put('app://self/file-upload', ['files[abc]' => $file1]);
 
         /** @var FileUpload $result */
         $result = $request;

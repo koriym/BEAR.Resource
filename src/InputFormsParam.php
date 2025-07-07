@@ -60,7 +60,7 @@ final class InputFormsParam implements ParamInterface
      *
      * @return array<AbstractFileUpload>
      *
-     * @throws InvalidArgumentException When array contains invalid file objects
+     * @throws InvalidArgumentException When array contains invalid file objects.
      */
     private function getUserFileUploads(string $varName, array $query): array
     {

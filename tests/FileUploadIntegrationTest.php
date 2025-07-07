@@ -1,9 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-namespace BEAR\Resource;
-
 /**
  * Test-specific types for FileUploadIntegrationTest
  *
@@ -55,6 +51,10 @@ namespace BEAR\Resource;
  *     hasErrors: bool
  * }
  */
+
+declare(strict_types=1);
+
+namespace BEAR\Resource;
 
 use BEAR\Resource\Module\ResourceModule;
 use Koriym\FileUpload\ErrorFileUpload;
