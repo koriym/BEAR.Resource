@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use InvalidArgumentException;
+use Koriym\FileUpload\AbstractFileUpload;
 use Koriym\FileUpload\ErrorFileUpload;
 use Koriym\FileUpload\FileUpload;
 use Override;
@@ -38,7 +39,7 @@ final class InputFormParam implements ParamInterface
      * @param RequestQuery $query
      */
     #[Override]
-    public function __invoke(string $varName, array $query, InjectorInterface $injector): FileUpload|ErrorFileUpload|null
+    public function __invoke(string $varName, array $query, InjectorInterface $injector): AbstractFileUpload|null
     {
         // When user sets the FileUpload object, return it directly
         if (array_key_exists($varName, $query)) {
