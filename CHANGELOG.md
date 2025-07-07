@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.26.0] - 2025-07-07
 
 ### Added
 - Ray.InputQuery integration for file upload handling
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive type definitions in `Types.php` for improved type safety
 
 ### Changed
-- Updated `ray/input-query` dependency to version 0.1.0
+- Updated `ray/input-query` dependency to version ^0.2.0
 - Updated `koriym/file-upload` dependency to version ^0.2.0
 - Refactored file upload handling for improved consistency and readability
 - Replaced `create` method with `newInstance` for inputQuery instantiation
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Code style issues in test files
 
 ### Dependencies
-- `ray/input-query`: 0.1.0
+- `ray/input-query`: ^0.2.0
 - `koriym/file-upload`: ^0.2.0
 - `ext-fileinfo`: * (required for Windows CI compatibility)
 
@@ -62,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.25.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.26.0...HEAD
+[1.26.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.25.0...1.26.0
 [1.25.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.24.0...1.25.0
 [1.24.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.23.0...1.24.0
 [1.23.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.22.5...1.23.0

@@ -9,4 +9,6 @@
 /tests/log/error.log
 /tests-php8/*
 /.phpunit-cache
+/CLAUDE.md
+/memo.txt
 
