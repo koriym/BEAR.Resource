@@ -12,6 +12,8 @@ use DateTime;
 use FakeVendor\Sandbox\Resource\Page\EnumParam;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\InputQuery\FileUploadFactory;
+use Ray\InputQuery\InputQuery;
 
 use function assert;
 use function call_user_func_array;
@@ -22,7 +24,16 @@ class NamedParameterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->params = new NamedParameter(new NamedParamMetas(), new Injector());
+        $this->params = new NamedParameter(
+            new NamedParamMetas(
+                new InputQuery(
+                    new Injector(),
+                    new FileUploadFactory(),
+                ),
+                new FileUploadFactory(),
+            ),
+            new Injector(),
+        );
     }
 
     public function testGetParameters(): void

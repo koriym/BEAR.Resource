@@ -399,6 +399,125 @@ class News extends ResourceObject
 
 In this example, the `nickname` property of `app://self//login` is bound to `$name`.
 
+## Ray.InputQuery Integration
+
+BEAR.Resource integrates with [Ray.InputQuery](https://github.com/ray-di/Ray.InputQuery) to provide type-safe input handling and file upload processing.
+
+### Input Objects
+
+Use `#[Input]` attribute to convert flat query data into structured, type-safe objects:
+
+```php
+use Ray\InputQuery\Attribute\Input;
+
+class ArticleResource extends ResourceObject
+{
+    public function onPost(#[Input] ArticleInput $article): static
+    {
+        $this->body = [
+            'title' => $article->title,
+            'author' => $article->author->name
+        ];
+        return $this;
+    }
+}
+```
+
+### File Upload
+
+Use `#[InputFile]` attribute for type-safe file upload processing. HTML forms map directly to PHP method parameters:
+
+```html
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required>
+    <input type="text" name="title" placeholder="Title">
+    <button type="submit">Upload</button>
+</form>
+```
+
+```php
+use Ray\InputQuery\Attribute\InputFile;
+use Koriym\FileUpload\FileUpload;
+use Koriym\FileUpload\ErrorFileUpload;
+
+class ImageUpload extends ResourceObject
+{
+    public function onPost(
+        #[InputFile(
+            maxSize: 1024 * 1024, // 1MB
+            allowedTypes: ['image/jpeg', 'image/png', 'image/svg+xml'],
+            allowedExtensions: ['jpg', 'jpeg', 'png', 'svg']
+        )]
+        FileUpload|ErrorFileUpload $image,
+        string $title = 'Default Title'
+    ): static {
+        if ($image instanceof ErrorFileUpload) {
+            $this->code = 400;
+            $this->body = ['error' => true, 'message' => $image->message];
+            return $this;
+        }
+
+        // Move file to upload directory
+        $uploadDir = '/var/www/uploads/';
+        $filename = uniqid() . '_' . $image->name;
+        $image->move($uploadDir . $filename);
+
+        $this->body = [
+            'success' => true,
+            'filename' => $image->name,
+            'savedAs' => $filename,
+            'size' => $image->size,
+            'type' => $image->type,
+            'title' => $title
+        ];
+        return $this;
+    }
+}
+```
+
+#### Multiple File Upload
+
+Array parameters support multiple file uploads:
+
+```html
+<input type="file" name="images[]" multiple accept="image/*">
+```
+
+```php
+/**
+ * @param array<FileUpload|ErrorFileUpload> $images
+ */
+public function onPost(
+    #[InputFile(maxSize: 2 * 1024 * 1024)]
+    array $images
+): static {
+    // Process multiple files...
+}
+```
+
+#### Testing File Uploads
+
+File upload functionality is easy to test with direct object creation:
+
+```php
+use Koriym\FileUpload\FileUpload;
+
+public function testFileUpload(): void
+{
+    $fileUpload = FileUpload::fromFile(__DIR__ . '/fixtures/test.jpg');
+    
+    $result = $this->resource->post('app://self/image-upload', [
+        'image' => $fileUpload,
+        'title' => 'Test Image'
+    ]);
+    
+    $this->assertSame(200, $result->code);
+    $this->assertTrue($result->body['success']);
+}
+```
+
+The `#[InputFile]` attribute enables direct mapping between HTML form elements and PHP method parameters, where code becomes specification and improves readability.
+
 
 ### Resource Representation
 

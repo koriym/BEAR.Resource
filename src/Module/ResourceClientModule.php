@@ -38,6 +38,10 @@ use Override;
 use Ray\Di\AbstractModule;
 use Ray\Di\Exception\NotFound;
 use Ray\Di\Scope;
+use Ray\InputQuery\FileUploadFactory;
+use Ray\InputQuery\FileUploadFactoryInterface;
+use Ray\InputQuery\InputQuery;
+use Ray\InputQuery\InputQueryInterface;
 
 /**
  * Provides ResourceInterface and derived bindings
@@ -94,6 +98,8 @@ final class ResourceClientModule extends AbstractModule
         $this->bind(LoggerInterface::class)->to(NullLogger::class);
         $this->configureDeprecatedBindings();
         $this->bind(PhpClassInvoker::class);
+        $this->bind(InputQueryInterface::class)->to(InputQuery::class);
+        $this->bind(FileUploadFactoryInterface::class)->to(FileUploadFactory::class);
     }
 
     /** @psalm-suppress DeprecatedClass */

@@ -9,6 +9,10 @@ use BEAR\Resource\Annotation\ResourceParam;
 use Override;
 use Ray\Aop\ReflectionMethod;
 use Ray\Di\Di\Assisted;
+use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\Attribute\InputFile;
+use Ray\InputQuery\FileUploadFactoryInterface;
+use Ray\InputQuery\InputQueryInterface;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 use ReflectionAttribute;
 use ReflectionNamedType;
@@ -16,6 +20,13 @@ use ReflectionParameter;
 
 final class NamedParamMetas implements NamedParamMetasInterface
 {
+    /** @param InputQueryInterface<object> $inputQuery */
+    public function __construct(
+        private readonly InputQueryInterface $inputQuery,
+        private readonly FileUploadFactoryInterface $factory,
+    ) {
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -70,6 +81,20 @@ final class NamedParamMetas implements NamedParamMetasInterface
                 $default = $this->getDefault($parameter);
                 $param = new AssistedWebContextParam($webParam, $default);
                 $names[$parameter->name] = $param;
+                continue;
+            }
+
+            // #[Input]
+            $inputAttribute = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
+            if ($inputAttribute) {
+                $names[$parameter->name] = new InputParam($this->inputQuery, $parameter);
+                continue;
+            }
+
+            // #[InputFile]
+            $inputFileAttributes = $parameter->getAttributes(InputFile::class, ReflectionAttribute::IS_INSTANCEOF);
+            if ($inputFileAttributes) {
+                $this->setInputFileParam($parameter, $inputFileAttributes, $names);
                 continue;
             }
 
@@ -173,6 +198,23 @@ final class NamedParamMetas implements NamedParamMetasInterface
         return $names;
     }
 
+    /**
+     * @param array<ReflectionAttribute<InputFile>> $inputFileAttributes
+     * @param array<string, ParamInterface>         $names
+     */
+    private function setInputFileParam(ReflectionParameter $parameter, array $inputFileAttributes, array &$names): void
+    {
+        $type = $parameter->getType();
+        $isArray = $type instanceof ReflectionNamedType && $type->isBuiltin() && $type->getName() === 'array';
+        if ($isArray) {
+            $names[$parameter->name] = new InputFormsParam($this->factory, $parameter, $inputFileAttributes);
+
+            return;
+        }
+
+        $names[$parameter->name] = new InputFormParam($this->factory, $parameter, $inputFileAttributes);
+    }
+
     /** @psalm-return DefaultParam<mixed>|NoDefaultParam */
     private function getDefault(ReflectionParameter $parameter): DefaultParam|NoDefaultParam
     {
@@ -180,8 +222,8 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param array<string, AssistedResourceParam|AssistedWebContextParam> $names
-     * @param array<string, ReflectionParameter>                           $valueParams
+     * @param array<string, ParamInterface>      $names
+     * @param array<string, ReflectionParameter> $valueParams
      *
      * @return array<string, ParamInterface>
      */
