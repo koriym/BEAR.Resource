@@ -36,7 +36,7 @@ final class InputParam implements ParamInterface
             $inputClass = $type->getName();
             assert(class_exists($inputClass));
 
-            return $this->inputQuery->create($inputClass, $query);
+            return $this->inputQuery->newInstance($inputClass, $query);
         }
 
         // For built-in types, handle missing values explicitly
