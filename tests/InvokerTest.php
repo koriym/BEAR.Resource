@@ -17,7 +17,6 @@ use FakeVendor\Sandbox\Resource\App\Doc;
 use FakeVendor\Sandbox\Resource\App\Restbucks\Order;
 use FakeVendor\Sandbox\Resource\App\User;
 use FakeVendor\Sandbox\Resource\App\Weave\Book;
-use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Ray\Aop\Bind;
@@ -196,7 +195,7 @@ class InvokerTest extends TestCase
 
     public function testInvokeExceptionHandle(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
         $outOfRangeId = 4;
         $request = new Request($this->invoker, new User(), Request::GET, ['id' => $outOfRangeId]);
         $this->invoker->invoke($request);

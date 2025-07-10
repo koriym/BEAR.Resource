@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use BEAR\Resource\Exception\ParameterException;
+use InvalidArgumentException;
 use Override;
 use Ray\Di\InjectorInterface;
 
@@ -17,6 +19,8 @@ final class NamedParameter implements NamedParameterInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws ParameterException Thrown when the query parameter is invalid.
      */
     #[Override]
     public function getParameters(callable $callable, array $query): array
@@ -24,8 +28,14 @@ final class NamedParameter implements NamedParameterInterface
         $metas = ($this->paramMetas)($callable);
         $parameters = [];
         foreach ($metas as $varName => $param) {
+
             /** @psalm-suppress MixedAssignment */
-            $parameters[$varName] = $param($varName, $query, $this->injector);
+            try {
+                $parameters[$varName] = $param($varName, $query, $this->injector);
+            } catch (InvalidArgumentException $e) {
+                // handle missing query parameter in Ray.InputQuery
+                throw new ParameterException($varName, $e->getCode(), $e);
+            }
         }
 
         return $parameters;
