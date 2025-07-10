@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FakeVendor\Sandbox\Resource\App;
 
+use BEAR\Resource\Exception\ParameterException;
 use BEAR\Resource\ResourceObject;
 
 class User extends ResourceObject
@@ -21,7 +22,7 @@ class User extends ResourceObject
     public function onGet(int $id)
     {
         if (! isset($this->users[$id])) {
-            throw new \InvalidArgumentException((string) $id);
+            throw new ParameterException((string) $id);
         }
 
         return $this->users[$id];

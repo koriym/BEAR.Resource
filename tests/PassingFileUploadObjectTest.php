@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use BEAR\Resource\Exception\ParameterException;
 use BEAR\Resource\Module\ResourceModule;
-use InvalidArgumentException;
 use Koriym\FileUpload\FileUpload;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
@@ -33,40 +33,40 @@ class PassingFileUploadObjectTest extends TestCase
 
     public function testInputFormParamInvalidStringType(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
 
         $this->resource->post('app://self/file-upload', ['image' => 'invalid_string']);
     }
 
     public function testInputFormParamInvalidIntType(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
 
         $this->resource->post('app://self/file-upload', ['image' => 123]);
     }
 
     public function testInputFormParamInvalidArrayType(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
 
         $this->resource->post('app://self/file-upload', ['image' => []]);
     }
 
     public function testInputFormsParamInvalidNonArrayType(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
         $this->resource->put('app://self/file-upload', ['files' => 'not_an_array']);
     }
 
     public function testInputFormsParamInvalidArrayElementString(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
         $this->resource->put('app://self/file-upload', ['files' => ['invalid_string']]);
     }
 
     public function testInputFormsParamInvalidArrayElementInt(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ParameterException::class);
         $this->resource->put('app://self/file-upload', [
             'files' => [
                 FileUpload::fromFile(__DIR__ . '/Fake/app.svg'),
