@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
+  "title": "BEAR.Resource Profile Data",
+  "description": "Schema for profiling data collected during resource processing",
+  "type": "object",
+  "properties": {
+    "xhprof": {
+      "oneOf": [
+        {
+          "type": "array",
+          "maxItems": 0,
+          "description": "Empty array when XHProf is not available"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "Path to XHProf data file"
+            }
+          },
+          "required": ["file"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "XHProf performance profiling data"
+    },
+    "xdebug": {
+      "oneOf": [
+        {
+          "type": "array",
+          "maxItems": 0,
+          "description": "Empty array when Xdebug trace is not available"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "Path to Xdebug trace file"
+            }
+          },
+          "required": ["file"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Xdebug execution trace data"
+    },
+    "php": {
+      "type": "object",
+      "properties": {
+        "backtrace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "Function name"
+              },
+              "file": {
+                "type": "string",
+                "description": "File path"
+              },
+              "line": {
+                "type": "integer",
+                "description": "Line number"
+              },
+              "class": {
+                "type": "string",
+                "description": "Class name (if applicable)"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["::", "->"],
+                "description": "Method call type"
+              }
+            },
+            "required": ["function"],
+            "additionalProperties": true
+          },
+          "description": "PHP backtrace information"
+        }
+      },
+      "required": ["backtrace"],
+      "description": "PHP-level profiling data"
+    }
+  },
+  "additionalProperties": false
+}

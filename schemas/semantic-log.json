@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/semantic-log.json",
+  "title": "BEAR.Resource Semantic Log",
+  "description": "Schema for BEAR.Resource semantic logging - structured performance profiling data designed for AI understanding",
+  "type": "object",
+  "required": ["schemaUrl", "open", "close"],
+  "properties": {
+    "schemaUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the semantic log schema"
+    },
+    "open": {
+      "$ref": "https://bearsunday.github.io/BEAR.Resource/schemas/open-context.json",
+      "description": "Resource request initiation context with profiling start"
+    },
+    "close": {
+      "oneOf": [
+        {
+          "$ref": "https://bearsunday.github.io/BEAR.Resource/schemas/complete-context.json"
+        },
+        {
+          "$ref": "https://bearsunday.github.io/BEAR.Resource/schemas/error-context.json"
+        }
+      ],
+      "description": "Resource completion or error context with profiling results"
+    },
+    "events": {
+      "type": "array",
+      "description": "Additional events during resource processing",
+      "items": {
+        "type": "object"
+      }
+    },
+    "links": {
+      "type": "array",
+      "description": "HAL-style links for semantic relationships",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

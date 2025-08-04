@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEAR.Resource JSON Schemas</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; margin: 40px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .schema-list { list-style: none; padding: 0; }
+        .schema-item { background: #f8f9fa; margin: 10px 0; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; }
+        .schema-item h3 { margin: 0 0 8px 0; color: #2c3e50; }
+        .schema-item p { margin: 0 0 10px 0; color: #7f8c8d; }
+        .schema-link { color: #3498db; text-decoration: none; font-family: monospace; font-size: 14px; }
+        .schema-link:hover { text-decoration: underline; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ecf0f1; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <h1>BEAR.Resource JSON Schemas</h1>
+    <p>JSON Schema definitions for BEAR.Resource Semantic Logging - structured performance profiling data designed for AI understanding.</p>
+    
+    <ul class="schema-list">
+        <li class="schema-item">
+            <h3>Semantic Log</h3>
+            <p>Main schema for semantic log structure</p>
+            <a href="schemas/semantic-log.json" class="schema-link">schemas/semantic-log.json</a>
+        </li>
+        
+        <li class="schema-item">
+            <h3>Open Context</h3>
+            <p>Schema for resource request initiation context</p>
+            <a href="schemas/open-context.json" class="schema-link">schemas/open-context.json</a>
+        </li>
+        
+        <li class="schema-item">
+            <h3>Complete Context</h3>
+            <p>Schema for successful resource completion context</p>
+            <a href="schemas/complete-context.json" class="schema-link">schemas/complete-context.json</a>
+        </li>
+        
+        <li class="schema-item">
+            <h3>Error Context</h3>
+            <p>Schema for resource error context</p>
+            <a href="schemas/error-context.json" class="schema-link">schemas/error-context.json</a>
+        </li>
+        
+        <li class="schema-item">
+            <h3>Profile Data</h3>
+            <p>Schema for profiling data (XHProf, Xdebug, PHP backtrace)</p>
+            <a href="schemas/profile.json" class="schema-link">schemas/profile.json</a>
+        </li>
+    </ul>
+    
+    <div class="footer">
+        <p><strong>Semantic Web Vision Realized</strong></p>
+        <p>These schemas enable AI-powered performance analysis through structured semantic profiling, fulfilling Tim Berners-Lee's vision of machines understanding the meaning of data.</p>
+        <p>Part of <a href="https://github.com/bearsunday/BEAR.Resource" style="color: #3498db;">BEAR.Resource</a> framework.</p>
+    </div>
+</body>
+</html>

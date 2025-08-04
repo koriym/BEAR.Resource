@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/error-context.json",
+  "title": "BEAR.Resource Error Context",
+  "description": "Schema for resource error context with profiling data preservation",
+  "type": "object",
+  "required": ["id", "type", "$schema", "context", "openId"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this context"
+    },
+    "type": {
+      "type": "string",
+      "const": "bear_resource_error",
+      "description": "Context type identifier"
+    },
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "JSON Schema URL for this context"
+    },
+    "context": {
+      "type": "object",
+      "required": ["uri", "error", "profile"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "Resource URI where error occurred"
+        },
+        "error": {
+          "type": "object",
+          "required": ["type", "message"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Exception class name"
+            },
+            "message": {
+              "type": "string",
+              "description": "Error message"
+            },
+            "code": {
+              "type": "integer",
+              "description": "Error code"
+            },
+            "file": {
+              "type": "string",
+              "description": "File where error occurred"
+            },
+            "line": {
+              "type": "integer",
+              "description": "Line number where error occurred"
+            },
+            "trace": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              },
+              "description": "Stack trace"
+            }
+          },
+          "additionalProperties": true
+        },
+        "profile": {
+          "$ref": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
+          "description": "Profiling data collected before error"
+        }
+      },
+      "additionalProperties": true
+    },
+    "openId": {
+      "type": "string",
+      "description": "ID of the corresponding open context"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/complete-context.json",
+  "title": "BEAR.Resource Complete Context",
+  "description": "Schema for successful resource completion context with profiling results",
+  "type": "object",
+  "required": ["id", "type", "$schema", "context", "openId"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this context"
+    },
+    "type": {
+      "type": "string",
+      "const": "bear_resource_complete",
+      "description": "Context type identifier"
+    },
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "JSON Schema URL for this context"
+    },
+    "context": {
+      "type": "object",
+      "required": ["uri", "code", "headers", "body", "profile"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "Resource URI that was processed"
+        },
+        "code": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 599,
+          "description": "HTTP status code"
+        },
+        "headers": {
+          "type": "object",
+          "description": "Response headers",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "body": {
+          "description": "Response body data"
+        },
+        "view": {
+          "type": "string",
+          "description": "Rendered view output"
+        },
+        "profile": {
+          "$ref": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
+          "description": "Profiling data collected at completion"
+        }
+      },
+      "additionalProperties": true
+    },
+    "openId": {
+      "type": "string",
+      "description": "ID of the corresponding open context"
+    }
+  },
+  "additionalProperties": false
+}
