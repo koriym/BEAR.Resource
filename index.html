@@ -50,6 +50,19 @@
             <p>Schema for profiling data (XHProf, Xdebug, PHP backtrace)</p>
             <a href="schemas/profile.json" class="schema-link">schemas/profile.json</a>
         </li>
+        
+        <li class="schema-item">
+            <h3>OPTIONS Response</h3>
+            <p>Schema for BEAR.Resource OPTIONS method response - provides machine-readable API documentation for available resource methods</p>
+            <p style="margin: 10px 0; font-size: 14px; color: #666;">
+                <strong>Example from docs/options/doc.json:</strong><br>
+                Defines GET method with required "id" parameter (string), POST method with "id" (required), "name" and "age" (optional with defaults), and empty DELETE array indicating method not supported.
+            </p>
+            <p style="margin: 10px 0; font-size: 14px; color: #666;">
+                <strong>Use cases:</strong> Self-documenting APIs, automatic client generation, parameter validation, API discovery
+            </p>
+            <a href="schemas/options-response.json" class="schema-link">schemas/options-response.json</a>
+        </li>
     </ul>
     
     <div class="footer">
