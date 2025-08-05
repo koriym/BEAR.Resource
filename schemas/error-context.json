@@ -3,17 +3,38 @@
   "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/error-context.json",
   "title": "BEAR.Resource Error Context",
   "description": "Schema for resource error context with profiling data preservation",
+  "links": [
+    {
+      "anchor": "#/type",
+      "rel": "describedby",
+      "href": "https://bearsunday.github.io/BEAR.Resource/schemas/semantic-log.json#/definitions/contextType",
+      "title": "Context Type Definition"
+    },
+    {
+      "anchor": "#/context/uri",
+      "rel": "describedby",
+      "href": "https://tools.ietf.org/html/rfc3986",
+      "title": "URI Generic Syntax (RFC 3986)"
+    },
+    {
+      "anchor": "#/context/exceptionAsString",
+      "rel": "describedby",
+      "href": "https://www.php.net/manual/en/exception.tostring.php",
+      "title": "PHP Exception String Format"
+    }
+  ],
   "type": "object",
   "required": ["id", "type", "$schema", "context", "openId"],
   "properties": {
     "id": {
       "type": "string",
-      "description": "Unique identifier for this context"
+      "pattern": "^[a-z_]+_[0-9]+$",
+      "description": "Sequential identifier for this context in format {type}_{number}, where number indicates order of appearance for tracking open/close relationships"
     },
     "type": {
       "type": "string",
       "const": "bear_resource_error",
-      "description": "Context type identifier"
+      "description": "Context type identifier, same as defined in semantic-log.json#/definitions/contextType"
     },
     "$schema": {
       "type": "string",
@@ -22,56 +43,47 @@
     },
     "context": {
       "type": "object",
-      "required": ["uri", "error", "profile"],
+      "required": ["exceptionId", "exceptionAsString", "profile"],
       "properties": {
-        "uri": {
+        "exceptionId": {
           "type": "string",
-          "description": "Resource URI where error occurred"
+          "description": "Unique identifier for this exception"
         },
-        "error": {
-          "type": "object",
-          "required": ["type", "message"],
-          "properties": {
-            "type": {
-              "type": "string",
-              "description": "Exception class name"
-            },
-            "message": {
-              "type": "string",
-              "description": "Error message"
-            },
-            "code": {
-              "type": "integer",
-              "description": "Error code"
-            },
-            "file": {
-              "type": "string",
-              "description": "File where error occurred"
-            },
-            "line": {
-              "type": "integer",
-              "description": "Line number where error occurred"
-            },
-            "trace": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              },
-              "description": "Stack trace"
-            }
-          },
-          "additionalProperties": true
+        "exceptionAsString": {
+          "type": "string",
+          "description": "String representation of the exception including stack trace"
         },
         "profile": {
-          "$ref": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
-          "description": "Profiling data collected before error"
+          "type": "object",
+          "description": "Profiling data collected before error",
+          "properties": {
+            "xhprof": {
+              "oneOf": [
+                {"type": "array", "maxItems": 0},
+                {"type": "object"}
+              ]
+            },
+            "xdebug": {
+              "oneOf": [
+                {"type": "array", "maxItems": 0},
+                {"type": "object"}
+              ]
+            },
+            "php": {
+              "type": "object",
+              "properties": {
+                "backtrace": {"type": "array"}
+              }
+            }
+          }
         }
       },
       "additionalProperties": true
     },
     "openId": {
       "type": "string",
-      "description": "ID of the corresponding open context"
+      "pattern": "^[a-z_]+_[0-9]+$",
+      "description": "Sequential ID of the corresponding open context in format {type}_{number}, used to correlate open/close pairs"
     }
   },
   "additionalProperties": false

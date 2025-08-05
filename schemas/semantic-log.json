@@ -63,5 +63,12 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "definitions": {
+    "contextType": {
+      "type": "string",
+      "enum": ["bear_resource_request", "bear_resource_complete", "bear_resource_error"],
+      "description": "Context type identifier for semantic log entries. Each type is defined by its corresponding schema: open-context.json for bear_resource_request, complete-context.json for bear_resource_complete, and error-context.json for bear_resource_error"
+    }
+  }
 }
