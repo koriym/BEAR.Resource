@@ -6,6 +6,11 @@
   "links": [
     {
       "rel": "describedby",
+      "href": "https://xdebug.org/docs/trace",
+      "title": "Xdebug Trace Documentation"
+    },
+    {
+      "rel": "describedby",
       "href": "https://xdebug.org/docs/trace#Output-Formats",
       "title": "Xdebug Trace Output Formats"
     },
@@ -29,7 +34,7 @@
           "properties": {
             "profile_data": {
               "type": "object",
-              "description": "Raw XHProf profiling data with function call metrics. Captures statistical performance data (wall time, memory usage, call counts) with low overhead, enabling production-ready performance monitoring unlike more intrusive tracing methods.",
+              "description": "Raw XHProf profiling data with function call metrics. Captured using xhprof_enable() and xhprof_disable() functions. Provides statistical performance data (wall time, memory usage, call counts) with low overhead, enabling production-ready performance monitoring unlike more intrusive tracing methods.",
               "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -112,7 +117,7 @@
           "properties": {
             "trace_content": {
               "type": "string",
-              "description": "Raw Xdebug trace file content in trace format 4. Provides granular execution flow beyond PHP's standard debug_backtrace(), capturing function entry/exit with precise timestamps, memory usage, and call depth for comprehensive performance analysis and bottleneck identification."
+              "description": "Raw Xdebug trace file content in trace format 4. Captured using xdebug_start_trace() and xdebug_stop_trace() functions. Provides granular execution flow beyond PHP's standard debug_backtrace(), capturing function entry/exit with precise timestamps, memory usage, and call depth for comprehensive performance analysis and bottleneck identification."
             },
             "analysis": {
               "type": "object",
@@ -177,6 +182,7 @@
       "properties": {
         "backtrace": {
           "type": "array",
+          "description": "PHP backtrace information captured using debug_backtrace() function",
           "items": {
             "type": "object",
             "properties": {
@@ -208,8 +214,7 @@
           "description": "PHP backtrace information"
         }
       },
-      "required": ["backtrace"],
-      "description": "PHP-level profiling data using debug_backtrace()"
+      "required": ["backtrace"]
     }
   },
   "additionalProperties": false
