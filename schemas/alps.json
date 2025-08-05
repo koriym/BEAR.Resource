@@ -15,6 +15,11 @@
         "rel": "profile",
         "href": "https://www.ietf.org/archive/id/draft-amundsen-richardson-foster-alps-07.txt",
         "title": "ALPS Specification"
+      },
+      {
+        "rel": "describedby",
+        "href": "https://bearsunday.github.io/BEAR.Resource/schemas/semantic-tags.json",
+        "title": "Semantic Tag Definitions"
       }
     ],
     "descriptor": [
@@ -279,6 +284,38 @@
           "value": "The ability of computer systems to comprehend not just data structure but the semantic meaning, context, and relationships within information."
         },
         "tag": "domain"
+      },
+      {
+        "id": "html-structure-semantics",
+        "type": "semantic",
+        "title": "HTML Structure Semantics",
+        "tag": "domain",
+        "doc": {
+          "value": "Semantic meaning associated with HTML document structure, layout elements, and presentation organization that defines how content is arranged and displayed."
+        },
+        "link": [
+          {
+            "rel": "describedby",
+            "href": "https://bearsunday.github.io/BEAR.Resource/schemas/semantic-tags.json#html",
+            "title": "HTML Tag Definition"
+          }
+        ]
+      },
+      {
+        "id": "domain-knowledge-semantics",
+        "type": "semantic",
+        "title": "Domain Knowledge Semantics", 
+        "tag": "domain",
+        "doc": {
+          "value": "Semantic meaning of specialized concepts, terminology, and relationships within a specific field or application domain, enabling AI to understand subject matter expertise."
+        },
+        "link": [
+          {
+            "rel": "describedby",
+            "href": "https://bearsunday.github.io/BEAR.Resource/schemas/semantic-tags.json#domain",
+            "title": "Domain Tag Definition"
+          }
+        ]
       }
     ]
   }
