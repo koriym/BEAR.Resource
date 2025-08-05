@@ -316,6 +316,72 @@
             "title": "Domain Tag Definition"
           }
         ]
+      },
+      {
+        "id": "resource-object",
+        "type": "semantic",
+        "title": "ResourceObject",
+        "tag": "domain",
+        "doc": {
+          "value": "Abstract base class in BEAR.Resource framework that implements REST resource pattern with HTTP methods (onGet, onPost, onPut, onDelete), containing code, headers, body, and view properties."
+        },
+        "link": [
+          {
+            "rel": "help",
+            "href": "https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/ResourceObject.php",
+            "title": "ResourceObject Source Code"
+          }
+        ]
+      },
+      {
+        "id": "resource-invoker",
+        "type": "semantic",
+        "title": "Resource Invoker",
+        "tag": "domain",
+        "doc": {
+          "value": "Component responsible for executing resource requests, handling method dispatch, parameter injection, and optional semantic profiling integration."
+        },
+        "link": [
+          {
+            "rel": "help", 
+            "href": "https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/Invoker.php",
+            "title": "Resource Invoker Source Code"
+          }
+        ]
+      },
+      {
+        "id": "hypermedia-linking",
+        "type": "semantic",
+        "title": "Hypermedia Linking",
+        "tag": "domain",
+        "doc": {
+          "value": "HATEOAS (Hypermedia as the Engine of Application State) implementation using @Link annotations to define resource relationships, transitions, and discoverable API endpoints."
+        },
+        "link": [
+          {
+            "rel": "help",
+            "href": "https://en.wikipedia.org/wiki/HATEOAS",
+            "title": "HATEOAS - Wikipedia"
+          }
+        ]
+      },
+      {
+        "id": "semantic-profiling",
+        "type": "semantic",
+        "title": "Semantic Profiling",
+        "tag": "domain",
+        "doc": {
+          "value": "Advanced performance analysis approach that captures raw metrics (XHProf, Xdebug) alongside semantic context, enabling AI-powered optimization insights and intelligent bottleneck identification."
+        }
+      },
+      {
+        "id": "resource-uri-scheme", 
+        "type": "semantic",
+        "title": "Resource URI Scheme",
+        "tag": "domain",
+        "doc": {
+          "value": "URI-to-class mapping system that routes requests using schemes (app://, http://, page://) to corresponding PSR-4 autoloaded resource classes, enabling uniform resource addressing."
+        }
       }
     ]
   }

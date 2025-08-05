@@ -71,6 +71,40 @@ h1 {
     margin-left: 10px; 
 }
 
+/* Terminology section */
+.terminology-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+}
+
+.terminology-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.terminology-list {
+    margin: 0;
+    padding: 0;
+}
+
+.term-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.term-name:first-child {
+    margin-top: 0;
+}
+
+.term-definition {
+    margin: 0 0 10px 20px;
+    color: #7f8c8d;
+    line-height: 1.5;
+}
+
 /* Semantic web vision footer */
 .semantic-web-vision { 
     margin-top: 30px; 
