@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
   "title": "BEAR.Resource Profile Data",
-  "description": "Schema for profiling data collected during resource processing",
+  "description": "Schema for profiling data collected during resource processing within the BEAR.Resource framework",
   "type": "object",
   "properties": {
     "xhprof": {
@@ -15,16 +15,58 @@
         {
           "type": "object",
           "properties": {
-            "file": {
-              "type": "string",
-              "description": "Path to XHProf data file"
+            "profile_data": {
+              "type": "object",
+              "description": "Raw XHProf profiling data with function call metrics",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "wt": {
+                    "type": "integer",
+                    "description": "Wall time in microseconds"
+                  },
+                  "mu": {
+                    "type": "integer", 
+                    "description": "Memory usage in bytes"
+                  },
+                  "pmu": {
+                    "type": "integer",
+                    "description": "Peak memory usage in bytes"
+                  },
+                  "ct": {
+                    "type": "integer",
+                    "description": "Call count"
+                  }
+                }
+              }
+            },
+            "analysis": {
+              "type": "object",
+              "description": "AI-friendly analysis of XHProf data",
+              "properties": {
+                "summary": {
+                  "type": "object",
+                  "properties": {
+                    "total_wall_time_microseconds": {"type": "integer"},
+                    "total_memory_usage_bytes": {"type": "integer"},
+                    "function_count": {"type": "integer"}
+                  }
+                },
+                "top_functions": {
+                  "type": "array",
+                  "description": "Functions sorted by wall time (descending)"
+                },
+                "bottlenecks": {
+                  "type": "array",
+                  "description": "Functions with wall time > 10ms"
+                }
+              }
             }
           },
-          "required": ["file"],
           "additionalProperties": false
         }
       ],
-      "description": "XHProf performance profiling data"
+      "description": "XHProf performance profiling data with embedded analysis"
     },
     "xdebug": {
       "oneOf": [
@@ -36,16 +78,47 @@
         {
           "type": "object",
           "properties": {
-            "file": {
+            "trace_content": {
               "type": "string",
-              "description": "Path to Xdebug trace file"
+              "description": "Raw Xdebug trace file content in trace format 4"
+            },
+            "analysis": {
+              "type": "object",
+              "description": "AI-friendly analysis of Xdebug trace data",
+              "properties": {
+                "summary": {
+                  "type": "object",
+                  "properties": {
+                    "total_function_calls": {"type": "integer"},
+                    "unique_functions": {"type": "integer"},
+                    "max_call_depth": {"type": "integer"},
+                    "trace_lines": {"type": "integer"}
+                  }
+                },
+                "most_called_functions": {
+                  "type": "object",
+                  "description": "Functions with their call counts"
+                },
+                "execution_flow": {
+                  "type": "object",
+                  "properties": {
+                    "entry_points": {
+                      "type": "array",
+                      "description": "First few function calls"
+                    },
+                    "bottlenecks": {
+                      "type": "object",
+                      "description": "Functions called more than 10 times"
+                    }
+                  }
+                }
+              }
             }
           },
-          "required": ["file"],
           "additionalProperties": false
         }
       ],
-      "description": "Xdebug execution trace data"
+      "description": "Xdebug execution trace data with embedded content and analysis"
     },
     "php": {
       "type": "object",
@@ -84,7 +157,7 @@
         }
       },
       "required": ["backtrace"],
-      "description": "PHP-level profiling data"
+      "description": "PHP-level profiling data using debug_backtrace()"
     }
   },
   "additionalProperties": false

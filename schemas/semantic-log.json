@@ -3,6 +3,23 @@
   "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/semantic-log.json",
   "title": "BEAR.Resource Semantic Log",
   "description": "Schema for BEAR.Resource semantic logging - structured performance profiling data designed for AI understanding",
+  "links": [
+    {
+      "rel": "describedby",
+      "href": "https://github.com/bearsunday/BEAR.Resource",
+      "title": "BEAR.Resource Framework"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://koriym.github.io/Koriym.SemanticLogger/llms-full.txt",
+      "title": "Semantic Logger Structure"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://xdebug.org/docs/trace#Output-Formats",
+      "title": "Xdebug Trace Format"
+    }
+  ],
   "type": "object",
   "required": ["schemaUrl", "open", "close"],
   "properties": {
