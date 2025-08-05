@@ -24,7 +24,8 @@
         "title": "Schema Collection Container",
         "doc": {
           "value": "Root container for JSON Schema collection with semantic profiling schemas."
-        }
+        },
+        "tag": "html"
       },
       {
         "id": "json-schema-resource",
@@ -33,6 +34,7 @@
         "doc": {
           "value": "Individual JSON Schema resource with metadata and reference link."
         },
+        "tag": "html",
         "descriptor": [
           {
             "id": "schema-title",
@@ -40,7 +42,8 @@
             "title": "Schema Title",
             "doc": {
               "value": "Human-readable schema name and purpose."
-            }
+            },
+            "tag": "html"
           },
           {
             "id": "schema-description", 
@@ -48,7 +51,8 @@
             "title": "Schema Description",
             "doc": {
               "value": "Detailed explanation of schema purpose and structure."
-            }
+            },
+            "tag": "html"
           },
           {
             "id": "schema-reference",
@@ -56,7 +60,8 @@
             "title": "Schema Reference Link",
             "doc": {
               "value": "Direct link to JSON Schema document for machine consumption."
-            }
+            },
+            "tag": "html"
           }
         ]
       },
@@ -67,21 +72,25 @@
         "doc": {
           "value": "ALPS semantic profile resource for machine-readable semantics."
         },
+        "tag": "html",
         "descriptor": [
           {
             "id": "alps-title",
             "type": "semantic",
-            "title": "ALPS Profile Title"
+            "title": "ALPS Profile Title",
+            "tag": "html"
           },
           {
             "id": "alps-description",
             "type": "semantic", 
-            "title": "ALPS Profile Description"
+            "title": "ALPS Profile Description",
+            "tag": "html"
           },
           {
             "id": "alps-reference",
             "type": "safe",
-            "title": "ALPS Profile Reference Link"
+            "title": "ALPS Profile Reference Link",
+            "tag": "html"
           }
         ]
       },
@@ -92,21 +101,25 @@
         "doc": {
           "value": "Collection of development documentation and LLM interaction logs."
         },
+        "tag": "html",
         "descriptor": [
           {
             "id": "development-resource",
             "type": "semantic",
             "title": "Development Resource Item",
+            "tag": "html",
             "descriptor": [
               {
                 "id": "resource-link",
                 "type": "safe",
-                "title": "Development Resource Link"
+                "title": "Development Resource Link",
+                "tag": "html"
               },
               {
                 "id": "resource-description",
                 "type": "semantic",
-                "title": "Development Resource Description"
+                "title": "Development Resource Description",
+                "tag": "html"
               }
             ]
           }
@@ -118,7 +131,8 @@
         "title": "Semantic Web Vision Statement",
         "doc": {
           "value": "Vision statement describing Tim Berners-Lee's Semantic Web realization through structured profiling."
-        }
+        },
+        "tag": "html"
       },
       {
         "id": "json-schema-definitions",
@@ -126,7 +140,8 @@
         "title": "JSON Schema Definitions",
         "doc": {
           "value": "Machine-readable specifications that define the structure, constraints, and validation rules for JSON data formats."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "bear-resource-framework",
@@ -135,6 +150,7 @@
         "doc": {
           "value": "PHP hypermedia framework implementing REST resource-oriented architecture with 'object as a service' patterns."
         },
+        "tag": "domain",
         "link": [
           {
             "rel": "help",
@@ -150,6 +166,7 @@
         "doc": {
           "value": "Structured logging approach that captures not just events but their semantic meaning and relationships for AI analysis."
         },
+        "tag": "domain",
         "link": [
           {
             "rel": "help",
@@ -165,6 +182,7 @@
         "doc": {
           "value": "Systematic collection of performance metrics (XHProf, Xdebug, PHP backtrace) in machine-readable formats."
         },
+        "tag": "domain",
         "link": [
           {
             "rel": "help",
@@ -184,7 +202,8 @@
         "title": "AI Understanding",
         "doc": {
           "value": "The capability of artificial intelligence systems to comprehend data structures, relationships, and context without human explanation."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "llm-interaction-logs",
@@ -192,7 +211,8 @@
         "title": "LLM Interaction Logs",
         "doc": {
           "value": "Records of conversations and interactions between developers and Large Language Models, capturing insights, patterns, and problem-solving approaches."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "development-insights",
@@ -200,7 +220,8 @@
         "title": "Development Insights", 
         "doc": {
           "value": "Valuable lessons, patterns, and understanding gained during the development process, often captured in LLM interactions."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "semantic-portal-template",
@@ -208,7 +229,8 @@
         "title": "Semantic Portal Template",
         "doc": {
           "value": "Reusable template system for creating semantic web portals that enable AI to understand project structures and documentation."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "ai-powered-performance-analysis",
@@ -216,7 +238,8 @@
         "title": "AI-Powered Performance Analysis",
         "doc": {
           "value": "Automated analysis of performance profiling data using artificial intelligence to identify bottlenecks, patterns, and optimization opportunities."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "structured-semantic-profiling",
@@ -224,7 +247,8 @@
         "title": "Structured Semantic Profiling",
         "doc": {
           "value": "Performance profiling that captures both raw metrics and semantic context, enabling AI to understand the meaning behind performance data."
-        }
+        },
+        "tag": "domain"
       },
       {
         "id": "tim-berners-lee-vision",
@@ -233,6 +257,7 @@
         "doc": {
           "value": "The Semantic Web vision where machines can understand and process the meaning of data, not just its syntax, enabling automatic knowledge discovery and reasoning."
         },
+        "tag": "domain",
         "link": [
           {
             "rel": "help",
@@ -252,7 +277,8 @@
         "title": "Machine Understanding",
         "doc": {
           "value": "The ability of computer systems to comprehend not just data structure but the semantic meaning, context, and relationships within information."
-        }
+        },
+        "tag": "domain"
       }
     ]
   }
