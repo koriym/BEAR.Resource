@@ -18,6 +18,11 @@
       "rel": "describedby",
       "href": "https://xdebug.org/docs/trace#Output-Formats",
       "title": "Xdebug Trace Format"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://github.com/tideways/php-xhprof-extension?tab=readme-ov-file#data-format",
+      "title": "XHProf Profile Format"
     }
   ],
   "type": "object",
