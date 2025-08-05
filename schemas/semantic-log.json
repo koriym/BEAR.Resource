@@ -13,6 +13,12 @@
       "rel": "describedby",
       "href": "https://koriym.github.io/Koriym.SemanticLogger/llms-full.txt",
       "title": "Semantic Logger Structure"
+    },
+    {
+      "anchor": "#/schemaUrl",
+      "rel": "describedby",
+      "href": "https://tools.ietf.org/html/rfc3986",
+      "title": "URI Generic Syntax (RFC 3986)"
     }
   ],
   "type": "object",

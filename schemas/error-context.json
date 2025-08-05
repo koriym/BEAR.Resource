@@ -21,6 +21,12 @@
       "rel": "describedby",
       "href": "https://www.php.net/manual/en/exception.tostring.php",
       "title": "PHP Exception String Format"
+    },
+    {
+      "anchor": "#/context/profile",
+      "rel": "describedby",
+      "href": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
+      "title": "Profile Data Structure"
     }
   ],
   "type": "object",
