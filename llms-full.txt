@@ -388,6 +388,36 @@ BEAR.Resource includes comprehensive semantic logging for observability:
 }
 ```
 
+## Namespace Code Classification
+
+### Framework vs Application Code
+
+When analyzing profiling data or semantic logs, distinguish code types by namespace patterns:
+
+**Framework/Library Code (NOT application code):**
+- `BEAR\*` - BEAR.Resource framework components
+- `Koriym\*` - Koriym library components  
+- `Ray\*` - Ray.Di dependency injection framework
+- `Doctrine\*` - Doctrine components
+- `Composer\*` - Composer autoloader
+- `vendor\*` path - Third-party vendor libraries
+
+**Application Code:**
+- `App\*` - Primary application namespace
+- `FakeVendor\*` - Test/demo application namespace
+- Any custom namespace outside vendor directory
+
+**Examples:**
+```
+Framework: BEAR\Resource\Invoker::invoke
+Framework: Ray\Di\Container::getInstance  
+Framework: Koriym\SemanticLogger\SemanticLogger::open
+Application: App\Resource\User::onGet
+Application: FakeVendor\Sandbox\Resource\App\Bird\Canary::onGet
+```
+
+When providing performance analysis, focus on application code performance issues. Framework overhead is expected and should be excluded from optimization recommendations unless specifically requested.
+
 ## Performance Optimization
 
 ### Resource Client Serialization

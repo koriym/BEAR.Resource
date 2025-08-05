@@ -21,6 +21,12 @@
       "rel": "describedby",
       "href": "https://tools.ietf.org/html/rfc7231#section-4",
       "title": "HTTP Methods (RFC 7231)"
+    },
+    {
+      "anchor": "#/context/call",
+      "rel": "describedby",
+      "href": "https://www.php-fig.org/psr/psr-4/",
+      "title": "PSR-4 Autoloading Standard"
     }
   ],
   "type": "object",
@@ -53,6 +59,22 @@
         "uri": {
           "type": "string",
           "description": "Resource URI being requested"
+        },
+        "call": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "description": "Fully qualified class name of the target resource"
+            },
+            {
+              "type": "string", 
+              "description": "Method name to be invoked (e.g., onGet, onPost)"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Target resource class and method for direct code access"
         }
       },
       "additionalProperties": true
