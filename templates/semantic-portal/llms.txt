@@ -1,0 +1,23 @@
+# {{PROJECT_NAME}} - Summary Documentation
+
+{{PROJECT_DESCRIPTION_BRIEF}}
+
+## Quick Reference
+
+{{QUICK_REFERENCE_GUIDE}}
+
+## Common Use Cases
+
+{{COMMON_USE_CASES}}
+
+## Key APIs/Methods
+
+{{KEY_APIS}}
+
+## Configuration
+
+{{CONFIGURATION_BASICS}}
+
+## Troubleshooting
+
+{{COMMON_ISSUES_AND_SOLUTIONS}}

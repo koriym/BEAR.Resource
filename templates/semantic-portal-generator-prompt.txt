@@ -1,0 +1,146 @@
+# Semantic Portal Generator
+
+Create a comprehensive semantic portal for your project following Tim Berners-Lee's Semantic Web vision.
+
+## Instructions
+
+You are tasked with creating a semantic portal that enables AI to understand your project's data structures and documentation without human explanation. Follow these steps:
+
+### 1. Setup Directory Structure
+```
+your-project/
+├── schemas/
+│   ├── alps.json
+│   └── [your-schema-files].json
+├── index.html
+├── llms.txt
+└── llms-full.txt
+```
+
+### 2. Use the Template Files
+
+Copy the template files from: https://bearsunday.github.io/BEAR.Resource/templates/semantic-portal/
+
+Replace these placeholders with your project-specific information:
+
+**HTML Template (index.html):**
+- `{{PROJECT_NAME}}` - Your project/library name
+- `{{PROJECT_DESCRIPTION}}` - Brief description (1-2 sentences)  
+- `{{DOMAIN_CONTEXT}}` - Your domain context (e.g., "resource profiling", "API validation", "data processing")
+- `{{PROJECT_URL}}` - Your project's main URL/repository
+- `{{PROJECT_TYPE}}` - Type description (e.g., "framework", "library", "service")
+- `{{SCHEMA_RESOURCES}}` - Generate schema resource entries for each JSON schema
+
+**ALPS Template (schemas/alps.json):**
+- `{{PROJECT_NAME}}` - Your project name
+- `{{PROJECT_URL}}` - Your project URL
+
+**Documentation Template (llms-full.txt):**
+- `{{PROJECT_NAME}}` - Your project name
+- `{{PROJECT_DESCRIPTION_DETAILED}}` - Comprehensive project description
+- `{{ARCHITECTURE_OVERVIEW}}` - Core architecture explanation
+- `{{COMPONENT_DESCRIPTIONS}}` - Key components and their roles
+- `{{USAGE_EXAMPLES}}` - Code examples showing usage patterns
+- `{{INTEGRATION_GUIDELINES}}` - How to integrate with other systems
+- `{{DEVELOPMENT_PATTERNS}}` - Development best practices
+- `{{TESTING_GUIDELINES}}` - Testing approaches and patterns
+- `{{PATTERN_1_NAME}}` - First common usage pattern name
+- `{{PATTERN_1_INDICATORS}}` - How to identify this pattern
+- `{{PATTERN_1_INTERPRETATION}}` - What this pattern means
+- `{{PATTERN_1_ANALYSIS_FOCUS}}` - What to focus on when analyzing
+- `{{PATTERN_2_NAME}}` - Second pattern (repeat for additional patterns)
+- `{{PROJECT_PURPOSE}}` - What the project accomplishes
+
+### 3. Schema Resource Generation
+
+For each JSON schema file, add this HTML block inside `{{SCHEMA_RESOURCES}}`:
+
+```html
+<article class="json-schema-resource">
+    <h3 class="schema-title">[Schema Name]</h3>
+    <p class="schema-description">[Schema description and purpose]</p>
+    <a href="schemas/[filename].json" class="schema-reference">schemas/[filename].json</a>
+</article>
+```
+
+### 4. JSON Schemas with Semantic Links
+
+Each JSON schema should include semantic links using `rel="describedby"`:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://your-domain.com/schemas/your-schema.json",
+  "title": "Your Schema Title",
+  "description": "Schema description",
+  "links": [
+    {
+      "rel": "describedby", 
+      "href": "https://your-project-url",
+      "title": "Your Project Documentation"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://your-domain.com/llms-full.txt", 
+      "title": "Complete Documentation"
+    }
+  ],
+  "type": "object",
+  "properties": {
+    // Your schema definition
+  }
+}
+```
+
+### 5. Key Principles
+
+**Semantic Web Compliance:**
+- Use proper Web standards (JSON Schema, ALPS, Link Relations)
+- Enable machine discovery of related knowledge
+- Structure data for AI consumption without human explanation
+
+**Self-Contained Documentation:**
+- Embed all necessary context in the portal
+- Avoid external file dependencies that limit AI access
+- Provide comprehensive domain knowledge in llms-full.txt
+
+**ALPS-Driven Structure:**
+- HTML class attributes match ALPS descriptor IDs
+- Machine-readable semantic relationships
+- Consistent semantic vocabulary across the portal
+
+### 6. Testing Your Portal
+
+Test with AI by asking questions like:
+- "What data structures does this project use?"
+- "How should I integrate with this system?"
+- "What are the common usage patterns?"
+
+The AI should be able to answer these questions by discovering and reading your semantic links and documentation.
+
+### 7. Best Practices
+
+**Documentation Quality:**
+- Include real code examples in llms-full.txt
+- Document common pitfalls and patterns
+- Explain the "why" behind design decisions
+
+**Schema Design:**
+- Use descriptive titles and descriptions
+- Include semantic links to external knowledge
+- Validate schemas with real data
+
+**Maintenance:**
+- Keep schemas synchronized with actual data structures
+- Update llms-full.txt when patterns change
+- Test semantic links regularly
+
+## Result
+
+You will have created a semantic portal that:
+- Enables any AI to understand your project instantly
+- Follows Web standards for machine-readable semantics
+- Provides comprehensive technical documentation
+- Supports automatic knowledge discovery and integration
+
+This template implements Tim Berners-Lee's Semantic Web vision, where machines can understand the meaning and context of your data without requiring human explanation.
