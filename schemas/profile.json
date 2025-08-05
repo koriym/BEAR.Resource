@@ -3,6 +3,18 @@
   "$id": "https://bearsunday.github.io/BEAR.Resource/schemas/profile.json",
   "title": "BEAR.Resource Profile Data",
   "description": "Schema for profiling data collected during resource processing within the BEAR.Resource framework",
+  "links": [
+    {
+      "rel": "describedby",
+      "href": "https://xdebug.org/docs/trace#Output-Formats",
+      "title": "Xdebug Trace Output Formats"
+    },
+    {
+      "rel": "describedby", 
+      "href": "https://github.com/tideways/php-xhprof-extension?tab=readme-ov-file#data-format",
+      "title": "XHProf Data Format Documentation"
+    }
+  ],
   "type": "object",
   "properties": {
     "xhprof": {
@@ -17,7 +29,7 @@
           "properties": {
             "profile_data": {
               "type": "object",
-              "description": "Raw XHProf profiling data with function call metrics",
+              "description": "Raw XHProf profiling data with function call metrics. Captures statistical performance data (wall time, memory usage, call counts) with low overhead, enabling production-ready performance monitoring unlike more intrusive tracing methods.",
               "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -42,8 +54,27 @@
             },
             "analysis": {
               "type": "object",
-              "description": "AI-friendly analysis of XHProf data",
+              "description": "Auto-generated analysis of XHProf data for AI consumption",
               "properties": {
+                "generated_by": {
+                  "type": "string",
+                  "description": "Tool/component that generated this analysis (e.g., 'BEAR\\Resource\\SemanticLog\\Profile\\XHProfResult::generateAnalysis')"
+                },
+                "generated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp when analysis was generated"
+                },
+                "criteria": {
+                  "type": "object",
+                  "description": "Analysis criteria and thresholds used",
+                  "properties": {
+                    "bottleneck_threshold_microseconds": {
+                      "type": "integer",
+                      "description": "Minimum wall time in microseconds to be considered a bottleneck"
+                    }
+                  }
+                },
                 "summary": {
                   "type": "object",
                   "properties": {
@@ -58,9 +89,10 @@
                 },
                 "bottlenecks": {
                   "type": "array",
-                  "description": "Functions with wall time > 10ms"
+                  "description": "Functions exceeding bottleneck threshold"
                 }
-              }
+              },
+              "required": ["generated_by"]
             }
           },
           "additionalProperties": false
@@ -80,12 +112,31 @@
           "properties": {
             "trace_content": {
               "type": "string",
-              "description": "Raw Xdebug trace file content in trace format 4"
+              "description": "Raw Xdebug trace file content in trace format 4. Provides granular execution flow beyond PHP's standard debug_backtrace(), capturing function entry/exit with precise timestamps, memory usage, and call depth for comprehensive performance analysis and bottleneck identification."
             },
             "analysis": {
               "type": "object",
-              "description": "AI-friendly analysis of Xdebug trace data",
+              "description": "Auto-generated analysis of Xdebug trace data for AI consumption",
               "properties": {
+                "generated_by": {
+                  "type": "string",
+                  "description": "Tool/component that generated this analysis (e.g., 'BEAR\\Resource\\SemanticLog\\Profile\\XdebugTrace::generateAnalysis')"
+                },
+                "generated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp when analysis was generated"
+                },
+                "criteria": {
+                  "type": "object",
+                  "description": "Analysis criteria and thresholds used",
+                  "properties": {
+                    "bottleneck_threshold": {
+                      "type": "integer",
+                      "description": "Minimum call count to be considered a bottleneck"
+                    }
+                  }
+                },
                 "summary": {
                   "type": "object",
                   "properties": {
@@ -108,17 +159,18 @@
                     },
                     "bottlenecks": {
                       "type": "object",
-                      "description": "Functions called more than 10 times"
+                      "description": "Functions exceeding bottleneck threshold"
                     }
                   }
                 }
-              }
+              },
+              "required": ["generated_by"]
             }
           },
           "additionalProperties": false
         }
       ],
-      "description": "Xdebug execution trace data with embedded content and analysis"
+      "description": "Xdebug execution trace data with embedded content and analysis. Provides detailed function-by-function execution flow that standard PHP profiling cannot capture, essential for identifying complex performance issues, recursive calls, and execution path bottlenecks."
     },
     "php": {
       "type": "object",
