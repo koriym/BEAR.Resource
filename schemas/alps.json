@@ -119,6 +119,140 @@
         "doc": {
           "value": "Vision statement describing Tim Berners-Lee's Semantic Web realization through structured profiling."
         }
+      },
+      {
+        "id": "json-schema-definitions",
+        "type": "semantic",
+        "title": "JSON Schema Definitions",
+        "doc": {
+          "value": "Machine-readable specifications that define the structure, constraints, and validation rules for JSON data formats."
+        }
+      },
+      {
+        "id": "bear-resource-framework",
+        "type": "semantic", 
+        "title": "BEAR.Resource Framework",
+        "doc": {
+          "value": "PHP hypermedia framework implementing REST resource-oriented architecture with 'object as a service' patterns."
+        },
+        "link": [
+          {
+            "rel": "help",
+            "href": "https://github.com/bearsunday/BEAR.Resource",
+            "title": "BEAR.Resource GitHub Repository"
+          }
+        ]
+      },
+      {
+        "id": "semantic-logging",
+        "type": "semantic",
+        "title": "Semantic Logging",
+        "doc": {
+          "value": "Structured logging approach that captures not just events but their semantic meaning and relationships for AI analysis."
+        },
+        "link": [
+          {
+            "rel": "help",
+            "href": "https://github.com/koriym/Koriym.SemanticLogger",
+            "title": "Semantic Logger Package"
+          }
+        ]
+      },
+      {
+        "id": "structured-performance-profiling",
+        "type": "semantic",
+        "title": "Structured Performance Profiling",
+        "doc": {
+          "value": "Systematic collection of performance metrics (XHProf, Xdebug, PHP backtrace) in machine-readable formats."
+        },
+        "link": [
+          {
+            "rel": "help",
+            "href": "https://github.com/tideways/php-xhprof-extension",
+            "title": "XHProf PHP Extension"
+          },
+          {
+            "rel": "help", 
+            "href": "https://xdebug.org/docs/trace",
+            "title": "Xdebug Trace Documentation"
+          }
+        ]
+      },
+      {
+        "id": "ai-understanding",
+        "type": "semantic", 
+        "title": "AI Understanding",
+        "doc": {
+          "value": "The capability of artificial intelligence systems to comprehend data structures, relationships, and context without human explanation."
+        }
+      },
+      {
+        "id": "llm-interaction-logs",
+        "type": "semantic",
+        "title": "LLM Interaction Logs",
+        "doc": {
+          "value": "Records of conversations and interactions between developers and Large Language Models, capturing insights, patterns, and problem-solving approaches."
+        }
+      },
+      {
+        "id": "development-insights",
+        "type": "semantic",
+        "title": "Development Insights", 
+        "doc": {
+          "value": "Valuable lessons, patterns, and understanding gained during the development process, often captured in LLM interactions."
+        }
+      },
+      {
+        "id": "semantic-portal-template",
+        "type": "semantic",
+        "title": "Semantic Portal Template",
+        "doc": {
+          "value": "Reusable template system for creating semantic web portals that enable AI to understand project structures and documentation."
+        }
+      },
+      {
+        "id": "ai-powered-performance-analysis",
+        "type": "semantic",
+        "title": "AI-Powered Performance Analysis",
+        "doc": {
+          "value": "Automated analysis of performance profiling data using artificial intelligence to identify bottlenecks, patterns, and optimization opportunities."
+        }
+      },
+      {
+        "id": "structured-semantic-profiling",
+        "type": "semantic",
+        "title": "Structured Semantic Profiling",
+        "doc": {
+          "value": "Performance profiling that captures both raw metrics and semantic context, enabling AI to understand the meaning behind performance data."
+        }
+      },
+      {
+        "id": "tim-berners-lee-vision",
+        "type": "semantic",
+        "title": "Tim Berners-Lee's Vision",
+        "doc": {
+          "value": "The Semantic Web vision where machines can understand and process the meaning of data, not just its syntax, enabling automatic knowledge discovery and reasoning."
+        },
+        "link": [
+          {
+            "rel": "help",
+            "href": "https://www.w3.org/2001/sw/",
+            "title": "W3C Semantic Web Activity"
+          },
+          {
+            "rel": "help",
+            "href": "https://en.wikipedia.org/wiki/Semantic_Web",
+            "title": "Semantic Web - Wikipedia"
+          }
+        ]
+      },
+      {
+        "id": "machine-understanding",
+        "type": "semantic",
+        "title": "Machine Understanding",
+        "doc": {
+          "value": "The ability of computer systems to comprehend not just data structure but the semantic meaning, context, and relationships within information."
+        }
       }
     ]
   }

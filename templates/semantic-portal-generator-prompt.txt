@@ -25,11 +25,38 @@ Replace these placeholders with your project-specific information:
 
 **HTML Template (index.html):**
 - `{{PROJECT_NAME}}` - Your project/library name
-- `{{PROJECT_DESCRIPTION}}` - Brief description (1-2 sentences)  
+- `{{PROJECT_DESCRIPTION_WITH_DOMAIN_CLASSES}}` - Brief description with domain terms wrapped in semantic classes
 - `{{DOMAIN_CONTEXT}}` - Your domain context (e.g., "resource profiling", "API validation", "data processing")
 - `{{PROJECT_URL}}` - Your project's main URL/repository
 - `{{PROJECT_TYPE}}` - Type description (e.g., "framework", "library", "service")
 - `{{SCHEMA_RESOURCES}}` - Generate schema resource entries for each JSON schema
+
+**IMPORTANT: Domain Term Semantic Markup**
+Wrap all domain-specific terms in semantic classes that correspond to ALPS descriptors:
+
+```html
+<p><span class="json-schema-definitions">JSON Schema definitions</span> for <span class="my-framework">MyFramework</span> <span class="data-validation">data validation</span> - <span class="structured-analysis">structured analysis</span> designed for <span class="ai-understanding">AI understanding</span>.</p>
+```
+
+Then define these classes in your ALPS profile with proper semantic descriptions and helpful links:
+
+```json
+{
+  "id": "my-framework",
+  "type": "semantic",
+  "title": "MyFramework",
+  "doc": {
+    "value": "Description of what MyFramework does and its purpose."
+  },
+  "link": [
+    {
+      "rel": "help",
+      "href": "https://github.com/user/myframework",
+      "title": "MyFramework GitHub Repository"
+    }
+  ]
+}
+```
 
 **ALPS Template (schemas/alps.json):**
 - `{{PROJECT_NAME}}` - Your project name
@@ -106,8 +133,11 @@ Each JSON schema should include semantic links using `rel="describedby"`:
 
 **ALPS-Driven Structure:**
 - HTML class attributes match ALPS descriptor IDs
-- Machine-readable semantic relationships
+- Machine-readable semantic relationships  
 - Consistent semantic vocabulary across the portal
+- **Domain Concepts**: Define domain-specific terms (not just HTML structure)
+- **Semantic Meaning**: ALPS explains what "LLM interaction logs", "performance profiling", etc. actually mean
+- **AI Understanding**: Enables AI to understand your domain without human explanation
 
 ### 6. Testing Your Portal
 
