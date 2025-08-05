@@ -37,6 +37,7 @@ A semantic portal implements Tim Berners-Lee's Semantic Web vision by providing:
 ```
 semantic-portal/
 ├── index.html              # Main portal page with ALPS-driven semantic classes
+├── semantic-portal.css     # Universal CSS styling for semantic portals
 ├── schemas/
 │   └── alps.json          # ALPS profile defining semantic descriptors
 ├── llms.txt               # Summary documentation for AI
@@ -50,6 +51,8 @@ semantic-portal/
 - **AI-Optimized**: Structured for machine understanding without human explanation
 - **Web Standards**: Uses JSON Schema, ALPS, and RFC 8288 Link Relations
 - **Universal**: Works with any AI system, not just specific platforms
+- **Professional Design**: Clean, modern CSS with semantic color scheme
+- **Responsive**: Works across all devices and screen sizes
 
 ## Examples
 

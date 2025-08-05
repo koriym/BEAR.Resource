@@ -78,7 +78,18 @@ Then define these classes in your ALPS profile with proper semantic descriptions
 - `{{PATTERN_2_NAME}}` - Second pattern (repeat for additional patterns)
 - `{{PROJECT_PURPOSE}}` - What the project accomplishes
 
-### 3. Schema Resource Generation
+### 3. CSS Styling
+
+The template includes `semantic-portal.css` with universal styling:
+- Modern, clean design with system fonts
+- Semantic color scheme (blues and grays) 
+- Responsive layout with proper spacing
+- Hover effects for interactive elements
+- Consistent styling for all semantic portal elements
+
+You can customize the CSS or use it as-is for consistent semantic portal appearance.
+
+### 4. Schema Resource Generation
 
 For each JSON schema file, add this HTML block inside `{{SCHEMA_RESOURCES}}`:
 
@@ -90,7 +101,7 @@ For each JSON schema file, add this HTML block inside `{{SCHEMA_RESOURCES}}`:
 </article>
 ```
 
-### 4. JSON Schemas with Semantic Links
+### 5. JSON Schemas with Semantic Links
 
 Each JSON schema should include semantic links using `rel="describedby"`:
 
@@ -119,7 +130,7 @@ Each JSON schema should include semantic links using `rel="describedby"`:
 }
 ```
 
-### 5. Key Principles
+### 6. Key Principles
 
 **Semantic Web Compliance:**
 - Use proper Web standards (JSON Schema, ALPS, Link Relations)
@@ -139,7 +150,7 @@ Each JSON schema should include semantic links using `rel="describedby"`:
 - **Semantic Meaning**: ALPS explains what "LLM interaction logs", "performance profiling", etc. actually mean
 - **AI Understanding**: Enables AI to understand your domain without human explanation
 
-### 6. Testing Your Portal
+### 7. Testing Your Portal
 
 Test with AI by asking questions like:
 - "What data structures does this project use?"
@@ -148,7 +159,7 @@ Test with AI by asking questions like:
 
 The AI should be able to answer these questions by discovering and reading your semantic links and documentation.
 
-### 7. Best Practices
+### 8. Best Practices
 
 **Documentation Quality:**
 - Include real code examples in llms-full.txt
