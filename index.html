@@ -4,78 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BEAR.Resource JSON Schemas</title>
+    
+    <!-- ALPS (Application-Level Profile Semantics) Profile -->
+    <link rel="profile" href="schemas/bear-resource-alps.json" type="application/alps+json" title="BEAR.Resource Semantic Profiling Profile" />
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; margin: 40px; line-height: 1.6; }
         h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        .schema-list { list-style: none; padding: 0; }
-        .schema-item { background: #f8f9fa; margin: 10px 0; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; }
-        .schema-item h3 { margin: 0 0 8px 0; color: #2c3e50; }
-        .schema-item p { margin: 0 0 10px 0; color: #7f8c8d; }
-        .schema-link { color: #3498db; text-decoration: none; font-family: monospace; font-size: 14px; }
-        .schema-link:hover { text-decoration: underline; }
-        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ecf0f1; color: #7f8c8d; }
+        .schema-collection { display: flex; flex-direction: column; gap: 20px; }
+        .json-schema-resource, .alps-profile-resource { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; }
+        .schema-title, .alps-title { margin: 0 0 8px 0; color: #2c3e50; font-size: 1.2em; font-weight: 600; }
+        .schema-description, .alps-description { margin: 0 0 10px 0; color: #7f8c8d; }
+        .schema-reference, .alps-reference, .resource-link { color: #3498db; text-decoration: none; font-family: monospace; font-size: 14px; }
+        .schema-reference:hover, .alps-reference:hover, .resource-link:hover { text-decoration: underline; }
+        .development-resources { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ecf0f1; }
+        .development-resource { margin: 5px 0; }
+        .resource-description { color: #7f8c8d; margin-left: 10px; }
+        .semantic-web-vision { margin-top: 30px; color: #7f8c8d; }
     </style>
 </head>
 <body>
     <h1>BEAR.Resource JSON Schemas</h1>
     <p>JSON Schema definitions for BEAR.Resource Semantic Logging - structured performance profiling data designed for AI understanding.</p>
     
-    <ul class="schema-list">
-        <li class="schema-item">
-            <h3>Semantic Log</h3>
-            <p>Main schema for semantic log structure</p>
-            <a href="schemas/semantic-log.json" class="schema-link">schemas/semantic-log.json</a>
-        </li>
+    <div class="schema-collection">
+        <article class="json-schema-resource">
+            <h3 class="schema-title">Semantic Log</h3>
+            <p class="schema-description">Main schema for semantic log structure</p>
+            <a href="schemas/semantic-log.json" class="schema-reference">schemas/semantic-log.json</a>
+        </article>
         
-        <li class="schema-item">
-            <h3>Open Context</h3>
-            <p>Schema for resource request initiation context</p>
-            <a href="schemas/open-context.json" class="schema-link">schemas/open-context.json</a>
-        </li>
+        <article class="json-schema-resource">
+            <h3 class="schema-title">Open Context</h3>
+            <p class="schema-description">Schema for resource request initiation context</p>
+            <a href="schemas/open-context.json" class="schema-reference">schemas/open-context.json</a>
+        </article>
         
-        <li class="schema-item">
-            <h3>Complete Context</h3>
-            <p>Schema for successful resource completion context</p>
-            <a href="schemas/complete-context.json" class="schema-link">schemas/complete-context.json</a>
-        </li>
+        <article class="json-schema-resource">
+            <h3 class="schema-title">Complete Context</h3>
+            <p class="schema-description">Schema for successful resource completion context</p>
+            <a href="schemas/complete-context.json" class="schema-reference">schemas/complete-context.json</a>
+        </article>
         
-        <li class="schema-item">
-            <h3>Error Context</h3>
-            <p>Schema for resource error context</p>
-            <a href="schemas/error-context.json" class="schema-link">schemas/error-context.json</a>
-        </li>
+        <article class="json-schema-resource">
+            <h3 class="schema-title">Error Context</h3>
+            <p class="schema-description">Schema for resource error context</p>
+            <a href="schemas/error-context.json" class="schema-reference">schemas/error-context.json</a>
+        </article>
         
-        <li class="schema-item">
-            <h3>Profile Data</h3>
-            <p>Schema for profiling data (XHProf, Xdebug, PHP backtrace)</p>
-            <a href="schemas/profile.json" class="schema-link">schemas/profile.json</a>
-        </li>
+        <article class="json-schema-resource">
+            <h3 class="schema-title">Profile Data</h3>
+            <p class="schema-description">Schema for profiling data (XHProf, Xdebug, PHP backtrace)</p>
+            <a href="schemas/profile.json" class="schema-reference">schemas/profile.json</a>
+        </article>
         
-        <li class="schema-item">
-            <h3>OPTIONS Response</h3>
-            <p>Schema for BEAR.Resource OPTIONS method response - provides machine-readable API documentation for available resource methods</p>
-            <p style="margin: 10px 0; font-size: 14px; color: #666;">
-                <strong>Example from docs/options/doc.json:</strong><br>
-                Defines GET method with required "id" parameter (string), POST method with "id" (required), "name" and "age" (optional with defaults), and empty DELETE array indicating method not supported.
+        <article class="json-schema-resource">
+            <h3 class="schema-title">OPTIONS Response</h3>
+            <p class="schema-description">Schema for BEAR.Resource OPTIONS method response - provides machine-readable API documentation for available resource methods</p>
+            <p class="schema-description" style="margin: 10px 0; font-size: 14px;">
+                <strong>Example:</strong> Defines GET method with required "id" parameter, POST method with optional defaults, and empty DELETE array for unsupported methods.
             </p>
-            <p style="margin: 10px 0; font-size: 14px; color: #666;">
+            <p class="schema-description" style="margin: 10px 0; font-size: 14px;">
                 <strong>Use cases:</strong> Self-documenting APIs, automatic client generation, parameter validation, API discovery
             </p>
-            <a href="schemas/options-response.json" class="schema-link">schemas/options-response.json</a>
-        </li>
-    </ul>
+            <a href="schemas/options-response.json" class="schema-reference">schemas/options-response.json</a>
+        </article>
+        
+        <article class="alps-profile-resource">
+            <h3 class="alps-title">ALPS Profile</h3>
+            <p class="alps-description">Application-Level Profile Semantics for BEAR.Resource semantic profiling operations</p>
+            <p class="alps-description" style="margin: 10px 0; font-size: 14px;">
+                <strong>ALPS (RFC Draft):</strong> Defines semantic descriptors for Resource-Oriented Architecture profiling, including development vs production patterns, multi-dimensional profiling data (XHProf, Xdebug, PHP), and resource operation semantics.
+            </p>
+            <p class="alps-description" style="margin: 10px 0; font-size: 14px;">
+                <strong>Machine-readable semantics:</strong> Enables AI to understand profiling context, operation types, and performance data meaning without human explanation.
+            </p>
+            <a href="schemas/bear-resource-alps.json" class="alps-reference">schemas/bear-resource-alps.json</a>
+        </article>
+    </div>
     
-    <div class="footer">
+    <footer class="semantic-web-vision">
         <p><strong>Semantic Web Vision Realized</strong></p>
         <p>These schemas enable AI-powered performance analysis through structured semantic profiling, fulfilling Tim Berners-Lee's vision of machines understanding the meaning of data.</p>
         
-        <h3 style="color: #2c3e50; margin-top: 30px;">Development Resources</h3>
-        <ul style="list-style: none; padding: 0;">
-            <li style="margin: 5px 0;"><a href="llms.txt" style="color: #3498db;">llms.txt</a> - LLM interaction logs (development insights)</li>
-            <li style="margin: 5px 0;"><a href="llms-full.txt" style="color: #3498db;">llms-full.txt</a> - Complete LLM interaction logs</li>
-        </ul>
+        <div class="development-resources">
+            <h3 style="color: #2c3e50; margin-top: 30px;">Development Resources</h3>
+            <div class="development-resource">
+                <a href="llms.txt" class="resource-link">llms.txt</a>
+                <span class="resource-description">- LLM interaction logs (development insights)</span>
+            </div>
+            <div class="development-resource">
+                <a href="llms-full.txt" class="resource-link">llms-full.txt</a>
+                <span class="resource-description">- Complete LLM interaction logs</span>
+            </div>
+        </div>
         
-        <p style="margin-top: 20px;">Part of <a href="https://github.com/bearsunday/BEAR.Resource" style="color: #3498db;">BEAR.Resource</a> framework.</p>
-    </div>
+        <p style="margin-top: 20px;">Part of <a href="https://github.com/bearsunday/BEAR.Resource" class="resource-link">BEAR.Resource</a> framework.</p>
+    </footer>
 </body>
 </html>

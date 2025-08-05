@@ -1,0 +1,125 @@
+{
+  "alps": {
+    "version": "1.0",
+    "title": "BEAR.Resource Schema Collection Profile",
+    "doc": {
+      "value": "Application-Level Profile Semantics for BEAR.Resource schema collection page. Defines semantic descriptors for schema presentation, documentation resources, and semantic profiling references."
+    },
+    "link": [
+      {
+        "rel": "help",
+        "href": "https://bearsunday.github.io/BEAR.Resource/",
+        "title": "BEAR.Resource Documentation"
+      },
+      {
+        "rel": "profile",
+        "href": "https://www.ietf.org/archive/id/draft-amundsen-richardson-foster-alps-07.txt",
+        "title": "ALPS Specification"
+      }
+    ],
+    "descriptor": [
+      {
+        "id": "schema-collection",
+        "type": "semantic",
+        "title": "Schema Collection Container",
+        "doc": {
+          "value": "Root container for JSON Schema collection with semantic profiling schemas."
+        }
+      },
+      {
+        "id": "json-schema-resource",
+        "type": "semantic",
+        "title": "JSON Schema Resource",
+        "doc": {
+          "value": "Individual JSON Schema resource with metadata and reference link."
+        },
+        "descriptor": [
+          {
+            "id": "schema-title",
+            "type": "semantic",
+            "title": "Schema Title",
+            "doc": {
+              "value": "Human-readable schema name and purpose."
+            }
+          },
+          {
+            "id": "schema-description", 
+            "type": "semantic",
+            "title": "Schema Description",
+            "doc": {
+              "value": "Detailed explanation of schema purpose and structure."
+            }
+          },
+          {
+            "id": "schema-reference",
+            "type": "safe",
+            "title": "Schema Reference Link",
+            "doc": {
+              "value": "Direct link to JSON Schema document for machine consumption."
+            }
+          }
+        ]
+      },
+      {
+        "id": "alps-profile-resource",
+        "type": "semantic", 
+        "title": "ALPS Profile Resource",
+        "doc": {
+          "value": "ALPS semantic profile resource for machine-readable semantics."
+        },
+        "descriptor": [
+          {
+            "id": "alps-title",
+            "type": "semantic",
+            "title": "ALPS Profile Title"
+          },
+          {
+            "id": "alps-description",
+            "type": "semantic", 
+            "title": "ALPS Profile Description"
+          },
+          {
+            "id": "alps-reference",
+            "type": "safe",
+            "title": "ALPS Profile Reference Link"
+          }
+        ]
+      },
+      {
+        "id": "development-resources",
+        "type": "semantic",
+        "title": "Development Resources Section",
+        "doc": {
+          "value": "Collection of development documentation and LLM interaction logs."
+        },
+        "descriptor": [
+          {
+            "id": "development-resource",
+            "type": "semantic",
+            "title": "Development Resource Item",
+            "descriptor": [
+              {
+                "id": "resource-link",
+                "type": "safe",
+                "title": "Development Resource Link"
+              },
+              {
+                "id": "resource-description",
+                "type": "semantic",
+                "title": "Development Resource Description"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "semantic-web-vision",
+        "type": "semantic",
+        "title": "Semantic Web Vision Statement",
+        "doc": {
+          "value": "Vision statement describing Tim Berners-Lee's Semantic Web realization through structured profiling."
+        }
+      }
+    ]
+  }
+}
