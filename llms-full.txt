@@ -529,7 +529,7 @@ This is a development environment log with comprehensive profiling enabled. Perf
 - Schema validation and semantic logging overhead
 
 **Analysis Focus:**
-Focus on application-specific bottlenecks. **Do NOT recommend disabling profiling** - this is intentional development tooling. Look for:
+Focus on application-specific bottlenecks. **Do NOT recommend disabling profiling in development** - this is intentional development tooling that should remain enabled during development for comprehensive analysis. However, these profiling tools (XHProf, Xdebug) should be disabled in production for performance reasons. Look for:
 - N+1 query patterns in database calls
 - Inefficient algorithms in business logic
 - Resource-specific performance issues
@@ -542,10 +542,10 @@ Focus on application-specific bottlenecks. **Do NOT recommend disabling profilin
 - Trace content: Minimal or absent
 
 **Interpretation:**
-This represents standard production request processing without development overhead. Performance metrics reflect actual application performance.
+This represents standard production request processing without development overhead. In production environments, XHProf and Xdebug are typically disabled for performance reasons, resulting in empty profile arrays. Performance metrics reflect actual application performance without development tooling overhead.
 
 **Analysis Focus:**
-Direct performance analysis of application code without development tooling interference.
+Direct performance analysis of application code without development tooling interference. When profile data is empty in production logs, this is expected and correct behavior.
 
 ---
 
