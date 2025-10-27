@@ -7,6 +7,7 @@ namespace BEAR\Resource;
 use BEAR\Resource\Annotation\Link;
 use Nocarrier\Hal;
 
+use function is_array;
 use function is_string;
 use function uri_template;
 
@@ -46,8 +47,8 @@ final class HalLinker
     }
 
     /**
-     * @param array<int|string, mixed>|array{_links: string} $body
-     * @param non-empty-list<object>                         $methodAnnotations
+     * @param array<int|string, mixed> $body
+     * @param non-empty-list<object>   $methodAnnotations
      */
     private function linkAnnotation(array $body, array $methodAnnotations, Hal $hal): Hal
     {
@@ -59,7 +60,7 @@ final class HalLinker
             $uri = uri_template($annotation->href, $body);
             $reverseUri = $this->getReverseLink($uri, []);
 
-            if (isset($body['_links'][$annotation->rel])) {
+            if (isset($body['_links']) && is_array($body['_links']) && isset($body['_links'][$annotation->rel])) {
                 // skip if already difined links in ResourceObject
                 continue;
             }

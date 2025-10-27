@@ -32,7 +32,7 @@ use const PHP_EOL;
 
 /**
  * @property int    $code
- * @property array  $headers
+ * @property array<string, mixed>  $headers
  * @property mixed  $body
  * @property string $view
  * @phpstan-implements IteratorAggregate<string, mixed>

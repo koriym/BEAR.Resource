@@ -22,10 +22,7 @@ use function is_array;
 use function ucfirst;
 use function uri_template;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- * @psalm-import-type Body from Types
- */
+/** @psalm-import-type Body from Types */
 final class Linker implements LinkerInterface
 {
     /**
@@ -185,7 +182,7 @@ final class Linker implements LinkerInterface
      * @throws LinkRelException
      * @throws UriException
      *
-     * @param-out array $body
+     * @param-out array<array-key, mixed> $body
      */
     private function crawl(array $annotations, LinkType $link, array &$body): void
     {

@@ -23,8 +23,8 @@ final class OptionsMethodRequest
     /**
      * Parameter #2 $paramMetas of method BEAR\Resource\OptionsMethodRequest::ignoreAnnotatedPrameter() expects array('parameters' => array<string, array('type' =>
      *
-     * @param array<array-key, array{type: string, description?: string}> $paramDoc
-     * @param InsMap                                                      $ins
+     * @param array<string, array{type: string, description?: string}> $paramDoc
+     * @param InsMap                                                   $ins
      *
      * @return OptionsResponse
      */
@@ -40,6 +40,7 @@ final class OptionsMethodRequest
      */
     private function getParameterType(ReflectionParameter $parameter, array $paramDoc, string $name): string|null
     {
+        /** @phpstan-ignore function.alreadyNarrowedType */
         $hasType = method_exists($parameter, 'getType') && $parameter->getType();
         if ($hasType) {
             return $this->getType($parameter);

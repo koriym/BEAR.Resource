@@ -66,8 +66,6 @@ use Ray\InputQuery\InputQueryInterface;
  * LoggerInterface
  * HalLinker
  * ReverseLinkerInterface
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 final class ResourceClientModule extends AbstractModule
 {

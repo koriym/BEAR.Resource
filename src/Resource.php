@@ -98,8 +98,9 @@ final class Resource implements ResourceInterface
     public function href(string $rel, array $query = []): ResourceObject
     {
         [$method, $uri] = $this->anchor->href($rel, $this->request, $query);
+        // Dynamic property access via magic __get() returns mixed
         /** @psalm-suppress MixedMethodCall */
-        $resourceObject = $this->{$method}->uri($uri)->addQuery($query)->eager->request();
+        $resourceObject = $this->{$method}->uri($uri)->addQuery($query)->eager->request(); // @phpstan-ignore-line
         assert($resourceObject instanceof ResourceObject);
 
         return $resourceObject;

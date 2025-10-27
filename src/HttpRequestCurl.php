@@ -8,6 +8,7 @@ use CurlHandle;
 use Override;
 use RuntimeException;
 
+use function assert;
 use function count;
 use function curl_exec;
 use function curl_getinfo;
@@ -75,6 +76,8 @@ final class HttpRequestCurl implements HttpRequestInterface
             throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
         }
 
+        assert($method !== '');
+        assert($uri !== '');
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $uri);
 

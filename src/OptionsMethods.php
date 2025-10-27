@@ -161,6 +161,8 @@ final class OptionsMethods
      * @param InsMap $ins
      *
      * @return InsMap
+     *
+     * @psalm-suppress InvalidArrayOffset, MixedAssignment, MixedReturnTypeCoercion
      */
     public function getInsFromParameterAttributes(ReflectionMethod $method, array $ins): array
     {
@@ -174,6 +176,7 @@ final class OptionsMethods
                 }
 
                 /** @var array-key $class */
+                /** @phpstan-ignore varTag.nativeType */
                 $class = $instance::class;
                 $ins[$parameter->name] = self::WEB_CONTEXT_NAME[$class];
             }

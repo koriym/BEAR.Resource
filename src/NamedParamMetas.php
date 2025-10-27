@@ -33,8 +33,10 @@ final class NamedParamMetas implements NamedParamMetasInterface
     #[Override]
     public function __invoke(callable $callable): array
     {
+        // callable is [object, string] but native type doesn't allow array access
+        /** @psalm-suppress InvalidArrayAccess, MixedArgument */
         /** @var array{0:object, 1:string} $callable */
-        $method = new ReflectionMethod($callable[0], $callable[1]);
+        $method = new ReflectionMethod($callable[0], $callable[1]); // @phpstan-ignore-line
         $paramMetas = $this->getAttributeParamMetas($method);
 
         if (! $paramMetas) {

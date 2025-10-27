@@ -35,20 +35,24 @@ final class Uri extends AbstractUri
         }
 
         $parts = (array) parse_url($uri);
+        // parse_url() returns array<string>|false but we cast to array
         $host = isset($parts['port']) ? sprintf('%s:%s', $parts['host'] ?? '', $parts['port'] ?? '') : $parts['host'] ?? ''; // @phpstan-ignore-line
         [$this->scheme, $this->host, $this->path] = [$parts['scheme'] ?? '', $host, $parts['path'] ?? ''];
         $parseQuery = $this->query;
         if (array_key_exists('query', $parts)) {
             parse_str($parts['query'], $parseQuery);
-            /** @var Query $parseQuery */ // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.NoAssignment
-            $this->query = $parseQuery;
+            // parse_str() outputs array<int|string, array|string> but Query is array<string, mixed>
+            /** @psalm-suppress MixedPropertyTypeCoercion */
+            $this->query = $parseQuery; // @phpstan-ignore-line
         }
 
         if (count($query) === 0) {
             return;
         }
 
-        $this->query = $query + $parseQuery;
+        // Array union may contain int keys from parse_str output
+        /** @psalm-suppress MixedPropertyTypeCoercion */
+        $this->query = $query + $parseQuery; // @phpstan-ignore-line
     }
 
     /** @throws UriException */

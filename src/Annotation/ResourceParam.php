@@ -29,11 +29,7 @@ final class ResourceParam implements RequestParamInterface
     /** @var bool */
     public $templated;
 
-    /**
-     * @param array{uri?: string, param?: string, templated?: bool} $values
-     *
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     */
+    /** @param array{uri?: string, param?: string, templated?: bool} $values */
     public function __construct(array $values = [], string $uri = '', string $param = '', bool $templated = false)
     {
         $this->uri = $values['uri'] ?? $uri;
