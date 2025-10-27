@@ -13,28 +13,10 @@ parameters:
 			path: src/Annotation/ResourceParam.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$invocation contains generic type Ray\\Aop\\MethodInvocation\<object\> but interface Ray\\Aop\\MethodInvocation is not generic\.$#'
-			identifier: generics.notGeneric
-			count: 1
-			path: src/EmbedInterceptor.php
-
-		-
 			message: '#^Cannot access offset string on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
 			path: src/HalLinker.php
-
-		-
-			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/HalRenderer.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/HalRenderer.php
 
 		-
 			message: '#^Parameter \#2 \$methodAnnotations of method BEAR\\Resource\\HalLinker\:\:addHalLink\(\) expects list\<object\>, array\<object\> given\.$#'
@@ -103,15 +85,33 @@ parameters:
 			path: src/HttpResourceObject.php
 
 		-
+			message: '#^Property BEAR\\Resource\\HttpResourceObject\:\:\$body \(array\<string, string\>\) does not accept array\<mixed\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/HttpResourceObject.php
+
+		-
+			message: '#^Property BEAR\\Resource\\HttpResourceObject\:\:\$code \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/HttpResourceObject.php
+
+		-
 			message: '#^PHPDoc tag @SuppressWarnings has invalid value \(\(PHPMD\.CamelCaseMethodName\)\)\: Unexpected token "\.CamelCaseMethodName\)", expected ''\)'' at offset 216 on line 6$#'
 			identifier: phpDoc.parseError
 			count: 1
 			path: src/InvokeRequestInterface.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$invocation contains generic type Ray\\Aop\\MethodInvocation\<object\> but interface Ray\\Aop\\MethodInvocation is not generic\.$#'
-			identifier: generics.notGeneric
+			message: '#^Method BEAR\\Resource\\Interceptor\\JsonSchemaInterceptor\:\:validateRequest\(\) has parameter \$invocation with generic interface Ray\\Aop\\MethodInvocation but does not specify its types\: T$#'
+			identifier: missingType.generics
 			count: 1
+			path: src/JsonSchema/Interceptor/JsonSchemaInterceptor.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
 			path: src/JsonSchema/Interceptor/JsonSchemaInterceptor.php
 
 		-
@@ -125,12 +125,6 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: src/Linker.php
-
-		-
-			message: '#^Property BEAR\\Resource\\Meta\:\:\$extras \(array\{vendor\?\: string, package\?\: string\}\) does not accept array\{vendor\: string\|null, package\?\: string\}\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Meta.php
 
 		-
 			message: '#^PHPDoc tag @SuppressWarnings has invalid value \(\(PHPMD\.CouplingBetweenObjects\)\)\: Unexpected token "\.CouplingBetweenObjects\)", expected ''\)'' at offset 504 on line 25$#'
@@ -419,24 +413,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: tests/FileUploadIntegrationTest.php
-
-		-
-			message: '#^Call to method start\(\) on an unknown class BEAR\\Dev\\Http\\BuiltinServer\.$#'
-			identifier: class.notFound
-			count: 2
-			path: tests/HttpResourceObjectTest.php
-
-		-
-			message: '#^Instantiated class BEAR\\Dev\\Http\\BuiltinServer not found\.$#'
-			identifier: class.notFound
-			count: 2
-			path: tests/HttpResourceObjectTest.php
-
-		-
-			message: '#^Property BEAR\\Resource\\HttpResourceObjectTest\:\:\$server has unknown class BEAR\\Dev\\Http\\BuiltinServer as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: tests/HttpResourceObjectTest.php
 
 		-
 			message: '#^Instanceof between FakeVendor\\Sandbox\\Resource\\App\\Restbucks\\Order and FakeVendor\\Sandbox\\Resource\\App\\Restbucks\\Order will always evaluate to true\.$#'
