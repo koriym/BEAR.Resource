@@ -1,6 +1,5 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "^9.5.10",
         "doctrine/coding-standard": "^14.0",
         "phpmd/phpmd": "^2.9",
         "phpstan/phpstan": "^2.1",
