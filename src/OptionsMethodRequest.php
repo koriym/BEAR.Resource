@@ -17,14 +17,15 @@ use function method_exists;
 /**
  * @psalm-import-type OptionsResponse from Types
  * @psalm-import-type InsMap from Types
+ * @psalm-import-type ParameterMetadata from Types
+ * @psalm-import-type ParametersMap from Types
+ * @psalm-import-type RequiredParameters from Types
  */
 final class OptionsMethodRequest
 {
     /**
-     * Parameter #2 $paramMetas of method BEAR\Resource\OptionsMethodRequest::ignoreAnnotatedPrameter() expects array('parameters' => array<string, array('type' =>
-     *
-     * @param array<string, array{type: string, description?: string}> $paramDoc
-     * @param InsMap                                                   $ins
+     * @param ParametersMap $paramDoc
+     * @param InsMap        $ins
      *
      * @return OptionsResponse
      */
@@ -34,7 +35,7 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<string, array{type?: string, description?: string}> $paramDoc
+     * @param ParametersMap $paramDoc
      *
      * @psalm-suppress RedundantCondition for BC
      */
@@ -50,9 +51,9 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<ReflectionParameter>                               $parameters
-     * @param array<string, array{type: string, description?: string}> $paramDoc
-     * @param InsMap                                                   $ins
+     * @param array<ReflectionParameter> $parameters
+     * @param ParametersMap              $paramDoc
+     * @param InsMap                     $ins
      *
      * @return OptionsResponse
      */
@@ -80,8 +81,7 @@ final class OptionsMethodRequest
     /**
      * @param array<ReflectionParameter> $parameters
      *
-     * @return string[]
-     * @psalm-return list<string>
+     * @return RequiredParameters
      */
     private function getRequired(array $parameters): array
     {
@@ -98,9 +98,9 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<string, array{type?: string, description?: string}> $paramDoc
+     * @param ParametersMap $paramDoc
      *
-     * @return array<string, array{type?: string, description?: string, default?: string}>
+     * @return ParametersMap
      *
      * @throws ReflectionException
      */
@@ -116,9 +116,9 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<string, array{type?: string, description?: string, default?: string, in?: string}> $paramDoc
+     * @param ParametersMap $paramDoc
      *
-     * @return array<string, array{type?: string, description?: string, default?: string, in?: string}>
+     * @return ParametersMap
      */
     private function paramType(array $paramDoc, ReflectionParameter $parameter): array
     {
@@ -143,8 +143,8 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<string, array{type?: string}> $paramDoc
-     * @param list<string>                        $required
+     * @param ParametersMap      $paramDoc
+     * @param RequiredParameters $required
      *
      * @return OptionsResponse
      */
