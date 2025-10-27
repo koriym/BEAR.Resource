@@ -155,7 +155,7 @@ class RequestTest extends TestCase
 
             return true;
         });
-        (string) $request; // @phpstan-ignore-line
+        (string) $request;
         $this->assertSame('', (string) $request);
         restore_error_handler();
     }
@@ -267,7 +267,7 @@ class RequestTest extends TestCase
 
             return true;
         });
-        (string) $request; // @phpstan-ignore-line
+        (string) $request;
         $this->assertSame(256, $no);
         $this->assertStringContainsString(FakeNopResource::class, $str);
         restore_error_handler();

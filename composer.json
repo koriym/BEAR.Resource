@@ -67,7 +67,8 @@
         "sa": ["psalm --monochrome --show-info=true", "phpstan --memory-limit=-1 analyse -c phpstan.neon"],
         "metrics": ["phpmetrics --report-html=build/metrics --exclude=Exception --log-junit=build/junit.xml --junit=build/junit.xml src"],
         "phpmd": ["phpmd --exclude src/Annotation src text ./phpmd.xml"],
-        "build": ["@cs", "@sa", "@pcov", "@metrics"]
+        "build": ["@cs", "@sa", "@pcov", "@metrics"],
+        "baseline": ["phpstan analyse -c phpstan.neon --generate-baseline", "psalm --set-baseline=psalm-baseline.xml"]
     },
     "config": {
         "sort-packages": true,
