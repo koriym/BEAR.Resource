@@ -10,6 +10,8 @@ interface InvokeRequestInterface
      * Invokes a request using the given invoker and request objects.
      *
      * @return ResourceObject The resulting resource object returned from the request invocation.
+     *
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName) Underscore prefix indicates internal API method
      */
     public function _invokeRequest(InvokerInterface $invoker, AbstractRequest $request): ResourceObject;
 }

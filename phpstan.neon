@@ -19,3 +19,5 @@ parameters:
     - '#^PHPDoc tag @var .* is not subtype of native type#'
     - '#^(Binary operation|Cannot cast) .* (results in an error|to string)\.$#'
     - '#^(Parameter|Trying to invoke) .* (expects|but it.s not a callable)#'
+    # PHPMD suppression comments are not valid PHPDoc syntax for PHPStan
+    - '#^PHPDoc tag @SuppressWarnings has invalid value#'

@@ -275,6 +275,8 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
 
     /**
      * {@inheritDoc}
+     *
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName) Underscore prefix indicates internal API method
      */
     #[Override]
     public function _invokeRequest(InvokerInterface $invoker, AbstractRequest $request): ResourceObject
