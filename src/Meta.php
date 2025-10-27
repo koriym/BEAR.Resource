@@ -45,8 +45,10 @@ final class Meta
     {
         $classPath = explode('\\', $class);
         // $class
-        $this->extras[self::EXTRAS_VENDOR] = array_shift($classPath); // @phpstan-ignore-line
-        $this->extras[self::EXTRAS_PACKAGE] = (string) array_shift($classPath);
+        $vendor = (string) array_shift($classPath);
+        $this->extras[self::EXTRAS_VENDOR] = $vendor;
+        $package = (string) array_shift($classPath);
+        $this->extras[self::EXTRAS_PACKAGE] = $package;
         array_shift($classPath); // "/Resource/"
         $scheme = array_shift($classPath);
 

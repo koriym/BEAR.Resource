@@ -9,7 +9,6 @@ use Override;
 use RuntimeException;
 
 use function count;
-use function curl_close;
 use function curl_exec;
 use function curl_getinfo;
 use function curl_init;
@@ -58,7 +57,6 @@ final class HttpRequestCurl implements HttpRequestInterface
         $headerString = substr($response, 0, $headerSize);
         $view = substr($response, $headerSize);
         $headers = $this->parseResponseHeaders($headerString);
-        curl_close($curl);
 
         $body = $this->parseBody($curl, $view);
 
