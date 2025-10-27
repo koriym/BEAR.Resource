@@ -26,7 +26,10 @@ use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use const PHP_URL_QUERY;
 
-/** @psalm-import-type Body from Types */
+/**
+ * @psalm-import-type Body from Types
+ * @psalm-import-type ResourceObjectBody from Types
+ */
 final class HalRenderer implements RenderInterface
 {
     public function __construct(
@@ -114,7 +117,7 @@ final class HalRenderer implements RenderInterface
         return $this->linker->addHalLink($body, array_values($annotations), $hal);
     }
 
-    /** @return array{0: ResourceObject, 1: array<array-key, mixed>} */
+    /** @return ResourceObjectBody */
     private function valuate(ResourceObject $ro): array
     {
         if (is_scalar($ro->body)) {
