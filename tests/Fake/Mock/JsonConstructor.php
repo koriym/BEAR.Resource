@@ -8,7 +8,7 @@ use BEAR\Resource\ResourceObject;
 
 class JsonConstructor extends ResourceObject
 {
-    public function onGet(PersonConstructor $specialPerson, PersonConstructor $defaultPerson = null)
+    public function onGet(PersonConstructor $specialPerson, ?PersonConstructor $defaultPerson = null)
     {
         $this->body = $specialPerson;
         unset($defaultPerson);

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "bear-semantic-logs": {
+      "command": "php",
+      "args": [
+        "/Users/akihito/git/BEAR.Resource/vendor/koriym/semantic-logger/bin/semantic-mcp.php",
+        "/Users/akihito/git/BEAR.Resource/demo/tmp/semantic-logs"
+      ]
+    }
+  }
+}
