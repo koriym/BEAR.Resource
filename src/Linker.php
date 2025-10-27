@@ -22,13 +22,16 @@ use function is_array;
 use function ucfirst;
 use function uri_template;
 
-/** @psalm-import-type Body from Types */
+/**
+ * @psalm-import-type Body from Types
+ * @psalm-import-type Query from Types
+ */
 final class Linker implements LinkerInterface
 {
     /**
      * memory cache for linker
      *
-     * @var array<string, mixed>
+     * @var Query
      */
     private array $cache = [];
 
@@ -161,7 +164,7 @@ final class Linker implements LinkerInterface
     private function annotationCrawl(array $annotations, LinkType $link, ResourceObject $current): ResourceObject
     {
         $isList = $this->isList($current->body);
-        /** @var array<array<string, mixed>> $bodyList */
+        /** @var array<Query> $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
@@ -182,7 +185,7 @@ final class Linker implements LinkerInterface
      * @throws LinkRelException
      * @throws UriException
      *
-     * @param-out array<array-key, mixed> $body
+     * @param-out Body $body
      */
     private function crawl(array $annotations, LinkType $link, array &$body): void
     {
@@ -253,8 +256,8 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<int|string, mixed> $value
-     * @psalm-param array<string, mixed>|scalar $firstRow
+     * @param Body $value
+     * @psalm-param Query|scalar $firstRow
      */
     private function isMultiColumnList(array $value, mixed $firstRow): bool
     {
@@ -262,7 +265,7 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<int|string, mixed> $value
+     * @param Body $value
      * @param list<array-key>          $keys
      * @param array<mixed, mixed>      $list
      */
