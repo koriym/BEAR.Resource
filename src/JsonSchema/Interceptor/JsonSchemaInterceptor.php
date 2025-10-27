@@ -72,7 +72,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
     }
 
     /** @param array<string, mixed> $arguments */
-    private function validateRequest(MethodInvocation $invocation, JsonSchema $jsonSchema, array $arguments): void // @phpstan-ignore-line
+    private function validateRequest(MethodInvocation $invocation, JsonSchema $jsonSchema, array $arguments): void
     {
         try {
             $schemaFile = $this->validateDir . '/' . $jsonSchema->params;
