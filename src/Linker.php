@@ -65,7 +65,7 @@ final class Linker implements LinkerInterface
         }
 
         foreach ($request->links as $link) {
-            /** @var array<mixed> $nextBody */
+            /** @var Body $nextBody */
             $nextBody = $this->annotationLink($link, $current, $request)->body;
             $current = $this->nextLink($link, $current, $nextBody);
         }
@@ -74,7 +74,7 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<mixed> $nextResource
+     * @param Body $nextResource
      *
      * @return ResourceObject
      */
@@ -201,7 +201,7 @@ final class Linker implements LinkerInterface
             $request = new Request($this->invoker, $rel, Request::GET, $query, [$link], $this);
             $hash = $request->hash();
             if (array_key_exists($hash, $this->cache)) {
-                /** @var array<array<string, scalar|array<mixed>>>  $cachedResponse */
+                /** @var Body $cachedResponse */
                 $cachedResponse = $this->cache[$hash];
                 $body[$annotation->rel] = $cachedResponse;
                 continue;
@@ -211,7 +211,7 @@ final class Linker implements LinkerInterface
         }
     }
 
-    /** @return array<mixed> */
+    /** @return Body|null */
     private function getResponseBody(Request $request): array|null
     {
         $body = $this->invokeRecursive($request)->body;
@@ -223,11 +223,11 @@ final class Linker implements LinkerInterface
     private function isList(mixed $value): bool
     {
         assert(is_array($value));
-        /** @var array<array<mixed>|string> $list */
+        /** @var array<Body|string> $list */
         $list = $value;
-        /** @var array<mixed> $firstRow */
+        /** @var Body $firstRow */
         $firstRow = array_pop($list);
-        /** @var array<string, mixed>|string $firstRow */
+        /** @var Query|string $firstRow */
         $keys = array_keys((array) $firstRow);
         $isMultiColumnMultiRowList = $this->isMultiColumnMultiRowList($keys, $list);
         $isMultiColumnList = $this->isMultiColumnList($value, $firstRow);
@@ -237,8 +237,8 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<int, int|string>     $keys
-     * @param array<array<mixed>|string> $list
+     * @param list<array-key>    $keys
+     * @param array<Body|string> $list
      */
     private function isMultiColumnMultiRowList(array $keys, array $list): bool
     {
@@ -265,9 +265,9 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param Body $value
-     * @param list<array-key>          $keys
-     * @param array<mixed, mixed>      $list
+     * @param Body            $value
+     * @param list<array-key> $keys
+     * @param Body            $list
      */
     private function isSingleColumnList(array $value, array $keys, array $list): bool
     {
