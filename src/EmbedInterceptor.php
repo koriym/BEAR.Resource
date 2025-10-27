@@ -110,7 +110,7 @@ final class EmbedInterceptor implements MethodInterceptor
     /**
      * @param MethodInvocation<object> $invocation
      *
-     * @return array<string, mixed>
+     * @return Query
      */
     private function getArgsByInvocation(MethodInvocation $invocation): array
     {

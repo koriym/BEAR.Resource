@@ -9,17 +9,19 @@ use Override;
 use function strtoupper;
 
 /**
- * @method HttpResourceObject get(AbstractUri|string $uri, array<string, mixed> $params = [])
- * @method HttpResourceObject head(AbstractUri|string $uri, array<string, mixed> $params = [])
- * @method HttpResourceObject put(AbstractUri|string $uri, array<string, mixed> $params = [])
- * @method HttpResourceObject post(AbstractUri|string $uri, array<string, mixed> $params = [])
- * @method HttpResourceObject patch(AbstractUri|string $uri, array<string, mixed> $params = [])
- * @method HttpResourceObject delete(AbstractUri|string $uri, array<string, mixed> $params = [])
- * @property-read int                   $code
- * @property-read array<string, string> $headers
- * @property-read array<mixed>          $body
- * @property-read string                $view
+ * @method HttpResourceObject get(AbstractUri|string $uri, Query $params = [])
+ * @method HttpResourceObject head(AbstractUri|string $uri, Query $params = [])
+ * @method HttpResourceObject put(AbstractUri|string $uri, Query $params = [])
+ * @method HttpResourceObject post(AbstractUri|string $uri, Query $params = [])
+ * @method HttpResourceObject patch(AbstractUri|string $uri, Query $params = [])
+ * @method HttpResourceObject delete(AbstractUri|string $uri, Query $params = [])
+ * @property-read int        $code
+ * @property-read Headers    $headers
+ * @property-read HttpBody   $body
+ * @property-read string     $view
  * @psalm-import-type Query from Types
+ * @psalm-import-type Headers from Types
+ * @psalm-import-type HttpBody from Types
  */
 final class HttpResourceObject extends ResourceObject implements InvokeRequestInterface
 {

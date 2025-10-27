@@ -11,12 +11,13 @@ use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 use function assert;
 use function is_string;
 
+/** @psalm-import-type Query from Types */
 final class AssistedWebContextParam implements ParamInterface
 {
     /**
      * $GLOBALS for testing
      *
-     * @var array<string, array<string, mixed>>
+     * @var array<string, Query>
      */
     private static array $globals = [];
 
@@ -33,7 +34,7 @@ final class AssistedWebContextParam implements ParamInterface
     public function __invoke(string $varName, array $query, InjectorInterface $injector)
     {
         $superGlobals = static::$globals ?: $GLOBALS;
-        /** @var array<string, array<string, string>> $superGlobals */
+        /** @var array<string, Query> $superGlobals */
         $webContextParam = $this->webContextParam;
         assert(is_string($webContextParam::GLOBAL_KEY));
         /** @psalm-suppress MixedArrayOffset */
@@ -42,7 +43,7 @@ final class AssistedWebContextParam implements ParamInterface
         return $phpWebContext[$this->webContextParam->key] ?? ($this->defaultParam)($varName, $query, $injector);
     }
 
-    /** @param array<string, array<string, mixed>> $globals */
+    /** @param array<string, Query> $globals */
     public static function setSuperGlobalsOnlyForTestingPurpose(array $globals): void
     {
         self::$globals = $globals;
