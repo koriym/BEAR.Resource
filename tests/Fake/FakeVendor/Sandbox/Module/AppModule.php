@@ -6,6 +6,8 @@ namespace FakeVendor\Sandbox\Module;
 
 use BEAR\Resource\Module\HalModule;
 use BEAR\Resource\Module\ResourceModule;
+use BEAR\Resource\Module\ResourceObjectModule;
+use FakeVendor\Sandbox\Resource\Page\Index;
 use Ray\Di\AbstractModule;
 
 class AppModule extends AbstractModule
@@ -14,5 +16,6 @@ class AppModule extends AbstractModule
     {
         $this->install(new ResourceModule('FakeVendor\Sandbox'));
         $this->install(new HalModule());
+        $this->install(new ResourceObjectModule([Index::class]));
     }
 }

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Module;
 
-use BEAR\Resource\FakeLazyModule;
 use BEAR\Resource\ResourceObject;
 use FakeVendor\Sandbox\Resource\Page\HelloWorld;
 use FakeVendor\Sandbox\Resource\Page\Index;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Ray\Compiler\CompileInjector;
+use Ray\Compiler\CompiledInjector;
+use Ray\Compiler\Compiler;
+use Ray\Di\AbstractModule;
 
 use function array_map;
 use function glob;
@@ -29,10 +30,20 @@ final class ResrouceObjectModuleTest extends TestCase
 
     public function testConfigureWithGenerator(): void
     {
-        $injector = new CompileInjector(
-            __DIR__ . '/tmp',
-            new FakeLazyModule(new ResourceObjectModule($this->getResourceObjectGenerator())),
-        );
+        $scriptDir = __DIR__ . '/tmp';
+        $module = new class ($this->getResourceObjectGenerator()) extends AbstractModule {
+            public function __construct(private Generator $generator)
+            {
+                parent::__construct();
+            }
+
+            protected function configure(): void
+            {
+                $this->install(new ResourceObjectModule($this->generator));
+            }
+        };
+        (new Compiler())->compile($module, $scriptDir);
+        $injector = new CompiledInjector($scriptDir);
 
         $this->assertInstanceOf(Index::class, $injector->getInstance(Index::class));
         $this->assertInstanceOf(HelloWorld::class, $injector->getInstance(HelloWorld::class));
@@ -40,10 +51,21 @@ final class ResrouceObjectModuleTest extends TestCase
 
     public function testConfigureWithArray(): void
     {
-        $injector = new CompileInjector(
-            __DIR__ . '/tmp',
-            new FakeLazyModule(new ResourceObjectModule(iterator_to_array($this->getResourceObjectGenerator()))),
-        );
+        $scriptDir = __DIR__ . '/tmp';
+        $module = new class (iterator_to_array($this->getResourceObjectGenerator())) extends AbstractModule {
+            /** @param array<class-string<ResourceObject>> $resourceObjects */
+            public function __construct(private array $resourceObjects)
+            {
+                parent::__construct();
+            }
+
+            protected function configure(): void
+            {
+                $this->install(new ResourceObjectModule($this->resourceObjects));
+            }
+        };
+        (new Compiler())->compile($module, $scriptDir);
+        $injector = new CompiledInjector($scriptDir);
 
         $this->assertInstanceOf(Index::class, $injector->getInstance(Index::class));
         $this->assertInstanceOf(HelloWorld::class, $injector->getInstance(HelloWorld::class));

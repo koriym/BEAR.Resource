@@ -8,8 +8,8 @@ use BEAR\Resource\Exception\ResourceNotFoundException;
 use FakeVendor\Sandbox\Module\AppModule;
 use FakeVendor\Sandbox\Resource\Page\Index;
 use PHPUnit\Framework\TestCase;
-use Ray\Compiler\DiCompiler;
-use Ray\Compiler\ScriptInjector;
+use Ray\Compiler\CompiledInjector;
+use Ray\Compiler\Compiler;
 use Ray\Di\Injector;
 
 class AppAdapterTest extends TestCase
@@ -36,7 +36,7 @@ class AppAdapterTest extends TestCase
 
     public function testGetWithCompiler(): void
     {
-        $injector = $this->getScriptInjector();
+        $injector = $this->getCompiledInjector();
         $appAdapter = new AppAdapter($injector, 'FakeVendor\Sandbox');
         $index = $appAdapter->get(new Uri('page://self/index'));
         $this->assertInstanceOf(Index::class, $index);
@@ -46,19 +46,17 @@ class AppAdapterTest extends TestCase
     {
         $this->expectException(ResourceNotFoundException::class);
         $scriptDir = __DIR__ . '/tmp';
-        $compiler = new DiCompiler(new AppModule(), $scriptDir);
-        $compiler->compile();
-        $injector = new ScriptInjector($scriptDir);
+        (new Compiler())->compile(new AppModule(), $scriptDir);
+        $injector = new CompiledInjector($scriptDir);
         $appAdapter = new AppAdapter($injector, 'FakeVendor\Sandbox');
         $appAdapter->get(new Uri('page://self/__not_found__'));
     }
 
-    private function getScriptInjector(): ScriptInjector
+    private function getCompiledInjector(): CompiledInjector
     {
         $scriptDir = __DIR__ . '/tmp';
-        $compiler = new DiCompiler(new AppModule(), $scriptDir);
-        $compiler->compile();
+        (new Compiler())->compile(new AppModule(), $scriptDir);
 
-        return new ScriptInjector($scriptDir);
+        return new CompiledInjector($scriptDir);
     }
 }

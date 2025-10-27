@@ -193,6 +193,18 @@ parameters:
 			path: src/Uri.php
 
 		-
+			message: '#^Method BEAR\\Resource\\AppAdapterTest\:\:getScriptInjector\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: tests/AppAdapterTest.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: tests/AppAdapterTest.php
+
+		-
 			message: '#^Instanceof between Ray\\Di\\Injector and Ray\\Di\\InjectorInterface will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
@@ -533,6 +545,12 @@ parameters:
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: tests/Module/LoggerModuleTest.php
+
+		-
+			message: '#^Method BEAR\\Resource\\Module\\ResrouceObjectModuleTest\:\:getResourceObjectGenerator\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: tests/Module/ResrouceObjectModuleTest.php
 
 		-
 			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
