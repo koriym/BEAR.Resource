@@ -35,9 +35,10 @@ use const CURLOPT_URL;
 /**
  * Sends a HTTP request using cURL
  *
- * @psalm-type RequestOptions = array<null>|array{"body?": string, "headers?": array<string, string>}
- * @psalm-type RequestHeaders = array<string, string>
- * @psalm-type Body = array<mixed>
+ * @psalm-import-type Query from Types
+ * @psalm-import-type HttpHeaders from Types
+ * @psalm-import-type HttpBody from Types
+ * @psalm-import-type RequestOptions from Types
  */
 final class HttpRequestCurl implements HttpRequestInterface
 {
@@ -96,7 +97,7 @@ final class HttpRequestCurl implements HttpRequestInterface
         return $curl;
     }
 
-    /** @return array<string, string> */
+    /** @return HttpHeaders */
     private function parseResponseHeaders(string $responseHeaders): array
     {
         $responseHeadersArray = [];
@@ -115,7 +116,7 @@ final class HttpRequestCurl implements HttpRequestInterface
         return $responseHeadersArray;
     }
 
-    /** @return array<mixed> */
+    /** @return HttpBody */
     private function parseBody(CurlHandle $curl, string $view): array
     {
         $responseBody = [];
