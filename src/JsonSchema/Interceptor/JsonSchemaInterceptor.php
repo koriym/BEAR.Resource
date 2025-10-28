@@ -156,7 +156,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
         /** @psalm-suppress MixedAssignment */
         foreach ($values as $key => $value) { // @phpstan-ignore-line
             /** @psalm-suppress MixedArrayOffset */
-            $result[$key] = is_object($value) ? $this->deepArray($value) : $result[$key] = $value; // @phpstan-ignore-line
+            $result[$key] = is_object($value) ? $this->deepArray($value) : $value; // @phpstan-ignore-line
         }
 
         return $result;
