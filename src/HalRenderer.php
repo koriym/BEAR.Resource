@@ -28,6 +28,7 @@ use const PHP_URL_QUERY;
 
 /**
  * @psalm-import-type Body from Types
+ * @psalm-import-type Query from Types
  * @psalm-import-type ResourceObjectBody from Types
  */
 final class HalRenderer implements RenderInterface
@@ -150,7 +151,7 @@ final class HalRenderer implements RenderInterface
         $isRelativePath = $url === null;
         $path = $isRelativePath ? $ro->headers['Location'] : $url;
         parse_str((string) $path, $query);
-        /** @var array<string, string> $query */
+        /** @var Query $query */
 
         $ro->headers['Location'] = $this->linker->getReverseLink($ro->headers['Location'], $query);
     }

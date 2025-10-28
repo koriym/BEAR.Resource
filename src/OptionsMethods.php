@@ -26,6 +26,7 @@ use function json_decode;
 use const JSON_THROW_ON_ERROR;
 
 /**
+ * @psalm-import-type Body from Types
  * @psalm-import-type InsMap from Types
  * @psalm-import-type OptionsMethodsResponse from Types
  * @psalm-import-type OptionsResponse from Types
@@ -114,7 +115,7 @@ final class OptionsMethods
         return $this->getInsFromParameterAttributes($method, $ins);
     }
 
-    /** @return array<array-key, mixed> */
+    /** @return Body */
     private function getJsonSchema(ReflectionMethod $method): array
     {
         $schema = $method->getAnnotation(JsonSchema::class);

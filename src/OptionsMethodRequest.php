@@ -19,7 +19,8 @@ use function method_exists;
  * @psalm-import-type InsMap from Types
  * @psalm-import-type ParameterMetadata from Types
  * @psalm-import-type ParametersMap from Types
- * @psalm-import-type RequiredParameters from Types
+ * @psalm-import-type RequiredParameterList from Types
+ * @psalm-import-type ReflectionParameterList from Types
  */
 final class OptionsMethodRequest
 {
@@ -51,9 +52,9 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<ReflectionParameter> $parameters
-     * @param ParametersMap              $paramDoc
-     * @param InsMap                     $ins
+     * @param ReflectionParameterList $parameters
+     * @param ParametersMap           $paramDoc
+     * @param InsMap                  $ins
      *
      * @return OptionsResponse
      */
@@ -79,9 +80,9 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param array<ReflectionParameter> $parameters
+     * @param ReflectionParameterList $parameters
      *
-     * @return RequiredParameters
+     * @return RequiredParameterList
      */
     private function getRequired(array $parameters): array
     {
@@ -143,8 +144,8 @@ final class OptionsMethodRequest
     }
 
     /**
-     * @param ParametersMap      $paramDoc
-     * @param RequiredParameters $required
+     * @param ParametersMap         $paramDoc
+     * @param RequiredParameterList $required
      *
      * @return OptionsResponse
      */

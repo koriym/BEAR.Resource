@@ -48,8 +48,8 @@ final class HalLinker
     }
 
     /**
-     * @param array<int|string, mixed> $body
-     * @param non-empty-list<object>   $methodAnnotations
+     * @param Body                   $body
+     * @param non-empty-list<object> $methodAnnotations
      */
     private function linkAnnotation(array $body, array $methodAnnotations, Hal $hal): Hal
     {

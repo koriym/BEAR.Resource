@@ -24,7 +24,10 @@ use function uri_template;
 
 /**
  * @psalm-import-type Body from Types
+ * @psalm-import-type BodyOrStringList from Types
+ * @psalm-import-type ObjectList from Types
  * @psalm-import-type Query from Types
+ * @psalm-import-type QueryList from Types
  */
 final class Linker implements LinkerInterface
 {
@@ -157,28 +160,29 @@ final class Linker implements LinkerInterface
     /**
      * Link annotation crawl
      *
-     * @param array<object> $annotations
+     * @param ObjectList $annotations
      *
      * @throws MethodException
      */
     private function annotationCrawl(array $annotations, LinkType $link, ResourceObject $current): ResourceObject
     {
         $isList = $this->isList($current->body);
-        /** @var array<Query> $bodyList */
+        /** @var QueryList $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
         }
 
         unset($body);
+        /** @psalm-suppress PossiblyUndefinedArrayOffset */
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
     }
 
     /**
-     * @param array<object> $annotations
-     * @param Body          $body
+     * @param ObjectList $annotations
+     * @param Body       $body
      *
      * @throws LinkQueryException
      * @throws MethodException
@@ -223,7 +227,7 @@ final class Linker implements LinkerInterface
     private function isList(mixed $value): bool
     {
         assert(is_array($value));
-        /** @var array<Body|string> $list */
+        /** @var BodyOrStringList $list */
         $list = $value;
         /** @var Body $firstRow */
         $firstRow = array_pop($list);
@@ -237,8 +241,8 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param list<array-key>    $keys
-     * @param array<Body|string> $list
+     * @param list<array-key>  $keys
+     * @param BodyOrStringList $list
      */
     private function isMultiColumnMultiRowList(array $keys, array $list): bool
     {

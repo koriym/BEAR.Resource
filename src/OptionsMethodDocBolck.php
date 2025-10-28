@@ -10,7 +10,10 @@ use ReflectionMethod;
 
 use function is_string;
 
-/** @psalm-import-type OptionsDocBlock from Types */
+/**
+ * @psalm-import-type OptionsDocBlock from Types
+ * @psalm-import-type DocBlockParams from Types
+ */
 final class OptionsMethodDocBolck
 {
     /**
@@ -56,10 +59,10 @@ final class OptionsMethodDocBolck
     }
 
     /**
-     * @param Param[]                                                  $tags
-     * @param array<string, array{type: string, description?: string}> $params
+     * @param Param[]        $tags
+     * @param DocBlockParams $params
      *
-     * @return array<string, array{type: string, description?: string}>
+     * @return DocBlockParams
      */
     private function docBlogTags(array $tags, array $params): array
     {

@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace FakeVendor\Sandbox\Resource\App;
 
 use BEAR\Resource\ResourceObject;
+use BEAR\Resource\Types;
 use Koriym\FileUpload\ErrorFileUpload;
 use Koriym\FileUpload\FileUpload as KoriyumFileUpload;
 use Ray\InputQuery\Attribute\InputFile;
 
+/**
+ * @psalm-import-type Body from Types
+ */
 final class FileUpload extends ResourceObject
 {
     /**
-     * @var array<string, mixed>
+     * @var Body
      */
     public $body;
 

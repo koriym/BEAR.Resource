@@ -14,6 +14,7 @@ use stdClass;
 use function class_exists;
 use function is_object;
 
+/** @psalm-import-type Body from Types */
 final class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandlerInterface
 {
     final public const X_FAKE_JSON = 'X-Fake-JSON';
@@ -31,23 +32,23 @@ final class JsonSchemaExceptionFakeHandler implements JsonSchemaExceptionHandler
         $ro->view = null;
     }
 
-    /** @return array<int|string, mixed> */
+    /** @return Body */
     private function fakeResponse(string $schemaFile): array
     {
         if (! class_exists(Faker::class)) {
             throw new LogicException('"koriym/json-schema-faker" not installed. Please run "composer require koriym/json-schema-faker --dev". See more at https://github.com/bearsunday/BEAR.Resource/wiki/json_schema_faker_required'); // @codeCoverageIgnore
         }
 
-        /** @var array<int|string, mixed> $fakeObject */
+        /** @var Body $fakeObject */
         $fakeObject = (new Faker())->generate(new SplFileInfo($schemaFile));
 
         return $this->deepArray($fakeObject);
     }
 
     /**
-     * @param array<int|string, mixed> $values
+     * @param Body $values
      *
-     * @return array<int|string, mixed>
+     * @return Body
      */
     private function deepArray(array|stdClass $values): array
     {

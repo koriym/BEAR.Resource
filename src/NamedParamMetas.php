@@ -18,6 +18,12 @@ use ReflectionAttribute;
 use ReflectionNamedType;
 use ReflectionParameter;
 
+/**
+ * @psalm-import-type ParamMap from Types
+ * @psalm-import-type WebContextParamMap from Types
+ * @psalm-import-type ReflectionParameterMap from Types
+ * @psalm-import-type ObjectList from Types
+ */
 final class NamedParamMetas implements NamedParamMetasInterface
 {
     /** @param InputQueryInterface<object> $inputQuery */
@@ -58,9 +64,10 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @return array<string, ParamInterface>
+     * @return ParamMap
      *
      * @psalm-suppress TooManyTemplateParams $refAttribute
+     * @psalm-suppress PossiblyInvalidArrayAssignment
      */
     private function getAttributeParamMetas(ReflectionMethod $method): array
     {
@@ -109,9 +116,9 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param array<Assisted|object|ResourceParam> $annotations
+     * @param ObjectList $annotations
      *
-     * @return array<string, ParamInterface>
+     * @return ParamMap
      */
     private function getAssistedNames(array $annotations): array
     {
@@ -134,9 +141,9 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param array<object> $annotations
+     * @param ObjectList $annotations
      *
-     * @return array<string, AbstractWebContextParam>
+     * @return WebContextParamMap
      */
     private function getWebContext(array $annotations): array
     {
@@ -153,9 +160,9 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param array<string, ParamInterface> $names
+     * @param ParamMap $names
      *
-     * @return array<string, ParamInterface>
+     * @return ParamMap
      *
      * @codeCoverageIgnore BC for annotation
      */
@@ -169,12 +176,14 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param ReflectionParameter[]                  $parameters
-     * @param array<string, ParamInterface>          $assistedNames
-     * @param array<string, AbstractWebContextParam> $webcontext
+     * @param list<ReflectionParameter> $parameters
+     * @param ParamMap                  $assistedNames
+     * @param WebContextParamMap        $webcontext
      *
      * @return (AssistedWebContextParam|ParamInterface)[]
      * @psalm-return array<string, AssistedWebContextParam|ParamInterface>
+     *
+     * @psalm-suppress InvalidArgument
      */
     private function addNamedParams(array $parameters, array $assistedNames, array $webcontext): array
     {
@@ -202,7 +211,7 @@ final class NamedParamMetas implements NamedParamMetasInterface
 
     /**
      * @param array<ReflectionAttribute<InputFile>> $inputFileAttributes
-     * @param array<string, ParamInterface>         $names
+     * @param ParamMap                              $names
      */
     private function setInputFileParam(ReflectionParameter $parameter, array $inputFileAttributes, array &$names): void
     {
@@ -224,10 +233,10 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param array<string, ParamInterface>      $names
-     * @param array<string, ReflectionParameter> $valueParams
+     * @param ParamMap               $names
+     * @param ReflectionParameterMap $valueParams
      *
-     * @return array<string, ParamInterface>
+     * @return ParamMap
      */
     private function getNames(array $names, array $valueParams): array
     {
