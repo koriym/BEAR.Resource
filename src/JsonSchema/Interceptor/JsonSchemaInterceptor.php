@@ -12,6 +12,7 @@ use BEAR\Resource\Exception\JsonSchemaNotFoundException;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
+use BEAR\Resource\Types;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Override;
@@ -34,6 +35,10 @@ use function str_replace;
 
 use const JSON_THROW_ON_ERROR;
 
+/**
+ * @psalm-import-type Query from Types
+ * @psalm-import-type Body from Types
+ */
 final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
     public function __construct(
@@ -71,7 +76,13 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
         return $ro;
     }
 
-    /** @param array<string, mixed> $arguments */
+    /**
+     * @param Query $arguments
+     *
+     * MethodInvocation<T> generic cannot be specified without breaking interface compatibility
+     *
+     * @phpstan-ignore-next-line missingType.generics
+     */
     private function validateRequest(MethodInvocation $invocation, JsonSchema $jsonSchema, array $arguments): void
     {
         try {
@@ -137,14 +148,15 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
         throw $this->throwJsonSchemaException($validator, $schemaFile);
     }
 
-    /** @return array<int|string, mixed> */
+    /** @return Body */
     private function deepArray(object $values): array
     {
         $result = [];
+        // Iterating over object properties yields mixed key/value types
         /** @psalm-suppress MixedAssignment */
         foreach ($values as $key => $value) { // @phpstan-ignore-line
             /** @psalm-suppress MixedArrayOffset */
-            $result[$key] = is_object($value) ? $this->deepArray($value) : $result[$key] = $value;
+            $result[$key] = is_object($value) ? $this->deepArray($value) : $value; // @phpstan-ignore-line
         }
 
         return $result;
@@ -199,7 +211,7 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
     /**
      * @param MethodInvocation<object> $invocation
      *
-     * @return array<string, mixed>
+     * @return Query
      */
     private function getNamedArguments(MethodInvocation $invocation): array
     {

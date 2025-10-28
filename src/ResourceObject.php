@@ -31,6 +31,7 @@ use const E_USER_WARNING;
 
 /**
  * @psalm-import-type Headers from Types
+ * @psalm-import-type Body from Types
  * @phpstan-implements ArrayAccess<string, mixed>
  * @phpstan-implements IteratorAggregate<(int|string), mixed>
  */
@@ -245,7 +246,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
         return $this->renderer->render($this);
     }
 
-    /** @return array<int|string, mixed> */
+    /** @return Body */
     #[Override]
     public function jsonSerialize(): array
     {
@@ -276,7 +277,7 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
     /**
      * {@inheritDoc}
      *
-     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName) Underscore prefix indicates internal API method
      */
     #[Override]
     public function _invokeRequest(InvokerInterface $invoker, AbstractRequest $request): ResourceObject

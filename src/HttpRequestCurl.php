@@ -8,6 +8,7 @@ use CurlHandle;
 use Override;
 use RuntimeException;
 
+use function assert;
 use function count;
 use function curl_exec;
 use function curl_getinfo;
@@ -34,9 +35,10 @@ use const CURLOPT_URL;
 /**
  * Sends a HTTP request using cURL
  *
- * @psalm-type RequestOptions = array<null>|array{"body?": string, "headers?": array<string, string>}
- * @psalm-type RequestHeaders = array<string, string>
- * @psalm-type Body = array<mixed>
+ * @psalm-import-type Query from Types
+ * @psalm-import-type HttpHeaders from Types
+ * @psalm-import-type HttpBody from Types
+ * @psalm-import-type RequestOptions from Types
  */
 final class HttpRequestCurl implements HttpRequestInterface
 {
@@ -75,6 +77,8 @@ final class HttpRequestCurl implements HttpRequestInterface
             throw new RuntimeException('Failed to initialize cURL'); // @codeCoverageIgnore
         }
 
+        assert($method !== '');
+        assert($uri !== '');
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $uri);
 
@@ -93,7 +97,7 @@ final class HttpRequestCurl implements HttpRequestInterface
         return $curl;
     }
 
-    /** @return array<string, string> */
+    /** @return HttpHeaders */
     private function parseResponseHeaders(string $responseHeaders): array
     {
         $responseHeadersArray = [];
@@ -112,7 +116,7 @@ final class HttpRequestCurl implements HttpRequestInterface
         return $responseHeadersArray;
     }
 
-    /** @return array<mixed> */
+    /** @return HttpBody */
     private function parseBody(CurlHandle $curl, string $view): array
     {
         $responseBody = [];

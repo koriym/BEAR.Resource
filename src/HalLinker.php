@@ -7,12 +7,14 @@ namespace BEAR\Resource;
 use BEAR\Resource\Annotation\Link;
 use Nocarrier\Hal;
 
-use function is_string;
+use function is_array;
 use function uri_template;
 
 /**
  * @psalm-import-type Query from Types
  * @psalm-import-type Body from Types
+ * @psalm-import-type HalLinks from Types
+ * @psalm-import-type HalLinkData from Types
  */
 final class HalLinker
 {
@@ -38,7 +40,7 @@ final class HalLinker
         }
 
         if (isset($body['_links'])) {
-            /** @var array{_links: array<string, array{href: string}>} $body */
+            /** @var array{_links: HalLinks} $body */
             $hal = $this->bodyLink($body, $hal);
         }
 
@@ -46,8 +48,8 @@ final class HalLinker
     }
 
     /**
-     * @param array<int|string, mixed>|array{_links: string} $body
-     * @param non-empty-list<object>                         $methodAnnotations
+     * @param Body                   $body
+     * @param non-empty-list<object> $methodAnnotations
      */
     private function linkAnnotation(array $body, array $methodAnnotations, Hal $hal): Hal
     {
@@ -59,7 +61,7 @@ final class HalLinker
             $uri = uri_template($annotation->href, $body);
             $reverseUri = $this->getReverseLink($uri, []);
 
-            if (isset($body['_links'][$annotation->rel])) {
+            if (isset($body['_links']) && is_array($body['_links']) && isset($body['_links'][$annotation->rel])) {
                 // skip if already difined links in ResourceObject
                 continue;
             }
@@ -71,14 +73,14 @@ final class HalLinker
     }
 
     /**
-     * @param array{_links: array<array{href?: string}>} $body
+     * @param array{_links: HalLinks} $body
      *
      * User can set `_links` array as a `Links` annotation
      */
     private function bodyLink(array $body, Hal $hal): Hal
     {
         foreach ($body['_links'] as $rel => $link) {
-            if (! is_string($rel) || ! isset($link['href'])) {
+            if (! isset($link['href'])) {
                 // @codeCoverageIgnoreStart
                 continue;
                 // @codeCoverageIgnoreEnd

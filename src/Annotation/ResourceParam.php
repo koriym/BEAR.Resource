@@ -32,7 +32,7 @@ final class ResourceParam implements RequestParamInterface
     /**
      * @param array{uri?: string, param?: string, templated?: bool} $values
      *
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag) $templated is configuration flag for URI template expansion
      */
     public function __construct(array $values = [], string $uri = '', string $param = '', bool $templated = false)
     {

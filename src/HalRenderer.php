@@ -9,6 +9,7 @@ use Override;
 use Ray\Aop\ReflectionMethod;
 use RuntimeException;
 
+use function array_values;
 use function assert;
 use function http_build_query;
 use function is_array;
@@ -25,7 +26,11 @@ use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use const PHP_URL_QUERY;
 
-/** @psalm-import-type Body from Types */
+/**
+ * @psalm-import-type Body from Types
+ * @psalm-import-type Query from Types
+ * @psalm-import-type ResourceObjectBody from Types
+ */
 final class HalRenderer implements RenderInterface
 {
     public function __construct(
@@ -100,9 +105,8 @@ final class HalRenderer implements RenderInterface
     }
 
     /**
-     * @param Body $body
-     * @psalm-param list<object>       $annotations
-     * @phpstan-param array<object>    $annotations
+     * @param Body          $body
+     * @param array<object> $annotations
      */
     private function getHal(AbstractUri $uri, array $body, array $annotations): Hal
     {
@@ -111,10 +115,10 @@ final class HalRenderer implements RenderInterface
         $selfLink = $this->linker->getReverseLink($path, $uri->query);
         $hal = new Hal($selfLink, $body);
 
-        return $this->linker->addHalLink($body, $annotations, $hal);
+        return $this->linker->addHalLink($body, array_values($annotations), $hal);
     }
 
-    /** @return array{0: ResourceObject, 1: array<array-key, mixed>} */
+    /** @return ResourceObjectBody */
     private function valuate(ResourceObject $ro): array
     {
         if (is_scalar($ro->body)) {
@@ -147,7 +151,7 @@ final class HalRenderer implements RenderInterface
         $isRelativePath = $url === null;
         $path = $isRelativePath ? $ro->headers['Location'] : $url;
         parse_str((string) $path, $query);
-        /** @var array<string, string> $query */
+        /** @var Query $query */
 
         $ro->headers['Location'] = $this->linker->getReverseLink($ro->headers['Location'], $query);
     }

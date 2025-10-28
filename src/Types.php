@@ -6,6 +6,8 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Embed;
 use BEAR\Resource\Annotation\Link;
+use Ray\WebContextParam\Annotation\AbstractWebContextParam;
+use ReflectionParameter;
 
 /**
  * Type definitions for BEAR.Resource
@@ -13,18 +15,16 @@ use BEAR\Resource\Annotation\Link;
  * @phpcs:disable SlevomatCodingStandard.Commenting.DocCommentSpacing
  *
  * Domain Types
- * @psalm-type ResourceUri = non-empty-string
- * @psalm-type ResourceMethod = non-empty-string
- * @psalm-type ViewName = non-empty-string
  * @psalm-type ResourceClassName = class-string<ResourceObject>
  *
  * Base Types
  * @psalm-type Query = array<string, mixed>
+ * @psalm-type QueryList = list<Query>
  * @psalm-type StringList = list<string>
  * @psalm-type Body = array<array-key, mixed>
- * @psalm-type ResourceLinks = array<string, mixed>
- * @psalm-type Embeds = array<string, mixed>
+ * @psalm-type BodyOrStringList = array<Body|string>
  * @psalm-type Schema = array<array-key, mixed>
+ * @psalm-type ObjectList = list<object>
  *
  * Options Method Types
  * @psalm-type ParameterMetadata = array{
@@ -34,10 +34,10 @@ use BEAR\Resource\Annotation\Link;
  *     in?: string
  * }
  * @psalm-type ParametersMap = array<string, ParameterMetadata>
- * @psalm-type RequiredParameters = list<string>
+ * @psalm-type RequiredParameterList = list<string>
  * @psalm-type OptionsResponse = array{
  *     parameters?: ParametersMap,
- *     required?: RequiredParameters
+ *     required?: RequiredParameterList
  * }
  * @psalm-type OptionsDocumentation = array{
  *     summary?: string,
@@ -47,6 +47,7 @@ use BEAR\Resource\Annotation\Link;
  *     0: OptionsDocumentation,
  *     1: array<string, array{type: string, description?: string}>
  * }
+ * @psalm-type DocBlockParams = array<string, array{type: string, description?: string}>
  * @psalm-type EmbedList = non-empty-list<Embed>
  * @psalm-type LinkList = non-empty-list<Link>
  * @psalm-type SchemaArray = non-empty-array<array-key, mixed>
@@ -58,6 +59,7 @@ use BEAR\Resource\Annotation\Link;
  *     embed?: EmbedList,
  *     schema?: SchemaArray
  * }
+ * @psalm-type OptionsEntityBody = array<string, array<Body|string>>
  *
  * HTTP Request/Response Types
  * @psalm-type Headers = array<string, string>
@@ -86,10 +88,6 @@ use BEAR\Resource\Annotation\Link;
  *     hreflang?: string
  * }
  * @psalm-type HalLinks = array<string, HalLinkData|list<HalLinkData>>
- * @psalm-type HalResource = array{
- *     _links?: HalLinks,
- *     _embedded?: array<string, mixed>
- * }
  *
  * Resource Metadata Types
  * @psalm-type PackageMetadata = array{
@@ -106,24 +104,24 @@ use BEAR\Resource\Annotation\Link;
  *
  * Annotation Types
  * @psalm-type Annotations = array<class-string, object>
- * @psalm-type ClassAnnotations = array<class-string, Annotations>
  * @psalm-type MethodAnnotations = array<string, Annotations>
  * @psalm-type WebContextParam = class-string
- * @psalm-type WebContextName = 'cookie'|'env'|'formData'|'query'|'server'|'files'
- * @psalm-type WebContextMap = array<WebContextParam, WebContextName>
  * @psalm-type InsMap = array<string, string>
  *
+ * Parameter/Injection Types
+ * @psalm-type ParamMap = array<string, ParamInterface>
+ * @psalm-type WebContextParamMap = array<string, AbstractWebContextParam>
+ * @psalm-type SuperGlobalsMap = array<string, Query>
+ * @psalm-type ReflectionParameterList = list<ReflectionParameter>
+ * @psalm-type ReflectionParameterMap = array<string, ReflectionParameter>
+ *
  * Request Types
- * @psalm-type RequestInvoker = callable(ResourceObject, Request): ResourceObject
  * @psalm-type RequestQuery = array<string, mixed>
  *
- * Renderer Types
- * @psalm-type RenderView = array{
- *     status: string,
- *     headers: Headers,
- *     value: mixed,
- *     view: ViewName
- * }
+ * App/Module Types
+ * @psalm-type MetaMap = array<string, Meta>
+ * @psalm-type ClassNameList = list<class-string>
+ * @psalm-type StatusMessageMap = array<int, string>
  *
  * @phpcs:enable
  */

@@ -24,13 +24,15 @@ use function str_contains;
 
 /**
  * @psalm-import-type ResourceClassName from Types
+ * @psalm-import-type MetaMap from Types
+ * @psalm-import-type ClassNameList from Types
  * @implements Iterator<string, Meta>
  */
 final class AppIterator implements Iterator
 {
     private int $i = 0;
 
-    /** @var array<string, Meta> */
+    /** @var MetaMap */
     private array $metaCollection = [];
 
     /** @var list<string> */
@@ -99,7 +101,7 @@ final class AppIterator implements Iterator
     /**
      * @param Iterator<SplFileInfo> $iterator
      *
-     * @return array<string, Meta>
+     * @return MetaMap
      */
     private function getMetaCollection(Iterator $iterator): array
     {
@@ -143,7 +145,7 @@ final class AppIterator implements Iterator
     }
 
     /**
-     * @param array<class-string> $newClasses
+     * @param ClassNameList $newClasses
      *
      * @return ResourceClassName|''
      */

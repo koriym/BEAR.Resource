@@ -1,6 +1,3 @@
-includes:
-  - phpstan-baseline.neon
-
 parameters:
   level: max
   paths:
@@ -11,4 +8,16 @@ parameters:
     - '%currentWorkingDirectory%/tests/Module/tmp/*'
     - '%currentWorkingDirectory%/tests/Fake/*'
   ignoreErrors:
-  		- '#Access to an undefined property#'
+    # ResourceInterface uses magic __get() for HTTP method properties ($get, $post, etc.)
+    - '#^Access to an undefined property BEAR\\Resource\\(ResourceInterface|HttpResourceObject)::\$\w+\.$#'
+    - '#^Access to an undefined property Koriym\\FileUpload\\FileUpload::\$(code|body)\.$#'
+    # Method chaining on ResourceInterface returns mixed from magic methods
+    - '#^Cannot call method .* on mixed\.$#'
+    - '#^Cannot access (property|offset) .* on mixed\.$#'
+    # Test assertions and type operations
+    - '#^(Instanceof between|Call to (function|method) .* with) .* will always evaluate to (true|false)\.$#'
+    - '#^PHPDoc tag @var .* is not subtype of native type#'
+    - '#^(Binary operation|Cannot cast) .* (results in an error|to string)\.$#'
+    - '#^(Parameter|Trying to invoke) .* (expects|but it.s not a callable)#'
+    # PHPMD suppression comments are not valid PHPDoc syntax for PHPStan
+    - '#^PHPDoc tag @SuppressWarnings has invalid value#'

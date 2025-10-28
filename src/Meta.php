@@ -9,9 +9,11 @@ use ReflectionClass;
 use ReflectionMethod;
 
 use function array_shift;
+use function assert;
 use function class_exists;
 use function explode;
 use function implode;
+use function is_string;
 use function str_starts_with;
 use function strtolower;
 use function substr;
@@ -43,14 +45,18 @@ final class Meta
 
     private function getUri(string $class): string
     {
+        /** @var list<string> $classPath */
         $classPath = explode('\\', $class);
         // $class
-        $vendor = (string) array_shift($classPath);
+        $vendor = array_shift($classPath);
+        assert(is_string($vendor));
         $this->extras[self::EXTRAS_VENDOR] = $vendor;
-        $package = (string) array_shift($classPath);
+        $package = array_shift($classPath);
+        assert(is_string($package));
         $this->extras[self::EXTRAS_PACKAGE] = $package;
         array_shift($classPath); // "/Resource/"
         $scheme = array_shift($classPath);
+        assert(is_string($scheme));
 
         return strtolower("{$scheme}://self/" . implode('/', $classPath));
     }

@@ -6,6 +6,8 @@ namespace BEAR\Resource;
 
 /**
  * Resource object code
+ *
+ * @psalm-import-type StatusMessageMap from Types
  */
 final class Code
 {
@@ -45,7 +47,7 @@ final class Code
      * </pre>
      *
      * @see http://www.iana.org/assignments/http-status-codes
-     * @var array<int, string>
+     * @var StatusMessageMap
      */
     public $statusText = [
         100 => 'Continue',

@@ -10,6 +10,7 @@ namespace BEAR\Resource;
  * @psalm-import-type Query from Types
  * @psalm-import-type HttpHeaders from Types
  * @psalm-import-type HttpBody from Types
+ * @psalm-import-type HttpResponse from Types
  */
 interface HttpRequestInterface
 {
@@ -20,8 +21,7 @@ interface HttpRequestInterface
      * @param string $uri    The URL of the request.
      * @param Query  $query  An associative array of query parameters.
      *
-     * @return array{body: HttpBody, code: int, headers: HttpHeaders, view: string}
-     *      An associative array containing the response information.
+     * @return HttpResponse An associative array containing the response information.
      *     - code: The HTTP response code.
      *     - headers: An array of response headers.
      *     - body: The parsed response body.

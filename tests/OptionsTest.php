@@ -9,11 +9,12 @@ use FakeVendor\Sandbox\Resource\App\DocPhp7;
 use FakeVendor\Sandbox\Resource\App\DocUser;
 use PHPUnit\Framework\TestCase;
 
+/** @psalm-import-type Query from Types */
 class OptionsTest extends TestCase
 {
     protected Invoker $invoker;
 
-    /** @var array<string, mixed> */
+    /** @var Query */
     protected array $query = [];
     protected Request $request;
 

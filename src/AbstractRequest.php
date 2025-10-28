@@ -31,14 +31,16 @@ use const E_USER_ERROR;
 use const PHP_EOL;
 
 /**
- * @property int    $code
- * @property array  $headers
- * @property mixed  $body
- * @property string $view
+ * @property int     $code
+ * @property Headers $headers
+ * @property mixed   $body
+ * @property string  $view
  * @phpstan-implements IteratorAggregate<string, mixed>
  * @phpstan-implements ArrayAccess<string, mixed>
  * @psalm-suppress PropertyNotSetInConstructor
  * @psalm-import-type Query from Types
+ * @psalm-import-type Headers from Types
+ * @psalm-import-type Body from Types
  */
 abstract class AbstractRequest implements RequestInterface, ArrayAccess, IteratorAggregate, Serializable, JsonSerializable, Stringable
 {
@@ -59,7 +61,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * Options
      *
-     * @var array<mixed>
+     * @var Body
      */
     public $options = [];
 
@@ -266,7 +268,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     }
 
     /**
-     * @param array<mixed> $data
+     * @param Body $data
      *
      * @codeCoverageIgnore
      */

@@ -12,7 +12,7 @@ interface NamedParameterInterface
      *
      * @param Query $query
      *
-     * @return array<string, mixed>
+     * @return Query
      */
     public function getParameters(callable $callable, array $query): array;
 }

@@ -6,7 +6,7 @@ namespace BEAR\Resource;
 
 final class HttpRequestHeaders
 {
-    /** @param array<string> $headers */
+    /** @param list<string> $headers */
     public function __construct(
         public array $headers = [],
     ) {

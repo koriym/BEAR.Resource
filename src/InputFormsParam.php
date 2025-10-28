@@ -69,11 +69,11 @@ final class InputFormsParam implements ParamInterface
             throw new InvalidArgumentException($varName); // Invalid type of array
         }
 
-        /** @var array<FileUpload|ErrorFileUpload> $fileUploads */
+        /** @var array<AbstractFileUpload> $fileUploads */
 
         assert(count($fileUploads) > 0);
         foreach ($fileUploads as $fileUpload) {
-            if (! ($fileUpload instanceof FileUpload) && ! ($fileUpload instanceof ErrorFileUpload)) { // @phpstan-ignore-line
+            if (! ($fileUpload instanceof FileUpload) && ! ($fileUpload instanceof ErrorFileUpload)) {
                 throw new InvalidArgumentException($varName); // Invalid item of array tye of FileUpload or ErrorFileUpload
             }
         }

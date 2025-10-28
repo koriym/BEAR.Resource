@@ -6,12 +6,13 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Exception\JsonSchemaException;
 
+/** @psalm-import-type Query from Types */
 interface JsonSchemaRequestExceptionHandlerInterface
 {
     /**
      * Handle invalid request object
      *
-     * @param array<string, mixed> $arguments
+     * @param Query $arguments
      *
      * @return void
      */

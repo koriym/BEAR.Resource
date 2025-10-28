@@ -23,15 +23,18 @@ use function ucfirst;
 use function uri_template;
 
 /**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @psalm-import-type Body from Types
+ * @psalm-import-type BodyOrStringList from Types
+ * @psalm-import-type ObjectList from Types
+ * @psalm-import-type Query from Types
+ * @psalm-import-type QueryList from Types
  */
 final class Linker implements LinkerInterface
 {
     /**
      * memory cache for linker
      *
-     * @var array<string, mixed>
+     * @var Query
      */
     private array $cache = [];
 
@@ -65,7 +68,7 @@ final class Linker implements LinkerInterface
         }
 
         foreach ($request->links as $link) {
-            /** @var array<mixed> $nextBody */
+            /** @var Body $nextBody */
             $nextBody = $this->annotationLink($link, $current, $request)->body;
             $current = $this->nextLink($link, $current, $nextBody);
         }
@@ -74,7 +77,7 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<mixed> $nextResource
+     * @param Body $nextResource
      *
      * @return ResourceObject
      */
@@ -157,35 +160,36 @@ final class Linker implements LinkerInterface
     /**
      * Link annotation crawl
      *
-     * @param array<object> $annotations
+     * @param ObjectList $annotations
      *
      * @throws MethodException
      */
     private function annotationCrawl(array $annotations, LinkType $link, ResourceObject $current): ResourceObject
     {
         $isList = $this->isList($current->body);
-        /** @var array<array<string, mixed>> $bodyList */
+        /** @var QueryList $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
         }
 
         unset($body);
+        /** @psalm-suppress PossiblyUndefinedArrayOffset */
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
     }
 
     /**
-     * @param array<object> $annotations
-     * @param Body          $body
+     * @param ObjectList $annotations
+     * @param Body       $body
      *
      * @throws LinkQueryException
      * @throws MethodException
      * @throws LinkRelException
      * @throws UriException
      *
-     * @param-out array $body
+     * @param-out Body $body
      */
     private function crawl(array $annotations, LinkType $link, array &$body): void
     {
@@ -201,7 +205,7 @@ final class Linker implements LinkerInterface
             $request = new Request($this->invoker, $rel, Request::GET, $query, [$link], $this);
             $hash = $request->hash();
             if (array_key_exists($hash, $this->cache)) {
-                /** @var array<array<string, scalar|array<mixed>>>  $cachedResponse */
+                /** @var Body $cachedResponse */
                 $cachedResponse = $this->cache[$hash];
                 $body[$annotation->rel] = $cachedResponse;
                 continue;
@@ -211,7 +215,7 @@ final class Linker implements LinkerInterface
         }
     }
 
-    /** @return array<mixed> */
+    /** @return Body|null */
     private function getResponseBody(Request $request): array|null
     {
         $body = $this->invokeRecursive($request)->body;
@@ -223,11 +227,11 @@ final class Linker implements LinkerInterface
     private function isList(mixed $value): bool
     {
         assert(is_array($value));
-        /** @var array<array<mixed>|string> $list */
+        /** @var BodyOrStringList $list */
         $list = $value;
-        /** @var array<mixed> $firstRow */
+        /** @var Body $firstRow */
         $firstRow = array_pop($list);
-        /** @var array<string, mixed>|string $firstRow */
+        /** @var Query|string $firstRow */
         $keys = array_keys((array) $firstRow);
         $isMultiColumnMultiRowList = $this->isMultiColumnMultiRowList($keys, $list);
         $isMultiColumnList = $this->isMultiColumnList($value, $firstRow);
@@ -237,8 +241,8 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<int, int|string>     $keys
-     * @param array<array<mixed>|string> $list
+     * @param list<array-key>  $keys
+     * @param BodyOrStringList $list
      */
     private function isMultiColumnMultiRowList(array $keys, array $list): bool
     {
@@ -256,8 +260,8 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<int|string, mixed> $value
-     * @psalm-param array<string, mixed>|scalar $firstRow
+     * @param Body $value
+     * @psalm-param Query|scalar $firstRow
      */
     private function isMultiColumnList(array $value, mixed $firstRow): bool
     {
@@ -265,9 +269,9 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * @param array<int|string, mixed> $value
-     * @param list<array-key>          $keys
-     * @param array<mixed, mixed>      $list
+     * @param Body            $value
+     * @param list<array-key> $keys
+     * @param Body            $list
      */
     private function isSingleColumnList(array $value, array $keys, array $list): bool
     {
