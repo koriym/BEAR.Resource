@@ -24,12 +24,12 @@ use ReflectionParameter;
  * @psalm-import-type ReflectionParameterMap from Types
  * @psalm-import-type ObjectList from Types
  */
-final class NamedParamMetas implements NamedParamMetasInterface
+final readonly class NamedParamMetas implements NamedParamMetasInterface
 {
     /** @param InputQueryInterface<object> $inputQuery */
     public function __construct(
-        private readonly InputQueryInterface $inputQuery,
-        private readonly FileUploadFactoryInterface $factory,
+        private InputQueryInterface $inputQuery,
+        private FileUploadFactoryInterface $factory,
     ) {
     }
 
@@ -144,6 +144,11 @@ final class NamedParamMetas implements NamedParamMetasInterface
      * @param ObjectList $annotations
      *
      * @return WebContextParamMap
+     *
+     * @codeCoverageIgnore BC for annotation
+     * @psalm-suppress MixedReturnTypeCoercion
+     * @psalm-suppress MixedArrayOffset
+     * @psalm-suppress UndefinedPropertyFetch
      */
     private function getWebContext(array $annotations): array
     {
@@ -165,6 +170,10 @@ final class NamedParamMetas implements NamedParamMetasInterface
      * @return ParamMap
      *
      * @codeCoverageIgnore BC for annotation
+     * @psalm-suppress MixedReturnTypeCoercion
+     * @psalm-suppress MixedArrayOffset
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress UndefinedPropertyFetch
      */
     private function setAssistedAnnotation(array $names, Assisted $assisted): array
     {

@@ -31,7 +31,7 @@ use const JSON_THROW_ON_ERROR;
  * @psalm-import-type OptionsMethodsResponse from Types
  * @psalm-import-type OptionsResponse from Types
  */
-final class OptionsMethods
+final readonly class OptionsMethods
 {
     /**
      * Constants for annotation name and "in" name
@@ -47,7 +47,7 @@ final class OptionsMethods
 
     public function __construct(
         #[Named('json_schema_dir')]
-        private readonly string $schemaDir = '',
+        private string $schemaDir = '',
     ) {
     }
 
@@ -138,6 +138,9 @@ final class OptionsMethods
      * @return InsMap
      *
      * @codeCoverageIgnore BC for annotation
+     * @psalm-suppress MixedReturnTypeCoercion
+     * @psalm-suppress MixedArrayOffset
+     * @psalm-suppress UndefinedPropertyFetch
      */
     public function getInsFromMethodAnnotations(array $annotations, array $ins): array
     {
