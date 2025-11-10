@@ -37,9 +37,7 @@ class User extends ResourceObject
         ['name' => 'Porthos', 'age' => 17, 'blog_id' => 2]
     ];
 
-    /**
-     * @Link(rel="blog", href="app://self/blog?id={blog_id}")
-     */
+    #[Link(rel: 'blog', href: 'app://self/blog?id={blog_id}')]
     public function onGet(int $id) : ResourceObject
     {
         $this->body = $this->users[$id];

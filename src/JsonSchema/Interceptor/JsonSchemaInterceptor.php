@@ -39,17 +39,17 @@ use const JSON_THROW_ON_ERROR;
  * @psalm-import-type Query from Types
  * @psalm-import-type Body from Types
  */
-final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
+final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
     public function __construct(
         #[Named('json_schema_dir')]
-        private readonly string $schemaDir,
+        private string $schemaDir,
         #[Named('json_validate_dir')]
-        private readonly string $validateDir,
-        private readonly JsonSchemaExceptionHandlerInterface $handler,
-        private readonly JsonSchemaRequestExceptionHandlerInterface $requestHandler,
+        private string $validateDir,
+        private JsonSchemaExceptionHandlerInterface $handler,
+        private JsonSchemaRequestExceptionHandlerInterface $requestHandler,
         #[Named('json_schema_host')]
-        private readonly string|null $schemaHost = null,
+        private string|null $schemaHost = null,
     ) {
     }
 
@@ -60,7 +60,8 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
     public function invoke(MethodInvocation $invocation): ResourceObject
     {
         $method = $invocation->getMethod();
-        $jsonSchema = $method->getAnnotation(JsonSchema::class);
+        $attributes = $method->getAttributes(JsonSchema::class);
+        $jsonSchema = isset($attributes[0]) ? $attributes[0]->newInstance() : null;
         assert($jsonSchema instanceof JsonSchema);
         if ($jsonSchema->params) {
             $arguments = $this->getNamedArguments($invocation);

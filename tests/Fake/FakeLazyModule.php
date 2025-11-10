@@ -7,9 +7,9 @@ namespace BEAR\Resource;
 use Ray\Compiler\LazyModuleInterface;
 use Ray\Di\AbstractModule;
 
-final class FakeLazyModule implements LazyModuleInterface
+final readonly class FakeLazyModule implements LazyModuleInterface
 {
-    public function __construct(private readonly AbstractModule $module)
+    public function __construct(private AbstractModule $module)
     {
     }
 

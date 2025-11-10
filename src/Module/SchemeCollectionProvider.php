@@ -13,12 +13,12 @@ use Ray\Di\InjectorInterface;
 use Ray\Di\ProviderInterface;
 
 /** @implements ProviderInterface<SchemeCollection> */
-final class SchemeCollectionProvider implements ProviderInterface
+final readonly class SchemeCollectionProvider implements ProviderInterface
 {
     public function __construct(
         #[AppName]
-        private readonly string $appName,
-        private readonly InjectorInterface $injector,
+        private string $appName,
+        private InjectorInterface $injector,
     ) {
     }
 

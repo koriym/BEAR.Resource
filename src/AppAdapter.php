@@ -17,16 +17,16 @@ use function str_ends_with;
 use function str_replace;
 use function ucwords;
 
-final class AppAdapter implements AdapterInterface
+final readonly class AppAdapter implements AdapterInterface
 {
     /**
      * @param InjectorInterface $injector  Application dependency injector
      * @param string            $namespace Resource adapter namespace
      */
     public function __construct(
-        private readonly InjectorInterface $injector,
+        private InjectorInterface $injector,
         /** Resource adapter namespace */
-        private readonly string $namespace,
+        private string $namespace,
     ) {
     }
 

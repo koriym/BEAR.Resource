@@ -21,13 +21,13 @@ use function array_key_exists;
  * @psalm-import-type Query from Types
  * @psalm-import-type RequestQuery from Types
  */
-final class InputFormParam implements ParamInterface
+final readonly class InputFormParam implements ParamInterface
 {
     /** @param array<ReflectionAttribute<InputFile>> $inputFileAttributes */
     public function __construct(
-        private readonly FileUploadFactoryInterface $factory,
-        private readonly ReflectionParameter $parameter,
-        private readonly array $inputFileAttributes = [],
+        private FileUploadFactoryInterface $factory,
+        private ReflectionParameter $parameter,
+        private array $inputFileAttributes = [],
     ) {
     }
 

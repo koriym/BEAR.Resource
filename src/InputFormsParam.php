@@ -24,13 +24,13 @@ use function is_array;
  * @psalm-import-type Query from Types
  * @psalm-import-type RequestQuery from Types
  */
-final class InputFormsParam implements ParamInterface
+final readonly class InputFormsParam implements ParamInterface
 {
     /** @param array<ReflectionAttribute<InputFile>> $inputFileAttributes */
     public function __construct(
-        private readonly FileUploadFactoryInterface $factory,
-        private readonly ReflectionParameter $parameter,
-        private readonly array $inputFileAttributes = [],
+        private FileUploadFactoryInterface $factory,
+        private ReflectionParameter $parameter,
+        private array $inputFileAttributes = [],
     ) {
     }
 

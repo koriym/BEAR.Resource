@@ -6,9 +6,6 @@ namespace BEAR\Resource\Annotation;
 
 use Attribute;
 
-/**
- * @Annotation
- */
 #[Attribute]
 final class FakeLog
 {

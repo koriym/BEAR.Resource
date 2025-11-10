@@ -20,22 +20,20 @@ class AttrWebContext extends ResourceObject
     /**
      * Forward compatible attribute
      */
-    #[CookieParam(param: "cookie", key: "c")]
-    #[EnvParam(param: "env", key: "e")]
-    #[FormParam(param: "form", key: "f")]
-    #[QueryParam(param: "query", key: "q")]
-    #[ServerParam(param: "server", key: "s")]
-    public function onPost(string $cookie, string $env, string $form, string $query, string $server)
+    public function onPost(
+        #[CookieParam("c")] string $cookie,
+        #[EnvParam("e")] string $env,
+        #[FormParam("f")] string $form,
+        #[QueryParam("q")] string $query,
+        #[ServerParam("s")] string $server
+    ) {
+    }
+
+    public function onPut(#[CookieParam('c')] string $cookie)
     {
     }
 
-    #[CookieParam('c', param: "cookie")]
-    public function onPut(string $cookie)
-    {
-    }
-
-    #[CookieParam('c', param: "cookie")]
-    public function onDelete(string $a, string $cookie = 'default')
+    public function onDelete(string $a, #[CookieParam('c')] string $cookie = 'default')
     {
     }
 }

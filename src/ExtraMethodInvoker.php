@@ -7,11 +7,11 @@ namespace BEAR\Resource;
 use BEAR\Resource\Exception\MethodNotAllowedException;
 use Ray\Di\Di\Named;
 
-final class ExtraMethodInvoker
+final readonly class ExtraMethodInvoker
 {
     public function __construct(
         #[Named('options')]
-        private readonly RenderInterface $optionsRenderer,
+        private RenderInterface $optionsRenderer,
     ) {
     }
 

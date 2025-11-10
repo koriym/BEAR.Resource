@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **BREAKING**: Minimum PHP version requirement changed from 8.1 to 8.2
+- Migrated from Doctrine Annotations to PHP 8 Attributes
+- Updated Ray.Di and Ray.AOP dependencies to `dev-php82` branch for PHP 8.2+ compatibility
+- Applied readonly class optimization by Rector
+
+### Removed
+- **BREAKING**: Removed all Doctrine Annotations support
+- Removed backward compatibility code for annotations (`getAnnotationParamMetas`, `getAssistedNames`, `addNamedParams`, `getWebContext`, `setAssistedAnnotation`, `getInsFromMethodAnnotations`)
+- Removed `doctrine/annotations` dependency
+
+**Migration Guide**: Use [bearsunday/rector-bearsunday](https://github.com/bearsunday/rector-bearsunday) to automatically convert annotations to attributes.
+
+### Fixed
+- CI workflow to remove PHP 8.1 from test matrix
+- Parameter processing to handle methods without attributes correctly
+
 ## [1.26.3] - 2025-07-30
 
 ### Changed

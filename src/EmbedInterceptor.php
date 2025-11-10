@@ -19,11 +19,11 @@ use function is_string;
 use function uri_template;
 
 /** @psalm-import-type Query from Types */
-final class EmbedInterceptor implements MethodInterceptor
+final readonly class EmbedInterceptor implements MethodInterceptor
 {
     private const SELF_LINK = '_self';
 
-    private readonly ResourceInterface $resource;
+    private ResourceInterface $resource;
 
     public function __construct(
         ResourceInterface $resource,

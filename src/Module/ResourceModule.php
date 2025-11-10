@@ -41,9 +41,5 @@ final class ResourceModule extends AbstractModule
         $this->install(new EmbedResourceModule());
         $this->install(new HttpClientModule());
         $this->bind()->annotatedWith(AppName::class)->toInstance($this->appName);
-
-        // Backward compatibility
-        /** @psalm-suppress DeprecatedClass */
-        $this->install(new AnnotationModule());
     }
 }

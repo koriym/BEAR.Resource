@@ -40,10 +40,10 @@ use const CURLOPT_URL;
  * @psalm-import-type HttpBody from Types
  * @psalm-import-type RequestOptions from Types
  */
-final class HttpRequestCurl implements HttpRequestInterface
+final readonly class HttpRequestCurl implements HttpRequestInterface
 {
     public function __construct(
-        private readonly HttpRequestHeaders $requestHeaders,
+        private HttpRequestHeaders $requestHeaders,
     ) {
     }
 

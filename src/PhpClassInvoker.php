@@ -10,12 +10,12 @@ use function is_callable;
 use function ucfirst;
 
 /** @psalm-import-type Query from Types */
-final class PhpClassInvoker implements InvokerInterface
+final readonly class PhpClassInvoker implements InvokerInterface
 {
     public function __construct(
-        private readonly NamedParameterInterface $params,
-        private readonly ExtraMethodInvoker $extraMethod,
-        private readonly LoggerInterface $logger,
+        private NamedParameterInterface $params,
+        private ExtraMethodInvoker $extraMethod,
+        private LoggerInterface $logger,
     ) {
     }
 

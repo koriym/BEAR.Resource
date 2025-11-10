@@ -8,11 +8,11 @@ use Override;
 use Ray\Di\InjectorInterface;
 
 /** @template T */
-final class DefaultParam implements ParamInterface
+final readonly class DefaultParam implements ParamInterface
 {
     /** @param T $defaultValue */
     public function __construct(
-        private readonly mixed $defaultValue,
+        private mixed $defaultValue,
     ) {
     }
 

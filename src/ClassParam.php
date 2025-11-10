@@ -26,11 +26,11 @@ use function preg_replace;
 use function strtolower;
 
 /** @psalm-import-type Query from Types */
-final class ClassParam implements ParamInterface
+final readonly class ClassParam implements ParamInterface
 {
-    private readonly string $type;
-    private readonly bool $isDefaultAvailable;
-    private readonly mixed $defaultValue; // @phpstan-ignore-line
+    private string $type;
+    private bool $isDefaultAvailable;
+    private mixed $defaultValue; // @phpstan-ignore-line
 
     public function __construct(
         ReflectionNamedType $type,

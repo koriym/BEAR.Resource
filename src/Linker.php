@@ -19,6 +19,7 @@ use function array_pop;
 use function assert;
 use function count;
 use function is_array;
+use function is_numeric;
 use function ucfirst;
 use function uri_template;
 
@@ -265,7 +266,7 @@ final class Linker implements LinkerInterface
      */
     private function isMultiColumnList(array $value, mixed $firstRow): bool
     {
-        return is_array($firstRow) && array_filter(array_keys($value), 'is_numeric') === array_keys($value);
+        return is_array($firstRow) && array_filter(array_keys($value), is_numeric(...)) === array_keys($value);
     }
 
     /**

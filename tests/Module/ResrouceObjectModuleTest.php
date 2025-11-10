@@ -25,14 +25,14 @@ final class ResrouceObjectModuleTest extends TestCase
     protected function setUp(): void
     {
         @unlink(__DIR__ . '/tmp/compiled');
-        array_map('unlink', (array) glob(__DIR__ . '/tmp/{*.php}', GLOB_BRACE)); // @phpstan-ignore-line
+        array_map(unlink(...), (array) glob(__DIR__ . '/tmp/{*.php}', GLOB_BRACE)); // @phpstan-ignore-line
     }
 
     public function testConfigureWithGenerator(): void
     {
         $scriptDir = __DIR__ . '/tmp';
         $module = new class ($this->getResourceObjectGenerator()) extends AbstractModule {
-            public function __construct(private Generator $generator)
+            public function __construct(private readonly Generator $generator)
             {
                 parent::__construct();
             }
@@ -54,7 +54,7 @@ final class ResrouceObjectModuleTest extends TestCase
         $scriptDir = __DIR__ . '/tmp';
         $module = new class (iterator_to_array($this->getResourceObjectGenerator())) extends AbstractModule {
             /** @param array<class-string<ResourceObject>> $resourceObjects */
-            public function __construct(private array $resourceObjects)
+            public function __construct(private readonly array $resourceObjects)
             {
                 parent::__construct();
             }

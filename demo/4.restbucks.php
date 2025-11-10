@@ -27,9 +27,7 @@ class Menu extends ResourceObject
     {
     }
 
-    /**
-     * @Link(rel="order", href="app://self/Order?drink={drink}")
-     */
+    #[Link(rel: 'order', href: 'app://self/Order?drink={drink}')]
     public function onGet(string $drink = null) : ResourceObject
     {
         if ($drink === null) {
@@ -57,9 +55,7 @@ class Order extends ResourceObject
         return $this;
     }
 
-    /**
-     * @Link(rel="payment", href="app://self/payment{?order_id,credit_card_number,expires,name,amount}", method="put")
-     */
+    #[Link(rel: 'payment', href: 'app://self/payment{?order_id,credit_card_number,expires,name,amount}', method: 'put')]
     public function onPost(string $drink) : ResourceObject
     {
         // data store here

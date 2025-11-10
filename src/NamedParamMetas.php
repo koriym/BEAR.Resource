@@ -8,7 +8,6 @@ use BEAR\Resource\Annotation\RequestParamInterface;
 use BEAR\Resource\Annotation\ResourceParam;
 use Override;
 use Ray\Aop\ReflectionMethod;
-use Ray\Di\Di\Assisted;
 use Ray\InputQuery\Attribute\Input;
 use Ray\InputQuery\Attribute\InputFile;
 use Ray\InputQuery\FileUploadFactoryInterface;
@@ -24,12 +23,12 @@ use ReflectionParameter;
  * @psalm-import-type ReflectionParameterMap from Types
  * @psalm-import-type ObjectList from Types
  */
-final class NamedParamMetas implements NamedParamMetasInterface
+final readonly class NamedParamMetas implements NamedParamMetasInterface
 {
     /** @param InputQueryInterface<object> $inputQuery */
     public function __construct(
-        private readonly InputQueryInterface $inputQuery,
-        private readonly FileUploadFactoryInterface $factory,
+        private InputQueryInterface $inputQuery,
+        private FileUploadFactoryInterface $factory,
     ) {
     }
 
@@ -43,24 +42,8 @@ final class NamedParamMetas implements NamedParamMetasInterface
         /** @psalm-suppress InvalidArrayAccess, MixedArgument */
         /** @var array{0:object, 1:string} $callable */
         $method = new ReflectionMethod($callable[0], $callable[1]); // @phpstan-ignore-line
-        $paramMetas = $this->getAttributeParamMetas($method);
 
-        if (! $paramMetas) {
-            $paramMetas = $this->getAnnotationParamMetas($method);
-        }
-
-        return $paramMetas;
-    }
-
-    /** @return array<string, AssistedWebContextParam|ParamInterface> */
-    private function getAnnotationParamMetas(ReflectionMethod $method): array
-    {
-        $parameters = $method->getParameters();
-        $annotations = $method->getAnnotations();
-        $assistedNames = $this->getAssistedNames($annotations);
-        $webContext = $this->getWebContext($annotations);
-
-        return $this->addNamedParams($parameters, $assistedNames, $webContext);
+        return $this->getAttributeParamMetas($method);
     }
 
     /**
@@ -73,7 +56,20 @@ final class NamedParamMetas implements NamedParamMetasInterface
     {
         $parameters = $method->getParameters();
         $names = $valueParams = [];
+
+        // Check method-level ResourceParam attributes
+        $methodResourceParams = $method->getAttributes(ResourceParam::class);
+        foreach ($methodResourceParams as $methodAttr) {
+            $resourceParam = $methodAttr->newInstance();
+            $names[$resourceParam->param] = new AssistedResourceParam($resourceParam);
+        }
+
         foreach ($parameters as $parameter) {
+            // Skip if already set by method-level attribute
+            if (isset($names[$parameter->name])) {
+                continue;
+            }
+
             $refAttribute = $parameter->getAttributes(RequestParamInterface::class, ReflectionAttribute::IS_INSTANCEOF);
             if ($refAttribute) {
                 /** @var ?ResourceParam $resourceParam */
@@ -116,100 +112,6 @@ final class NamedParamMetas implements NamedParamMetasInterface
     }
 
     /**
-     * @param ObjectList $annotations
-     *
-     * @return ParamMap
-     */
-    private function getAssistedNames(array $annotations): array
-    {
-        $names = [];
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof ResourceParam) {
-                $names[$annotation->param] = new AssistedResourceParam($annotation);
-            }
-
-            if (! ($annotation instanceof Assisted)) {
-                continue;
-            }
-
-            // @codeCoverageIgnoreStart
-            $names = $this->setAssistedAnnotation($names, $annotation); // BC for annotation
-            // @codeCoverageIgnoreEnd
-        }
-
-        return $names;
-    }
-
-    /**
-     * @param ObjectList $annotations
-     *
-     * @return WebContextParamMap
-     */
-    private function getWebContext(array $annotations): array
-    {
-        $webcontext = [];
-        foreach ($annotations as $annotation) {
-            if (! ($annotation instanceof AbstractWebContextParam)) {
-                continue;
-            }
-
-            $webcontext[$annotation->param] = $annotation;
-        }
-
-        return $webcontext;
-    }
-
-    /**
-     * @param ParamMap $names
-     *
-     * @return ParamMap
-     *
-     * @codeCoverageIgnore BC for annotation
-     */
-    private function setAssistedAnnotation(array $names, Assisted $assisted): array
-    {
-        foreach ($assisted->values as $assistedParam) {
-            $names[$assistedParam] = new AssistedParam();
-        }
-
-        return $names;
-    }
-
-    /**
-     * @param list<ReflectionParameter> $parameters
-     * @param ParamMap                  $assistedNames
-     * @param WebContextParamMap        $webcontext
-     *
-     * @return (AssistedWebContextParam|ParamInterface)[]
-     * @psalm-return array<string, AssistedWebContextParam|ParamInterface>
-     *
-     * @psalm-suppress InvalidArgument
-     */
-    private function addNamedParams(array $parameters, array $assistedNames, array $webcontext): array
-    {
-        $names = [];
-        foreach ($parameters as $parameter) {
-            $name = $parameter->name;
-            if (isset($assistedNames[$name])) {
-                $names[$name] = $assistedNames[$parameter->name];
-
-                continue;
-            }
-
-            if (isset($webcontext[$name])) {
-                $default = $this->getDefault($parameter);
-                $names[$name] = new AssistedWebContextParam($webcontext[$name], $default);
-
-                continue;
-            }
-
-            $names[$name] = $this->getParam($parameter);
-        }
-
-        return $names;
-    }
-
-    /**
      * @param array<ReflectionAttribute<InputFile>> $inputFileAttributes
      * @param ParamMap                              $names
      */
@@ -240,11 +142,8 @@ final class NamedParamMetas implements NamedParamMetasInterface
      */
     private function getNames(array $names, array $valueParams): array
     {
-        // if there is more than single attributes
-        if ($names) {
-            foreach ($valueParams as $paramName => $valueParam) {
-                $names[$paramName] = $this->getParam($valueParam);
-            }
+        foreach ($valueParams as $paramName => $valueParam) {
+            $names[$paramName] = $this->getParam($valueParam);
         }
 
         return $names;

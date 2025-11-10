@@ -16,12 +16,12 @@ use function assert;
 use function class_exists;
 
 /** @psalm-import-type Query from Types */
-final class InputParam implements ParamInterface
+final readonly class InputParam implements ParamInterface
 {
     /** @param InputQueryInterface<object> $inputQuery */
     public function __construct(
-        private readonly InputQueryInterface $inputQuery,
-        private readonly ReflectionParameter $parameter,
+        private InputQueryInterface $inputQuery,
+        private ReflectionParameter $parameter,
     ) {
     }
 

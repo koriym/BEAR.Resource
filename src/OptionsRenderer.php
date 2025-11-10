@@ -28,13 +28,13 @@ use const PHP_EOL;
  * @see /docs/options/README.md
  * @psalm-import-type OptionsEntityBody from Types
  */
-final class OptionsRenderer implements RenderInterface
+final readonly class OptionsRenderer implements RenderInterface
 {
     /** @SuppressWarnings(PHPMD.BooleanArgumentFlag) $optionsBody is configuration flag, not behavior control */
     public function __construct(
-        private readonly OptionsMethods $optionsMethod,
+        private OptionsMethods $optionsMethod,
         #[OptionsBody]
-        private readonly bool $optionsBody = true,
+        private bool $optionsBody = true,
     ) {
     }
 
