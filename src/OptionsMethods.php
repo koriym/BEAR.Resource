@@ -17,8 +17,6 @@ use Ray\WebContextParam\Annotation\FormParam;
 use Ray\WebContextParam\Annotation\QueryParam;
 use Ray\WebContextParam\Annotation\ServerParam;
 
-use function assert;
-use function class_exists;
 use function file_exists;
 use function file_get_contents;
 use function json_decode;
@@ -102,15 +100,6 @@ final readonly class OptionsMethods
     private function getInMap(ReflectionMethod $method): array
     {
         $ins = [];
-        bc_for_annotation: {
-            // @codeCoverageIgnoreStart
-            $annotations = $method->getAnnotations();
-            $ins = $this->getInsFromMethodAnnotations($annotations, $ins);
-        if ($ins) {
-            return $ins;
-        }
-            // @codeCoverageIgnoreEnd
-        }
 
         return $this->getInsFromParameterAttributes($method, $ins);
     }
@@ -129,36 +118,6 @@ final readonly class OptionsMethods
         }
 
         return (array) json_decode((string) file_get_contents($schemaFile), null, 512, JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * @param array<object> $annotations
-     * @param InsMap        $ins
-     *
-     * @return InsMap
-     *
-     * @codeCoverageIgnore BC for annotation
-     * @psalm-suppress MixedReturnTypeCoercion
-     * @psalm-suppress MixedArrayOffset
-     * @psalm-suppress UndefinedPropertyFetch
-     */
-    public function getInsFromMethodAnnotations(array $annotations, array $ins): array
-    {
-        foreach ($annotations as $annotation) {
-            if (! ($annotation instanceof AbstractWebContextParam)) {
-                continue;
-            }
-
-            $class = $annotation::class;
-            assert(class_exists($class));
-            /** @var array-key $webKey */
-            assert($class === CookieParam::class || $class === EnvParam::class || $class === FormParam::class || $class === QueryParam::class || $class === ServerParam::class || $class === FilesParam::class);
-            $webKey = self::WEB_CONTEXT_NAME[$class];
-
-            $ins[$annotation->param] = $webKey;
-        }
-
-        return $ins;
     }
 
     /**
