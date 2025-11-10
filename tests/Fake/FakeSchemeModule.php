@@ -12,6 +12,6 @@ class FakeSchemeModule extends AbstractModule
     protected function configure(): void
     {
         $this->bind(SchemeCollectionInterface::class)->toProvider(FakeSchemeCollectionProvider::class);
-        $this->bind()->annotatedWith('appName=BEAR\Resource\Annotation\AppName')->toInstance('TestApp');
+        $this->bind()->annotatedWith(AppName::class)->toInstance('TestApp');
     }
 }
