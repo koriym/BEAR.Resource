@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.27.0] - 2025-11-11
+
 ### Changed
 - **BREAKING**: Minimum PHP version requirement changed from 8.1 to 8.2
 - Migrated from Doctrine Annotations to PHP 8 Attributes
@@ -98,7 +100,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.26.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.27.0...HEAD
+[1.27.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.26.3...1.27.0
 [1.26.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.25.0...1.26.0
 [1.25.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.24.0...1.25.0
 [1.24.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.23.0...1.24.0
