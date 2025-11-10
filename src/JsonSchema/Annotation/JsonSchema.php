@@ -5,14 +5,8 @@ declare(strict_types=1);
 namespace BEAR\Resource\Annotation;
 
 use Attribute;
-use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
-/**
- * @Annotation
- * @Target("METHOD")
- * @NamedArgumentConstructor
- * @codeCoverageIgnore
- */
+/** @codeCoverageIgnore */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class JsonSchema
 {
@@ -22,7 +16,6 @@ final class JsonSchema
         public string $key = '',
         /** Input parameter validation schema */
         public string $params = '',
-        /** @Enum({"view", "body"}) */
         public string $target = 'body',
     ) {
     }

@@ -31,9 +31,7 @@ namespace MyVendor\Demo\Resource\App {
             ['id' => 3, 'name' => 'Porthos']
         ];
 
-        /**
-         * @Link(crawl="tree", rel="post", href="app://self/post?author_id={id}")
-         */
+        #[Link(crawl: 'tree', rel: 'post', href: 'app://self/post?author_id={id}')]
         public function onGet(int $id = null) : ResourceObject
         {
             $this->body = $id === null ? $this->users : $this->users[$id];
@@ -114,10 +112,8 @@ namespace MyVendor\Demo\Resource\App {
             ],
         ];
 
-        /**
-         * @Link(crawl="tree", rel="meta", href="app://self/meta?post_id={id}", method="get")
-         * @Link(crawl="tree", rel="tag",  href="app://self/tag?post_id={id}",  method="get")
-         */
+        #[Link(crawl: 'tree', rel: 'meta', href: 'app://self/meta?post_id={id}', method: 'get')]
+        #[Link(crawl: 'tree', rel: 'tag', href: 'app://self/tag?post_id={id}', method: 'get')]
         public function onGet(string $author_id) : ResourceObject
         {
             $this->body = $this->select('author_id', $author_id);
@@ -183,10 +179,8 @@ namespace MyVendor\Demo\Resource\App {
             ],
         ];
 
-        /**
-         * @Link(crawl="tree", rel="tag_name",  href="app://self/tag/name?tag_id={tag_id}",  method="get")
-         * @Link(crawl="another_tree", rel="xxx",  href="app://path/to/another/resource",  method="get")
-         */
+        #[Link(crawl: 'tree', rel: 'tag_name', href: 'app://self/tag/name?tag_id={tag_id}', method: 'get')]
+        #[Link(crawl: 'another_tree', rel: 'xxx', href: 'app://path/to/another/resource', method: 'get')]
         public function onGet(string $post_id) : ResourceObject
         {
             $this->body = $this->select('post_id', $post_id);

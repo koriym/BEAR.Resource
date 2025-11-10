@@ -38,7 +38,7 @@ class JsonSchemaInterceptorTest extends TestCase
         $this->expectException(JsonSchemaKeytNotFoundException::class);
         $object = new FakeUser();
         /** @var array<MethodInterceptor> $interceptrs */
-        $interceptrs = [JsonSchemaInterceptor::class];
+        $interceptrs = [$this->jsonSchemaIntercetor];
         $invocation = new ReflectiveMethodInvocation($object, 'invalidKey', [], $interceptrs);
         $this->jsonSchemaIntercetor->invoke($invocation);
     }
@@ -50,7 +50,7 @@ class JsonSchemaInterceptorTest extends TestCase
     {
         $object = new FakeUser();
         /** @var array<MethodInterceptor> $interceptrs */
-        $interceptrs = [JsonSchemaInterceptor::class];
+        $interceptrs = [$this->jsonSchemaIntercetor];
         $invocation = new ReflectiveMethodInvocation($object, 'bodyKey', [], $interceptrs);
         $ro = $this->jsonSchemaIntercetor->invoke($invocation);
         $this->assertInstanceOf(ResourceObject::class, $object);
@@ -61,7 +61,7 @@ class JsonSchemaInterceptorTest extends TestCase
         $object = new FakeUser();
         $object->view = 'string';
         /** @var array<MethodInterceptor> $interceptrs */
-        $interceptrs = [JsonSchemaInterceptor::class];
+        $interceptrs = [$this->jsonSchemaIntercetor];
         $invocation = new ReflectiveMethodInvocation($object, 'bodyKey', [], $interceptrs);
         $this->jsonSchemaIntercetor->invoke($invocation);
         $this->assertInstanceOf(ResourceObject::class, $object);
@@ -71,7 +71,7 @@ class JsonSchemaInterceptorTest extends TestCase
     {
         $object = new FakeView();
         /** @var array<MethodInterceptor> $interceptrs */
-        $interceptrs = [JsonSchemaInterceptor::class];
+        $interceptrs = [$this->jsonSchemaIntercetor];
         $invocation = new ReflectiveMethodInvocation($object, 'onGet', [20], $interceptrs);
         $ro = $this->jsonSchemaIntercetor->invoke($invocation);
         $this->assertInstanceOf(ResourceObject::class, $ro);

@@ -11,17 +11,8 @@ use Ray\Di\Di\Named;
 
 class Greeting extends ResourceObject
 {
-    /**
-     * ResourceParam annotated class
-     *
-     * This is not an intentional attribute to test annotations.
-     *
-     * @ResourceParam(uri="app://self/rparam/login#login_id", param="name")
-     * @Assisted({"appName"})
-     * @Named("appName=BEAR\Resource\Annotation\AppName")
-     */
     #[ResourceParam(uri: 'app://self/rparam/login#login_id', param: 'name')]
-    public function onGet(?string $name = null, ?string $appName = null)
+    public function onGet(?string $name = null, #[Assisted, Named('appName=BEAR\\Resource\\Annotation\\AppName')] ?string $appName = null)
     {
         $this->body = [
             'name' => $name,
@@ -35,9 +26,6 @@ class Greeting extends ResourceObject
     {
     }
 
-    /**
-     * @ResourceParam(uri="app://self/rparam/login{?name}#nickname", templated=true, param="id")
-     */
     #[ResourceParam(uri: 'app://self/rparam/login{?name}#nickname', templated: true, param: 'id')]
     public function onPost(string $id, string $name)
     {

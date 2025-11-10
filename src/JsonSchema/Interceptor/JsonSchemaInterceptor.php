@@ -60,7 +60,8 @@ final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
     public function invoke(MethodInvocation $invocation): ResourceObject
     {
         $method = $invocation->getMethod();
-        $jsonSchema = $method->getAnnotation(JsonSchema::class);
+        $attributes = $method->getAttributes(JsonSchema::class);
+        $jsonSchema = isset($attributes[0]) ? $attributes[0]->newInstance() : null;
         assert($jsonSchema instanceof JsonSchema);
         if ($jsonSchema->params) {
             $arguments = $this->getNamedArguments($invocation);

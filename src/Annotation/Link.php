@@ -5,15 +5,9 @@ declare(strict_types=1);
 namespace BEAR\Resource\Annotation;
 
 use Attribute;
-use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use JsonSerializable;
 use Override;
 
-/**
- * @Annotation
- * @Target("METHOD")
- * @NamedArgumentConstructor
- */
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final class Link implements JsonSerializable
 {
@@ -35,7 +29,6 @@ final class Link implements JsonSerializable
      * A method for the Link
      *
      * @var string
-     * @Enum({"get", "post", "put", "patch", "delete"})
      */
     public $method;
 

@@ -9,9 +9,7 @@ use BEAR\Resource\ResourceObject;
 
 class News extends ResourceObject
 {
-    /**
-     * @Embed(rel="weather", src="/weather{?date}")
-     */
+    #[Embed(rel: 'weather', src: '/weather{?date}')]
     public function onGet(string $date) : ResourceObject
     {
         $this->body += [

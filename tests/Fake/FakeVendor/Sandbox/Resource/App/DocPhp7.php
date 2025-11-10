@@ -14,19 +14,15 @@ use Ray\WebContextParam\Annotation\ServerParam;
 
 class DocPhp7 extends ResourceObject
 {
-    // Annotations (@ResourceParam, @Assisted) are intentionally used for testing.
-
     /**
      * @param int    $id          Id
      * @param string $name        Name
      * @param bool   $sw          Swithc
      * @param string $login_id    Login ID
      * @param string $defaultNull DefaultNull
-     *
-     * @ResourceParam(param="login_id", uri="app://self/login#id")
-     * @Assisted({"time"})
      */
-    public function onGet(int $id, string $name, bool $sw, string $login_id, array $arr, string $time, $defaultNull = null)
+    #[ResourceParam(param: 'login_id', uri: 'app://self/login#id')]
+    public function onGet(int $id, string $name, bool $sw, string $login_id, array $arr, #[Assisted] string $time, $defaultNull = null)
     {
         return $this;
     }
