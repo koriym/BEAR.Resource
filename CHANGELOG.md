@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed backward compatibility code for annotations (`getAnnotationParamMetas`, `getAssistedNames`, `addNamedParams`, `getWebContext`, `setAssistedAnnotation`, `getInsFromMethodAnnotations`)
 - Removed `doctrine/annotations` dependency
 
+**Migration Guide**: Use [bearsunday/rector-bearsunday](https://github.com/bearsunday/rector-bearsunday) to automatically convert annotations to attributes.
+
 ### Fixed
 - CI workflow to remove PHP 8.1 from test matrix
 - Parameter processing to handle methods without attributes correctly
