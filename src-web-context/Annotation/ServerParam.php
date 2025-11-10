@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ray\WebContextParam\Annotation;
 
 use Attribute;
@@ -7,5 +9,5 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 final class ServerParam extends AbstractWebContextParam
 {
-    const GLOBAL_KEY = '_SERVER';
+    public const GLOBAL_KEY = '_SERVER';
 }
