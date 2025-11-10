@@ -11,8 +11,4 @@ use Ray\Di\Di\Qualifier;
 #[Qualifier]
 final class OptionsBody
 {
-    public function __construct(
-        public string $value = '',
-    ) {
-    }
 }

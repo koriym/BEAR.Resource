@@ -11,8 +11,4 @@ use Ray\Di\Di\Qualifier;
 #[Qualifier]
 final class AppName
 {
-    public function __construct(
-        public string $value = '',
-    ) {
-    }
 }
