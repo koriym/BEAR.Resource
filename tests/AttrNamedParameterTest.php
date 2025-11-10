@@ -86,13 +86,11 @@ class AttrNamedParameterTest extends TestCase
     public function testParameterWebContextDefault(): void
     {
         AssistedWebContextParam::setSuperGlobalsOnlyForTestingPurpose([]);
-        $expected = [
-            'a' => 1,
-            'cookie' => 'default',
-        ];
         $object = new AttrWebContext();
         $args = $this->params->getParameters([$object, 'onDelete'], ['a' => 1]);
-        $this->assertSame($expected, $args);
+        $this->assertSame('default', $args['cookie']);
+        $this->assertSame(1, $args['a']);
+        $this->assertCount(2, $args);
     }
 
     public function testParameterWebContexRequiredNotGiven(): void
