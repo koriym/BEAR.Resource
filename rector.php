@@ -11,10 +11,9 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/src-files',
         __DIR__ . '/tests',
-        __DIR__ . '/tests-php8',
     ])
     // uncomment to reach your current PHP version
-     ->withPhpSets(php81: true)
+     ->withPhpSets(php82: true)
     ->withTypeCoverageLevel(0)
     ->withDeadCodeLevel(0)
     ->withCodeQualityLevel(0)

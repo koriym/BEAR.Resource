@@ -39,17 +39,17 @@ use const JSON_THROW_ON_ERROR;
  * @psalm-import-type Query from Types
  * @psalm-import-type Body from Types
  */
-final class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
+final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
     public function __construct(
         #[Named('json_schema_dir')]
-        private readonly string $schemaDir,
+        private string $schemaDir,
         #[Named('json_validate_dir')]
-        private readonly string $validateDir,
-        private readonly JsonSchemaExceptionHandlerInterface $handler,
-        private readonly JsonSchemaRequestExceptionHandlerInterface $requestHandler,
+        private string $validateDir,
+        private JsonSchemaExceptionHandlerInterface $handler,
+        private JsonSchemaRequestExceptionHandlerInterface $requestHandler,
         #[Named('json_schema_host')]
-        private readonly string|null $schemaHost = null,
+        private string|null $schemaHost = null,
     ) {
     }
 

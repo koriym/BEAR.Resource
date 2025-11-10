@@ -10,11 +10,11 @@ use function array_key_exists;
 use function parse_url;
 
 /** @psalm-import-type Query from Types */
-final class UriFactory
+final readonly class UriFactory
 {
     public function __construct(
         #[ContextScheme]
-        private readonly string $schemaHost = 'page://self',
+        private string $schemaHost = 'page://self',
     ) {
     }
 

@@ -10,10 +10,10 @@ use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use function in_array;
 use function sprintf;
 
-final class ProdLogger implements LoggerInterface
+final readonly class ProdLogger implements LoggerInterface
 {
     public function __construct(
-        private readonly PsrLoggerInterface $logger,
+        private PsrLoggerInterface $logger,
     ) {
     }
 

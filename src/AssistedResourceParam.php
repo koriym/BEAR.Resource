@@ -13,10 +13,10 @@ use function uri_template;
 
 use const PHP_URL_FRAGMENT;
 
-final class AssistedResourceParam implements ParamInterface
+final readonly class AssistedResourceParam implements ParamInterface
 {
     public function __construct(
-        private readonly ResourceParam $resourceParam,
+        private ResourceParam $resourceParam,
     ) {
     }
 

@@ -6,10 +6,10 @@ namespace BEAR\Resource\Fake;
 
 use Ray\InputQuery\Attribute\Input;
 
-final class UserInput
+final readonly class UserInput
 {
     public function __construct(
-        #[Input] public readonly string $name,
-        #[Input] public readonly string $email
+        #[Input] public string $name,
+        #[Input] public string $email
     ) {}
 }

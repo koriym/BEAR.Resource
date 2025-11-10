@@ -7,10 +7,10 @@ namespace BEAR\Resource;
 use Override;
 use Ray\Di\InjectorInterface;
 
-final class HttpAdapter implements AdapterInterface
+final readonly class HttpAdapter implements AdapterInterface
 {
     public function __construct(
-        private readonly InjectorInterface $injector,
+        private InjectorInterface $injector,
     ) {
     }
 

@@ -9,11 +9,11 @@ use InvalidArgumentException;
 use Override;
 use Ray\Di\InjectorInterface;
 
-final class NamedParameter implements NamedParameterInterface
+final readonly class NamedParameter implements NamedParameterInterface
 {
     public function __construct(
-        private readonly NamedParamMetasInterface $paramMetas,
-        private readonly InjectorInterface $injector,
+        private NamedParamMetasInterface $paramMetas,
+        private InjectorInterface $injector,
     ) {
     }
 

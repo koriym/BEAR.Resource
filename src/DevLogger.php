@@ -11,10 +11,10 @@ use Psr\Log\LogLevel;
 use function in_array;
 use function sprintf;
 
-final class DevLogger implements LoggerInterface
+final readonly class DevLogger implements LoggerInterface
 {
     public function __construct(
-        private readonly PsrLoggerInterface $logger,
+        private PsrLoggerInterface $logger,
     ) {
     }
 

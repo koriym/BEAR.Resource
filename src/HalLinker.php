@@ -16,10 +16,10 @@ use function uri_template;
  * @psalm-import-type HalLinks from Types
  * @psalm-import-type HalLinkData from Types
  */
-final class HalLinker
+final readonly class HalLinker
 {
     public function __construct(
-        private readonly ReverseLinkerInterface $link,
+        private ReverseLinkerInterface $link,
     ) {
     }
 

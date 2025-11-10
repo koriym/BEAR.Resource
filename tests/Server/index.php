@@ -17,11 +17,11 @@ http_response_code(200);
 header('Content-Type: application/json; charset=utf-8');
 $requestHeaders = [];
 foreach ($_SERVER as $key => $value) {
-    if (! str_starts_with($key, 'HTTP_')) {
+    if (! str_starts_with((string) $key, 'HTTP_')) {
         continue;
     }
 
-    $requestHeaders[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))))] = $value;
+    $requestHeaders[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr((string) $key, 5)))))] = $value;
 }
 
 echo json_encode(

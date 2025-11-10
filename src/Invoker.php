@@ -3,10 +3,10 @@
 
 namespace BEAR\Resource;
 
-final class Invoker implements InvokerInterface
+final readonly class Invoker implements InvokerInterface
 {
     public function __construct(
-        private readonly PhpClassInvoker $classInvoker
+        private PhpClassInvoker $classInvoker
     ) {
     }
 

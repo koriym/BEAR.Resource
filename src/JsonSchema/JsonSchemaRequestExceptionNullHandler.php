@@ -18,7 +18,7 @@ final class JsonSchemaRequestExceptionNullHandler implements JsonSchemaRequestEx
         ResourceObject $ro,
         JsonSchemaException $e,
         string $schemaFile,
-    ) {
+    ): never {
         throw $e;
     }
 }

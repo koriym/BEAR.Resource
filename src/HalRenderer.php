@@ -31,10 +31,10 @@ use const PHP_URL_QUERY;
  * @psalm-import-type Query from Types
  * @psalm-import-type ResourceObjectBody from Types
  */
-final class HalRenderer implements RenderInterface
+final readonly class HalRenderer implements RenderInterface
 {
     public function __construct(
-        private readonly HalLinker $linker,
+        private HalLinker $linker,
     ) {
     }
 
