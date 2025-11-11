@@ -22,7 +22,6 @@
         "ray/aop": "^2.18.0",
         "ray/di": "^2.18.0",
         "rize/uri-template": "^0.4",
-        "symfony/polyfill-php83": "^v1.32",
         "ray/input-query": "^1.0",
         "koriym/file-upload": "^1.0"
     },
