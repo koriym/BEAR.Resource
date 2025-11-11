@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Module\ResourceModule;
 use FakeVendor\Sandbox\Resource\Page\Index;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 
@@ -54,7 +55,7 @@ class ShortSyntaxTest extends TestCase
         return $index;
     }
 
-    /** @depends testShortSyntaxFunction */
+    #[Depends('testShortSyntaxFunction')]
     public function testShortSyntaxReuseRequest(AbstractRequest $index): void
     {
         $ro = $index(['id' => 'bear']);

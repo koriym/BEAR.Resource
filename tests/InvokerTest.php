@@ -18,6 +18,7 @@ use FakeVendor\Sandbox\Resource\App\Restbucks\Order;
 use FakeVendor\Sandbox\Resource\App\User;
 use FakeVendor\Sandbox\Resource\App\Weave\Book;
 use LogicException;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Aop\Bind;
 use Ray\Aop\Compiler;
@@ -98,7 +99,7 @@ class InvokerTest extends TestCase
         return (string) $response->view;
     }
 
-    /** @depends testOptionsMethod */
+    #[Depends('testOptionsMethod')]
     public function testOptionsMethodBody(string $view): void
     {
         $expected = '{

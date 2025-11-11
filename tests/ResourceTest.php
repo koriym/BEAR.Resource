@@ -13,6 +13,7 @@ use FakeVendor\Sandbox\Resource\App\Href\Hasembed;
 use FakeVendor\Sandbox\Resource\App\Href\Origin;
 use FakeVendor\Sandbox\Resource\App\Href\Target;
 use FakeVendor\Sandbox\Resource\Page\Index;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\Di\NullModule;
@@ -240,7 +241,7 @@ class ResourceTest extends TestCase
         return $this->resource;
     }
 
-    /** @depends testAssistedParameter */
+    #[Depends('testAssistedParameter')]
     public function testPreventAssistedParameterOverride(ResourceInterface $resource): void
     {
         $ro = $resource->get->uri('page://self/assist')->withQuery(['login_id' => '_WILL_BE_IGNORED_'])->eager->request();
@@ -315,7 +316,6 @@ class ResourceTest extends TestCase
         $this->assertJsonStringEqualsJsonString($expected, $view);
     }
 
-    /** @covers \BEAR\Resource\Resource::options() */
     public function testOptions(): void
     {
         $ro = $this->resource->options('page://self/index');

@@ -11,6 +11,7 @@ use BEAR\Resource\Renderer\FakeTestRenderer;
 use FakeVendor\Sandbox\Resource\App\User\Entry;
 use LogicException;
 use OutOfRangeException;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 use function restore_error_handler;
@@ -294,14 +295,14 @@ class RequestTest extends TestCase
         return $request;
     }
 
-    /** @depends testCode */
+    #[Depends('testCode')]
     public function testHeaders(Request $request): void
     {
         $headers = $request->headers;
         $this->assertSame([], $headers);
     }
 
-    /** @depends testCode */
+    #[Depends('testCode')]
     public function testBody(Request $request): void
     {
         $body = $request->body;
@@ -309,7 +310,7 @@ class RequestTest extends TestCase
         $this->assertSame($expected, $body);
     }
 
-    /** @depends testCode */
+    #[Depends('testCode')]
     public function testInvalidProp(Request $request): void
     {
         $this->expectException(OutOfRangeException::class);

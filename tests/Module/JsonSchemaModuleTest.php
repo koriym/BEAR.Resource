@@ -13,6 +13,7 @@ use BEAR\Resource\JsonSchema\FakeUsers;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Uri;
 use LogicException;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Aop\NullInterceptor;
 use Ray\Di\Injector;
@@ -54,7 +55,7 @@ class JsonSchemaModuleTest extends TestCase
         return $e;
     }
 
-    /** @depends testValidateException */
+    #[Depends('testValidateException')]
     public function testBCValidateErrorException(JsonSchemaException $e): void
     {
         $this->assertStringContainsString('[age]', $e->getMessage());
