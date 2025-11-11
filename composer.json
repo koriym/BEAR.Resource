@@ -16,7 +16,7 @@
         "ext-fileinfo": "*",
         "justinrainbow/json-schema": "^5.3 || ^6.0",
         "koriym/http-constants": "^1.1",
-        "nocarrier/hal": "^0.9.12",
+        "koriym/hal": "^1.1",
         "phpdocumentor/reflection-docblock": "^5.2",
         "psr/log": "^1.1 || ^2.0 || ^3.0",
         "ray/aop": "^2.18.0",
