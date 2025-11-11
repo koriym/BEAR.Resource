@@ -19,8 +19,8 @@
         "nocarrier/hal": "^0.9.12",
         "phpdocumentor/reflection-docblock": "^5.2",
         "psr/log": "^1.1 || ^2.0 || ^3.0",
-        "ray/aop": "dev-php82 as 2.19.0",
-        "ray/di": "dev-php82 as 2.19.0",
+        "ray/aop": "^2.18.0",
+        "ray/di": "^2.18.0",
         "rize/uri-template": "^0.4",
         "symfony/polyfill-php83": "^v1.32",
         "ray/input-query": "^1.0",
@@ -30,7 +30,7 @@
         "phpunit/phpunit": "^9.6.29",
         "bear/devtools": "^1.0",
         "koriym/json-schema-faker": "^0.3.1",
-        "ray/compiler": "dev-php82 as 1.13.0",
+        "ray/compiler": "^1.12",
         "bamarni/composer-bin-plugin": "^1.4"
     },
     "autoload": {
