@@ -12,19 +12,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **BREAKING**: Minimum PHP version requirement changed from 8.1 to 8.2
 - Migrated from Doctrine Annotations to PHP 8 Attributes
-- Updated Ray.Di and Ray.AOP dependencies to `dev-php82` branch for PHP 8.2+ compatibility
+- Upgraded PHPUnit from 9.6 to 11.0
+- Migrated PHPUnit XML configuration to latest schema
+- Converted PHPUnit annotations to PHP 8 attributes (`@depends` → `#[Depends]`, `@dataProvider` → `#[DataProvider]`)
+- Updated Scrutinizer CI to PHP 8.4
+- Replaced `nocarrier/hal` with `koriym/hal` ^1.1
+- Restored stable Ray dependencies (ray/aop ^2.18.0, ray/di ^2.18.0)
 - Applied readonly class optimization by Rector
 
 ### Removed
 - **BREAKING**: Removed all Doctrine Annotations support
 - Removed backward compatibility code for annotations (`getAnnotationParamMetas`, `getAssistedNames`, `addNamedParams`, `getWebContext`, `setAssistedAnnotation`, `getInsFromMethodAnnotations`)
 - Removed `doctrine/annotations` dependency
+- Removed unnecessary `symfony/polyfill-php83` dependency
+- Removed obsolete `@CookieParam` annotation docblocks
 
 **Migration Guide**: Use [bearsunday/rector-bearsunday](https://github.com/bearsunday/rector-bearsunday) to automatically convert annotations to attributes.
 
 ### Fixed
 - CI workflow to remove PHP 8.1 from test matrix
 - Parameter processing to handle methods without attributes correctly
+- Updated `.gitignore` for `.phpunit.cache` directory
 
 ## [1.26.3] - 2025-07-30
 
