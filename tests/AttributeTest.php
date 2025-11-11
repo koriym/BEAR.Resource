@@ -7,6 +7,7 @@ namespace BEAR\Resource;
 use BEAR\Resource\Module\ResourceModule;
 use FakeVendor\News\Resource\App\News;
 use FakeVendor\News\Resource\App\WebParam;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 
@@ -31,17 +32,15 @@ class AttributeTest extends TestCase
         return $instance;
     }
 
-    /** @depends testNewInstance */
+    #[Depends('testNewInstance')]
     public function testEmbeded(News $news): void
     {
         $ro = $news->onGet('2021/7/23');
         $this->assertInstanceOf(Request::class, $ro->body['weather']);
     }
 
-    /**
-     * @depends testNewInstance
-     * @see ResourceTest::testLinkSelf()
-     */
+    /** @see ResourceTest::testLinkSelf() */
+    #[Depends('testNewInstance')]
     public function testLink(News $news): void
     {
         $request = $this->resource->get->uri('app://self/news')->withQuery(['date' => '2021/7/23'])->linkSelf('event')->request();

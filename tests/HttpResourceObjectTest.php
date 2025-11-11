@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Dev\Http\BuiltinServer;
 use BEAR\Resource\Module\ResourceModule;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\AbstractModule;
 use Ray\Di\Injector;
@@ -80,14 +81,14 @@ class HttpResourceObjectTest extends TestCase
         $this->assertSame('bar', $body['form']['foo']);  // @phpstan-ignore-line
     }
 
-    /** @depends testGet */
+    #[Depends('testGet')]
     public function testToString(HttpResourceObject $response): void
     {
         $actual = (string) $response;
         $this->assertStringContainsString('"args": {', $actual);
     }
 
-    /** @depends testGet */
+    #[Depends('testGet')]
     public function testIsSet(HttpResourceObject $response): void
     {
         $isSet = isset($response->invalid);

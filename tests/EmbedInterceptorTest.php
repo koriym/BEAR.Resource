@@ -10,6 +10,7 @@ use BEAR\Resource\Module\ResourceModule;
 use FakeVendor\Sandbox\Resource\App\Bird\Birds;
 use FakeVendor\Sandbox\Resource\App\Bird\BirdsRel;
 use FakeVendor\Sandbox\Resource\App\Bird\Sparrow;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 
@@ -57,7 +58,7 @@ class EmbedInterceptorTest extends TestCase
         return $result;
     }
 
-    /** @depends testInvoke */
+    #[Depends('testInvoke')]
     public function testInvokeAnotherLink(ResourceObject $result): ResourceObject
     {
         $profile = $result['bird2'];
@@ -68,7 +69,7 @@ class EmbedInterceptorTest extends TestCase
         return $result;
     }
 
-    /** @depends testInvoke */
+    #[Depends('testInvoke')]
     public function testInvokeString(ResourceObject $result): void
     {
         $result->setRenderer(new JsonRenderer());
@@ -94,7 +95,7 @@ class EmbedInterceptorTest extends TestCase
         return $bird2;
     }
 
-    /** @depends testEmbedAnnotation */
+    #[Depends('testEmbedAnnotation')]
     public function testEmbedChangeQuery(AbstractRequest $request): void
     {
         $request->withQuery(['id' => 100]);

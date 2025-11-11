@@ -7,6 +7,8 @@ namespace BEAR\Resource;
 use FakeVendor\Sandbox\Resource\App\DocInvalidFile;
 use FakeVendor\Sandbox\Resource\App\DocPhp7;
 use FakeVendor\Sandbox\Resource\App\DocUser;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 /** @psalm-import-type Query from Types */
@@ -36,7 +38,7 @@ class OptionsTest extends TestCase
         return $ro;
     }
 
-    /** @depends testOptionsMethod */
+    #[Depends('testOptionsMethod')]
     public function testOptionsMethodBody(ResourceObject $ro): void
     {
         $actual = (string) $ro->view;
@@ -104,7 +106,7 @@ class OptionsTest extends TestCase
     }
 
     /** @return ResourceObject[][] */
-    public function roProvider(): array
+    public static function roProvider(): array
     {
         return [
             [new FakeParamResource()],
@@ -112,7 +114,7 @@ class OptionsTest extends TestCase
         ];
     }
 
-    /** @dataProvider roProvider */
+    #[DataProvider('roProvider')]
     public function testAssistedResource(ResourceObject $ro): void
     {
         $request = new Request($this->invoker, $ro, Request::OPTIONS);

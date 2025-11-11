@@ -7,6 +7,7 @@ namespace BEAR\Resource\Module;
 use BEAR\Resource\DevLogger;
 use BEAR\Resource\FakeResource;
 use BEAR\Resource\LoggerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Ray\Di\AbstractModule;
@@ -14,12 +15,10 @@ use Ray\Di\Injector;
 
 use function assert;
 
+#[CoversClass(DevLogger::class)]
+#[CoversClass(DevLoggerModule::class)]
 class DevLoggerModuleTest extends TestCase
 {
-    /**
-     * @covers \BEAR\Resource\DevLogger
-     * @covers \BEAR\Resource\Module\DevLoggerModule
-     */
     public function testDevLoggerModule(): void
     {
         $psrLoggerModule = new class extends AbstractModule {
