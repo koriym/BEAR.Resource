@@ -7,7 +7,6 @@ namespace BEAR\Resource;
 use Ray\InputQuery\Attribute\Input;
 use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -71,30 +70,11 @@ final class OptionsMethodRequest
         $expandedParamNames = [];
 
         foreach ($parameters as $parameter) {
-            // Check for #[Input] attribute with object type
-            $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
-            if ($inputAttributes) {
-                $inputResult = $this->expandInputParameter($parameter);
-                if ($inputResult !== null) {
-                    [$inputParamDoc, $inputRequired] = $inputResult;
-                    $expandedParameters += $inputParamDoc;
-                    $expandedRequired = [...$expandedRequired, ...$inputRequired];
-                    $expandedParamNames[] = $parameter->name;
-                    continue;
-                }
+            if ($this->processInputParameter($parameter, $expandedParameters, $expandedRequired, $expandedParamNames)) {
+                continue;
             }
 
-            $name = (string) $parameter->name;
-            if (isset($ins[$name])) {
-                $paramDoc[$name]['in'] = $ins[$parameter->name];
-            }
-
-            if (! isset($paramDoc[$parameter->name])) {
-                $paramDoc[$name] = [];
-            }
-
-            $paramDoc = $this->paramType($paramDoc, $parameter);
-            $paramDoc = $this->paramDefault($paramDoc, $parameter);
+            $this->processRegularParameter($parameter, $paramDoc, $ins);
         }
 
         // Merge expanded parameters with regular parameters
@@ -107,6 +87,61 @@ final class OptionsMethodRequest
         }
 
         return $this->setParamMetas($paramDoc, $required);
+    }
+
+    /**
+     * Process #[Input] parameter and accumulate expanded data
+     *
+     * @param ParametersMap $expandedParameters
+     * @param list<string>  $expandedRequired
+     * @param list<string>  $expandedParamNames
+     *
+     * @return bool True if parameter was processed as Input parameter
+     */
+    private function processInputParameter(
+        ReflectionParameter $parameter,
+        array &$expandedParameters,
+        array &$expandedRequired,
+        array &$expandedParamNames,
+    ): bool {
+        $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
+        if (! $inputAttributes) {
+            return false;
+        }
+
+        $inputResult = $this->expandInputParameter($parameter);
+        if ($inputResult === null) {
+            return false;
+        }
+
+        [$inputParamDoc, $inputRequired] = $inputResult;
+        $expandedParameters += $inputParamDoc;
+        $expandedRequired = [...$expandedRequired, ...$inputRequired];
+        $expandedParamNames[] = $parameter->name;
+
+        return true;
+    }
+
+    /**
+     * Process regular (non-Input) parameter
+     *
+     * @param ParametersMap $paramDoc
+     * @param InsMap        $ins
+     */
+    private function processRegularParameter(ReflectionParameter $parameter, array &$paramDoc, array $ins): void
+    {
+        $name = $parameter->name;
+
+        if (isset($ins[$name])) {
+            $paramDoc[$name]['in'] = $ins[$name];
+        }
+
+        if (! isset($paramDoc[$name])) {
+            $paramDoc[$name] = [];
+        }
+
+        $this->setParameterType($paramDoc, $parameter);
+        $this->setParameterDefault($paramDoc, $parameter);
     }
 
     /**
@@ -232,36 +267,34 @@ final class OptionsMethodRequest
     }
 
     /**
+     * Set parameter default value if available
+     *
      * @param ParametersMap $paramDoc
-     *
-     * @return ParametersMap
-     *
-     * @throws ReflectionException
      */
-    private function paramDefault(array $paramDoc, ReflectionParameter $parameter): array
+    private function setParameterDefault(array &$paramDoc, ReflectionParameter $parameter): void
     {
-        $hasDefault = $parameter->isDefaultValueAvailable() && $parameter->getDefaultValue() !== null;
-        if ($hasDefault) {
-            $default = $parameter->getDefaultValue();
-            $paramDoc[(string) $parameter->name]['default'] = is_array($default) ? '[]' : (string) $parameter->getDefaultValue(); // @phpstan-ignore-lines
+        if (! $parameter->isDefaultValueAvailable() || $parameter->getDefaultValue() === null) {
+            return;
         }
 
-        return $paramDoc;
+        $default = $parameter->getDefaultValue();
+        $paramDoc[$parameter->name]['default'] = is_array($default) ? '[]' : (string) $default;
     }
 
     /**
-     * @param ParametersMap $paramDoc
+     * Set parameter type from reflection
      *
-     * @return ParametersMap
+     * @param ParametersMap $paramDoc
      */
-    private function paramType(array $paramDoc, ReflectionParameter $parameter): array
+    private function setParameterType(array &$paramDoc, ReflectionParameter $parameter): void
     {
         $type = $this->getParameterType($parameter, $paramDoc, $parameter->name);
-        if (is_string($type)) {
-            $paramDoc[(string) $parameter->name]['type'] = $type; // override type parameter by reflection over phpdoc param type
+        if (! is_string($type)) {
+            return;
         }
 
-        return $paramDoc;
+        // Override type parameter by reflection over phpdoc param type
+        $paramDoc[$parameter->name]['type'] = $type;
     }
 
     private function getType(ReflectionParameter $parameter): string
@@ -285,11 +318,11 @@ final class OptionsMethodRequest
     private function setParamMetas(array $paramDoc, array $required): array
     {
         $paramMetas = [];
-        if ((bool) $paramDoc) {
+        if ($paramDoc !== []) {
             $paramMetas['parameters'] = $paramDoc;
         }
 
-        if ((bool) $required) {
+        if ($required !== []) {
             $paramMetas['required'] = $required;
         }
 
