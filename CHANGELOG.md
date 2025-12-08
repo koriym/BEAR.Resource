@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.x-dev] - 2024-12-09
+
+### Added
+- Ray.InputQuery `#[Input]` attribute support for OPTIONS method
+  - OPTIONS requests now properly expand `#[Input]` parameters to show constructor properties
+  - Added comprehensive test coverage for Input parameter expansion scenarios
+
+### Fixed
+- Bug where non-Input required parameters were dropped when `#[Input]` attribute existed
+- OPTIONS method now correctly handles mixed Input and regular parameters
+
+### Changed
+- Refactored `OptionsMethodRequest` parameter processing for improved maintainability
+  - Extracted Input parameter processing to dedicated method
+  - Improved code organization and readability
+
 ## [1.27.0] - 2025-11-11
 
 ### Changed
