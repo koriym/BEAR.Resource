@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.x-dev] - 2024-12-09
+## [1.28.0] - 2024-12-09
 
 ### Added
 - Ray.InputQuery `#[Input]` attribute support for OPTIONS method
@@ -124,7 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.27.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...HEAD
+[1.28.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.27.0...1.28.0
 [1.27.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.26.3...1.27.0
 [1.26.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.25.0...1.26.0
 [1.25.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.24.0...1.25.0
