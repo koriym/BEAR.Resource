@@ -7,6 +7,7 @@ namespace BEAR\Resource;
 use BEAR\Resource\Fake\InputResourceBuiltinType;
 use BEAR\Resource\Fake\InputResourceNoConstructor;
 use BEAR\Resource\Fake\InputResourceWithDefaults;
+use BEAR\Resource\Fake\InputResourceWithMixedParams;
 use BEAR\Resource\Fake\UserResource;
 use FakeVendor\Sandbox\Resource\App\DocInvalidFile;
 use FakeVendor\Sandbox\Resource\App\DocPhp7;
@@ -388,6 +389,41 @@ class OptionsTest extends TestCase
             },
             "required": [
                 "input"
+            ]
+        }
+    }
+}
+';
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+
+    public function testOptionsMethodWithInputAttributeMixedParams(): void
+    {
+        $ro = new InputResourceWithMixedParams();
+        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $this->invoker->invoke($request);
+        $actual = $ro->headers['Allow'];
+        $expected = 'POST';
+        $this->assertSame($actual, $expected);
+        $actual = (string) $ro->view;
+        $expected = '{
+    "POST": {
+        "request": {
+            "parameters": {
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "email",
+                "token"
             ]
         }
     }

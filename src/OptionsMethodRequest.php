@@ -12,7 +12,10 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 
+use function array_unique;
+use function array_values;
 use function assert;
+use function in_array;
 use function is_array;
 use function is_string;
 use function method_exists;
@@ -65,6 +68,7 @@ final class OptionsMethodRequest
     {
         $expandedParameters = [];
         $expandedRequired = [];
+        $expandedParamNames = [];
 
         foreach ($parameters as $parameter) {
             // Check for #[Input] attribute with object type
@@ -75,6 +79,7 @@ final class OptionsMethodRequest
                     [$inputParamDoc, $inputRequired] = $inputResult;
                     $expandedParameters += $inputParamDoc;
                     $expandedRequired = [...$expandedRequired, ...$inputRequired];
+                    $expandedParamNames[] = $parameter->name;
                     continue;
                 }
             }
@@ -95,10 +100,10 @@ final class OptionsMethodRequest
         // Merge expanded parameters with regular parameters
         $paramDoc = $expandedParameters + $paramDoc;
 
-        $required = $this->getRequired($parameters);
-        // Replace required with expanded required if we have Input parameters
+        $required = $this->getRequiredWithoutExpandedParams($parameters, $expandedParamNames);
+        // Merge expanded required with regular required
         if ($expandedRequired !== []) {
-            $required = $expandedRequired;
+            $required = array_values(array_unique([...$expandedRequired, ...$required]));
         }
 
         return $this->setParamMetas($paramDoc, $required);
@@ -159,15 +164,23 @@ final class OptionsMethodRequest
     }
 
     /**
+     * Get required parameters excluding successfully expanded #[Input] parameters
+     *
      * @param ReflectionParameterList $parameters
+     * @param list<string>            $expandedParamNames Names of parameters that were expanded
      *
      * @return RequiredParameterList
      */
-    private function getRequired(array $parameters): array
+    private function getRequiredWithoutExpandedParams(array $parameters, array $expandedParamNames): array
     {
         $required = [];
         foreach ($parameters as $parameter) {
             if ($parameter->isOptional()) {
+                continue;
+            }
+
+            // Skip parameters that were successfully expanded
+            if (in_array($parameter->name, $expandedParamNames, true)) {
                 continue;
             }
 
