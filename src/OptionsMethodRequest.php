@@ -116,14 +116,7 @@ final class OptionsMethodRequest
      */
     private function expandInputParameter(ReflectionParameter $parameter): array|null
     {
-        $type = $parameter->getType();
-        if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
-            return null;
-        }
-
-        $className = $type->getName();
-        $refClass = new ReflectionClass($className);
-        $constructor = $refClass->getConstructor();
+        $constructor = $this->getConstructor($parameter);
         if ($constructor === null) {
             return null;
         }
@@ -133,26 +126,8 @@ final class OptionsMethodRequest
 
         foreach ($constructor->getParameters() as $ctorParam) {
             $name = $ctorParam->getName();
-            $paramDoc[$name] = [];
+            $paramDoc[$name] = $this->buildConstructorParamDoc($ctorParam);
 
-            // Set type
-            $ctorType = $ctorParam->getType();
-            if ($ctorType instanceof ReflectionNamedType) {
-                $typeName = $ctorType->getName();
-                if ($typeName === 'int') {
-                    $typeName = 'integer';
-                }
-
-                $paramDoc[$name]['type'] = $typeName;
-            }
-
-            // Set default if available
-            if ($ctorParam->isDefaultValueAvailable() && $ctorParam->getDefaultValue() !== null) {
-                $default = $ctorParam->getDefaultValue();
-                $paramDoc[$name]['default'] = is_array($default) ? '[]' : (string) $default;
-            }
-
-            // Check if required
             if ($ctorParam->isOptional()) {
                 continue;
             }
@@ -161,6 +136,72 @@ final class OptionsMethodRequest
         }
 
         return [$paramDoc, $required];
+    }
+
+    /**
+     * Get constructor from parameter type if it's a class with constructor
+     */
+    private function getConstructor(ReflectionParameter $parameter): ReflectionMethod|null
+    {
+        $type = $parameter->getType();
+        if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            return null;
+        }
+
+        $refClass = new ReflectionClass($type->getName());
+
+        return $refClass->getConstructor();
+    }
+
+    /**
+     * Build parameter documentation for a constructor parameter
+     *
+     * @return array<string, string>
+     */
+    private function buildConstructorParamDoc(ReflectionParameter $ctorParam): array
+    {
+        $doc = [];
+
+        $typeName = $this->getConstructorParamType($ctorParam);
+        if ($typeName !== null) {
+            $doc['type'] = $typeName;
+        }
+
+        $default = $this->getDefaultValueString($ctorParam);
+        if ($default !== null) {
+            $doc['default'] = $default;
+        }
+
+        return $doc;
+    }
+
+    /**
+     * Get type name from constructor parameter
+     */
+    private function getConstructorParamType(ReflectionParameter $ctorParam): string|null
+    {
+        $ctorType = $ctorParam->getType();
+        if (! $ctorType instanceof ReflectionNamedType) {
+            return null;
+        }
+
+        $typeName = $ctorType->getName();
+
+        return $typeName === 'int' ? 'integer' : $typeName;
+    }
+
+    /**
+     * Get default value as string representation
+     */
+    private function getDefaultValueString(ReflectionParameter $param): string|null
+    {
+        if (! $param->isDefaultValueAvailable() || $param->getDefaultValue() === null) {
+            return null;
+        }
+
+        $default = $param->getDefaultValue();
+
+        return is_array($default) ? '[]' : (string) $default;
     }
 
     /**
