@@ -13,7 +13,6 @@ use ReflectionNamedType;
 use ReflectionParameter;
 
 use function assert;
-use function class_exists;
 use function is_array;
 use function is_string;
 use function method_exists;
@@ -71,7 +70,7 @@ final class OptionsMethodRequest
             // Check for #[Input] attribute with object type
             $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
             if ($inputAttributes) {
-                $inputResult = $this->expandInputParameter($parameter, $ins);
+                $inputResult = $this->expandInputParameter($parameter);
                 if ($inputResult !== null) {
                     [$inputParamDoc, $inputRequired] = $inputResult;
                     $expandedParameters += $inputParamDoc;
@@ -108,11 +107,9 @@ final class OptionsMethodRequest
     /**
      * Expand #[Input] parameter to its constructor properties
      *
-     * @param InsMap $ins
-     *
      * @return array{0: ParametersMap, 1: RequiredParameterList}|null
      */
-    private function expandInputParameter(ReflectionParameter $parameter, array $ins): array|null
+    private function expandInputParameter(ReflectionParameter $parameter): array|null
     {
         $type = $parameter->getType();
         if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
@@ -120,10 +117,6 @@ final class OptionsMethodRequest
         }
 
         $className = $type->getName();
-        if (! class_exists($className)) {
-            return null;
-        }
-
         $refClass = new ReflectionClass($className);
         $constructor = $refClass->getConstructor();
         if ($constructor === null) {
@@ -155,16 +148,11 @@ final class OptionsMethodRequest
             }
 
             // Check if required
-            if (! $ctorParam->isOptional()) {
-                $required[] = $name;
-            }
-
-            // Check for "in" mapping
-            if (! isset($ins[$name])) {
+            if ($ctorParam->isOptional()) {
                 continue;
             }
 
-            $paramDoc[$name]['in'] = $ins[$name];
+            $required[] = $name;
         }
 
         return [$paramDoc, $required];

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use BEAR\Resource\Fake\InputResourceBuiltinType;
+use BEAR\Resource\Fake\InputResourceNoConstructor;
+use BEAR\Resource\Fake\InputResourceWithDefaults;
 use BEAR\Resource\Fake\UserResource;
 use FakeVendor\Sandbox\Resource\App\DocInvalidFile;
 use FakeVendor\Sandbox\Resource\App\DocPhp7;
@@ -297,6 +300,94 @@ class OptionsTest extends TestCase
             "required": [
                 "name",
                 "email"
+            ]
+        }
+    }
+}
+';
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+
+    public function testOptionsMethodWithInputAttributeWithDefaults(): void
+    {
+        $ro = new InputResourceWithDefaults();
+        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $this->invoker->invoke($request);
+        $actual = $ro->headers['Allow'];
+        $expected = 'POST';
+        $this->assertSame($actual, $expected);
+        $actual = (string) $ro->view;
+        $expected = '{
+    "POST": {
+        "request": {
+            "parameters": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "default": "default"
+                },
+                "optional": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        }
+    }
+}
+';
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+
+    public function testOptionsMethodWithInputAttributeBuiltinType(): void
+    {
+        $ro = new InputResourceBuiltinType();
+        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $this->invoker->invoke($request);
+        $actual = $ro->headers['Allow'];
+        $expected = 'POST';
+        $this->assertSame($actual, $expected);
+        $actual = (string) $ro->view;
+        $expected = '{
+    "POST": {
+        "request": {
+            "parameters": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        }
+    }
+}
+';
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+
+    public function testOptionsMethodWithInputAttributeNoConstructor(): void
+    {
+        $ro = new InputResourceNoConstructor();
+        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $this->invoker->invoke($request);
+        $actual = $ro->headers['Allow'];
+        $expected = 'POST';
+        $this->assertSame($actual, $expected);
+        $actual = (string) $ro->view;
+        $expected = '{
+    "POST": {
+        "request": {
+            "parameters": {
+                "input": {
+                    "type": "BEAR\\\\Resource\\\\Fake\\\\InputNoConstructor"
+                }
+            },
+            "required": [
+                "input"
             ]
         }
     }
