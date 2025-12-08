@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use Ray\InputQuery\Attribute\Input;
+use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 
 use function assert;
+use function class_exists;
 use function is_array;
 use function is_string;
 use function method_exists;
@@ -60,7 +64,22 @@ final class OptionsMethodRequest
      */
     private function getParamMetas(array $parameters, array $paramDoc, array $ins): array
     {
+        $expandedParameters = [];
+        $expandedRequired = [];
+
         foreach ($parameters as $parameter) {
+            // Check for #[Input] attribute with object type
+            $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
+            if ($inputAttributes) {
+                $inputResult = $this->expandInputParameter($parameter, $ins);
+                if ($inputResult !== null) {
+                    [$inputParamDoc, $inputRequired] = $inputResult;
+                    $expandedParameters += $inputParamDoc;
+                    $expandedRequired = [...$expandedRequired, ...$inputRequired];
+                    continue;
+                }
+            }
+
             $name = (string) $parameter->name;
             if (isset($ins[$name])) {
                 $paramDoc[$name]['in'] = $ins[$parameter->name];
@@ -74,9 +93,81 @@ final class OptionsMethodRequest
             $paramDoc = $this->paramDefault($paramDoc, $parameter);
         }
 
+        // Merge expanded parameters with regular parameters
+        $paramDoc = $expandedParameters + $paramDoc;
+
         $required = $this->getRequired($parameters);
+        // Replace required with expanded required if we have Input parameters
+        if ($expandedRequired !== []) {
+            $required = $expandedRequired;
+        }
 
         return $this->setParamMetas($paramDoc, $required);
+    }
+
+    /**
+     * Expand #[Input] parameter to its constructor properties
+     *
+     * @param InsMap $ins
+     *
+     * @return array{0: ParametersMap, 1: RequiredParameterList}|null
+     */
+    private function expandInputParameter(ReflectionParameter $parameter, array $ins): array|null
+    {
+        $type = $parameter->getType();
+        if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            return null;
+        }
+
+        $className = $type->getName();
+        if (! class_exists($className)) {
+            return null;
+        }
+
+        $refClass = new ReflectionClass($className);
+        $constructor = $refClass->getConstructor();
+        if ($constructor === null) {
+            return null;
+        }
+
+        $paramDoc = [];
+        $required = [];
+
+        foreach ($constructor->getParameters() as $ctorParam) {
+            $name = $ctorParam->getName();
+            $paramDoc[$name] = [];
+
+            // Set type
+            $ctorType = $ctorParam->getType();
+            if ($ctorType instanceof ReflectionNamedType) {
+                $typeName = $ctorType->getName();
+                if ($typeName === 'int') {
+                    $typeName = 'integer';
+                }
+
+                $paramDoc[$name]['type'] = $typeName;
+            }
+
+            // Set default if available
+            if ($ctorParam->isDefaultValueAvailable() && $ctorParam->getDefaultValue() !== null) {
+                $default = $ctorParam->getDefaultValue();
+                $paramDoc[$name]['default'] = is_array($default) ? '[]' : (string) $default;
+            }
+
+            // Check if required
+            if (! $ctorParam->isOptional()) {
+                $required[] = $name;
+            }
+
+            // Check for "in" mapping
+            if (! isset($ins[$name])) {
+                continue;
+            }
+
+            $paramDoc[$name]['in'] = $ins[$name];
+        }
+
+        return [$paramDoc, $required];
     }
 
     /**

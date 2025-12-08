@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use BEAR\Resource\Fake\UserResource;
 use FakeVendor\Sandbox\Resource\App\DocInvalidFile;
 use FakeVendor\Sandbox\Resource\App\DocPhp7;
 use FakeVendor\Sandbox\Resource\App\DocUser;
@@ -271,5 +272,36 @@ class OptionsTest extends TestCase
 }
 ';
         $this->assertJsonStringEqualsJsonString($expected, (string) $ro->view);
+    }
+
+    public function testOptionsMethodWithInputAttribute(): void
+    {
+        $ro = new UserResource();
+        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $this->invoker->invoke($request);
+        $actual = $ro->headers['Allow'];
+        $expected = 'POST';
+        $this->assertSame($actual, $expected);
+        $actual = (string) $ro->view;
+        $expected = '{
+    "POST": {
+        "request": {
+            "parameters": {
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "email"
+            ]
+        }
+    }
+}
+';
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 }
