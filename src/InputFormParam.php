@@ -37,6 +37,8 @@ final readonly class InputFormParam implements ParamInterface
      * Returns form metadata instead of parsing query data
      *
      * @param RequestQuery $query
+     *
+     * @psalm-taint-source input
      */
     #[Override]
     public function __invoke(string $varName, array $query, InjectorInterface $injector): AbstractFileUpload|null

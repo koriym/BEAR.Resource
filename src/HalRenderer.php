@@ -40,6 +40,8 @@ final readonly class HalRenderer implements RenderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @psalm-taint-escape html
      */
     #[Override]
     public function render(ResourceObject $ro)

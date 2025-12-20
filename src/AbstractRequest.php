@@ -120,7 +120,9 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * {@inheritDoc}
      *
-     * @param Query $query
+     * @param Query $query Query parameters that may contain user input
+     *
+     * @psalm-taint-source input $query
      */
     #[Override]
     public function __invoke(array|null $query = null): ResourceObject
