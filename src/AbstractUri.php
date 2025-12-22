@@ -31,11 +31,7 @@ abstract class AbstractUri implements Stringable
     /** @var string */
     public $method = 'get';
 
-    /**
-     * @return string
-     *
-     * @psalm-taint-sink html
-     */
+    /** @return string */
     #[Override]
     public function __toString()
     {
