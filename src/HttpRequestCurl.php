@@ -49,7 +49,6 @@ final readonly class HttpRequestCurl implements HttpRequestInterface
 
     /**
      * @inheritDoc
-     *
      * @psalm-taint-sink ssrf $uri
      */
     #[Override]
