@@ -47,7 +47,10 @@ final readonly class HttpRequestCurl implements HttpRequestInterface
     ) {
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @psalm-taint-sink ssrf $uri
+     */
     #[Override]
     public function request(string $method, string $uri, array $query): array
     {
@@ -70,6 +73,7 @@ final readonly class HttpRequestCurl implements HttpRequestInterface
         ];
     }
 
+    /** @psalm-taint-sink ssrf $uri */
     private function initializeCurl(string $method, string $uri, string $body): CurlHandle
     {
         $curl = curl_init();
@@ -116,7 +120,11 @@ final readonly class HttpRequestCurl implements HttpRequestInterface
         return $responseHeadersArray;
     }
 
-    /** @return HttpBody */
+    /**
+     * @return HttpBody
+     *
+     * @psalm-taint-source input
+     */
     private function parseBody(CurlHandle $curl, string $view): array
     {
         $responseBody = [];

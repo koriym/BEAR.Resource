@@ -31,7 +31,11 @@ abstract class AbstractUri implements Stringable
     /** @var string */
     public $method = 'get';
 
-    /** @return string */
+    /**
+     * @return string
+     *
+     * @psalm-taint-specialize
+     */
     #[Override]
     public function __toString()
     {

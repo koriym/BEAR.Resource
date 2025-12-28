@@ -21,9 +21,11 @@ use const FILTER_VALIDATE_URL;
 final class Uri extends AbstractUri
 {
     /**
-     * @param Query $query
+     * @param Query $query Query parameters that may contain user input
      *
      * @throws UriException
+     *
+     * @psalm-taint-source input $query
      */
     public function __construct(
         string $uri,
