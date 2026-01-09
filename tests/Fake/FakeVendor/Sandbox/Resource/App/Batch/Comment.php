@@ -6,7 +6,7 @@ namespace FakeVendor\Sandbox\Resource\App\Batch;
 
 use BEAR\Resource\Annotation\Link;
 use BEAR\Resource\ResourceObject;
-use FakeVendor\Sandbox\BatchResolver\LikeBatchResolver;
+use FakeVendor\Sandbox\DataLoader\LikeDataLoader;
 
 class Comment extends ResourceObject
 {
@@ -22,7 +22,7 @@ class Comment extends ResourceObject
         ],
     ];
 
-    #[Link(crawl: 'comment-tree', rel: 'like', href: 'app://self/batch/like?comment_id={id}', batch: LikeBatchResolver::class)]
+    #[Link(crawl: 'comment-tree', rel: 'like', href: 'app://self/batch/like?comment_id={id}', batch: LikeDataLoader::class)]
     public function onGet(int $article_id = 0): static
     {
         $this->body = self::$data[$article_id] ?? [];

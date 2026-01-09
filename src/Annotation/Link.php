@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\Annotation;
 
 use Attribute;
-use BEAR\Resource\Batch\BatchResolverInterface;
+use BEAR\Resource\DataLoader\DataLoaderInterface;
 use JsonSerializable;
 use Override;
 
@@ -48,9 +48,9 @@ final class Link implements JsonSerializable
     public $crawl;
 
     /**
-     * BatchResolver class for batch processing
+     * DataLoader class for bulk processing
      *
-     * @var class-string<BatchResolverInterface>|null
+     * @var class-string<DataLoaderInterface>|null
      */
     public $batch;
 
@@ -73,7 +73,7 @@ final class Link implements JsonSerializable
         return $json;
     }
 
-    /** @param array{rel?: string, href?: string, method?: string, title?: string, crawl?: string, batch?: class-string<BatchResolverInterface>|null} $values */
+    /** @param array{rel?: string, href?: string, method?: string, title?: string, crawl?: string, batch?: class-string<DataLoaderInterface>|null} $values */
     public function __construct(
         array $values = [],
         string $rel = '',

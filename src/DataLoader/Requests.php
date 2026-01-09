@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BEAR\Resource\Batch;
+namespace BEAR\Resource\DataLoader;
 
 use function array_map;
 use function parse_str;
@@ -11,7 +11,7 @@ use function parse_url;
 use const PHP_URL_QUERY;
 
 /**
- * Collection of URIs for batch processing with helper methods
+ * Collection of URIs for DataLoader processing with helper methods
  *
  * @psalm-type UriString = string
  */

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace BEAR\Resource\Batch;
+namespace BEAR\Resource\DataLoader;
 
 /**
- * Interface for batch resolvers that process multiple URIs efficiently
+ * Interface for data loaders that process multiple URIs efficiently
  *
  * Implementations should:
  * 1. Extract query parameters from URIs using Requests::getQueryParam()
- * 2. Execute a batch query (e.g., SELECT ... WHERE id IN (...))
+ * 2. Execute a bulk query (e.g., SELECT ... WHERE id IN (...))
  * 3. Map results back to URIs using Requests::mapResults()
  *
  * Example:
  * ```php
- * class LikeBatchResolver implements BatchResolverInterface
+ * class LikeDataLoader implements DataLoaderInterface
  * {
  *     public function __invoke(Requests $requests): Results
  *     {
@@ -26,7 +26,7 @@ namespace BEAR\Resource\Batch;
  * }
  * ```
  */
-interface BatchResolverInterface
+interface DataLoaderInterface
 {
     public function __invoke(Requests $requests): Results;
 }

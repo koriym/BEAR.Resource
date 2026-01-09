@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BEAR\Resource\Batch;
+namespace BEAR\Resource\DataLoader;
 
 use PHPUnit\Framework\TestCase;
 

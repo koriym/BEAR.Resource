@@ -123,12 +123,12 @@ use ReflectionParameter;
  * @psalm-type ClassNameList = list<class-string>
  * @psalm-type StatusMessageMap = array<int, string>
  *
- * Batch Processing Types
- * @psalm-type BatchResolverClass = class-string<\BEAR\Resource\Batch\BatchResolverInterface>
+ * DataLoader Types
+ * @psalm-type DataLoaderClass = class-string<\BEAR\Resource\DataLoader\DataLoaderInterface>
  * @psalm-type UriList = list<string>
  * @psalm-type UriResultMap = array<string, mixed>
- * @psalm-type BatchPendingRequest = array{uri: string, rel: string, bodyRef: int}
- * @psalm-type BatchGroup = array<BatchResolverClass, list<BatchPendingRequest>>
+ * @psalm-type DataLoaderPendingRequest = array{uri: string, rel: string, bodyRef: int}
+ * @psalm-type DataLoaderGroup = array<DataLoaderClass, list<DataLoaderPendingRequest>>
  *
  * @phpcs:enable
  */

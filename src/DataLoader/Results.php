@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace BEAR\Resource\Batch;
+namespace BEAR\Resource\DataLoader;
 
 use function array_key_exists;
 
 /**
- * Batch processing results mapped by URI
+ * DataLoader results mapped by URI
  */
 final class Results
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BEAR\Resource\Batch;
+namespace BEAR\Resource\DataLoader;
 
 use BEAR\Resource\AppAdapter;
 use BEAR\Resource\Factory;
@@ -13,19 +13,19 @@ use BEAR\Resource\LinkType;
 use BEAR\Resource\Request;
 use BEAR\Resource\SchemeCollection;
 use BEAR\Resource\UriFactory;
-use FakeVendor\Sandbox\BatchResolver\LikeBatchResolver;
+use FakeVendor\Sandbox\DataLoader\LikeDataLoader;
 use FakeVendor\Sandbox\Resource\App\Batch\Article;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 
-class LinkerBatchTest extends TestCase
+class LinkerDataLoaderTest extends TestCase
 {
     private Linker $linker;
     private Request $request;
 
     protected function setUp(): void
     {
-        LikeBatchResolver::reset();
+        LikeDataLoader::reset();
 
         $invoker = (new InvokerFactory())();
         $injector = new Injector();
@@ -34,16 +34,16 @@ class LinkerBatchTest extends TestCase
             ->host('self')
             ->toAdapter(new AppAdapter($injector, 'FakeVendor\Sandbox'));
 
-        $batchResolverFactory = new BatchResolverFactory($injector);
+        $dataLoaderFactory = new DataLoaderFactory($injector);
 
         $this->linker = new Linker(
             $invoker,
             new Factory($schemeCollection, new UriFactory()),
-            $batchResolverFactory,
+            $dataLoaderFactory,
         );
     }
 
-    public function testBatchCrawl(): void
+    public function testDataLoaderCrawl(): void
     {
         $invoker = (new InvokerFactory())();
         $this->request = new Request(
@@ -80,23 +80,23 @@ class LinkerBatchTest extends TestCase
         $this->assertSame(12, $comments[2]['id']);
         $this->assertCount(3, $comments[2]['like']);
 
-        // BatchResolver should be called only once (not 3 times for 3 comments)
-        $this->assertSame(1, LikeBatchResolver::$callCount);
+        // DataLoader should be called only once (not 3 times for 3 comments)
+        $this->assertSame(1, LikeDataLoader::$callCount);
     }
 
-    public function testBatchCrawlWithoutBatchFactory(): void
+    public function testDataLoaderCrawlWithoutFactory(): void
     {
-        // Create linker without batch resolver factory
+        // Create linker without DataLoader factory
         $invoker = (new InvokerFactory())();
         $schemeCollection = (new SchemeCollection())
             ->scheme('app')
             ->host('self')
             ->toAdapter(new AppAdapter(new Injector(), 'FakeVendor\Sandbox'));
 
-        $linkerWithoutBatch = new Linker(
+        $linkerWithoutDataLoader = new Linker(
             $invoker,
             new Factory($schemeCollection, new UriFactory()),
-            null, // No batch factory
+            null, // No DataLoader factory
         );
 
         $this->request = new Request(
@@ -108,13 +108,13 @@ class LinkerBatchTest extends TestCase
         );
 
         // Should still work but fall back to individual requests
-        $result = $linkerWithoutBatch->invoke($this->request);
+        $result = $linkerWithoutDataLoader->invoke($this->request);
 
         // Verify structure is still correct
         $this->assertSame(1, $result->body['id']);
         $this->assertArrayHasKey('comment', $result->body);
 
-        // BatchResolver should NOT be called
-        $this->assertSame(0, LikeBatchResolver::$callCount);
+        // DataLoader should NOT be called
+        $this->assertSame(0, LikeDataLoader::$callCount);
     }
 }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link;
-use BEAR\Resource\Batch\BatchResolverFactoryInterface;
-use BEAR\Resource\Batch\BatchResolverInterface;
-use BEAR\Resource\Batch\Requests;
+use BEAR\Resource\DataLoader\DataLoaderFactoryInterface;
+use BEAR\Resource\DataLoader\DataLoaderInterface;
+use BEAR\Resource\DataLoader\Requests;
 use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
@@ -43,13 +43,13 @@ final class Linker implements LinkerInterface
      */
     private array $cache = [];
 
-    /** @var array<class-string<BatchResolverInterface>, BatchResolverInterface> */
-    private array $batchResolverCache = [];
+    /** @var array<class-string<DataLoaderInterface>, DataLoaderInterface> */
+    private array $dataLoaderCache = [];
 
     public function __construct(
         private readonly InvokerInterface $invoker,
         private readonly FactoryInterface $factory,
-        private readonly BatchResolverFactoryInterface|null $batchResolverFactory = null,
+        private readonly DataLoaderFactoryInterface|null $dataLoaderFactory = null,
     ) {
     }
 
@@ -179,10 +179,10 @@ final class Linker implements LinkerInterface
         /** @var QueryList $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
 
-        // Process batch links first
-        $this->processBatchLinks($annotations, $link, $bodyList);
+        // Process DataLoader-enabled links first
+        $this->processDataLoaderLinks($annotations, $link, $bodyList);
 
-        // Process non-batch links
+        // Process non-DataLoader links
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
         }
@@ -195,22 +195,22 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * Process batch-enabled links
+     * Process DataLoader-enabled links
      *
      * @param ObjectList $annotations
      * @param QueryList  $bodyList
      *
      * @param-out QueryList $bodyList
      */
-    private function processBatchLinks(array $annotations, LinkType $link, array &$bodyList): void
+    private function processDataLoaderLinks(array $annotations, LinkType $link, array &$bodyList): void
     {
-        if ($this->batchResolverFactory === null) {
+        if ($this->dataLoaderFactory === null) {
             return;
         }
 
-        // Group URIs by batch resolver class
-        /** @var array<class-string<BatchResolverInterface>, array{annotation: Link, uris: array<int, string>}> $batchGroups */
-        $batchGroups = [];
+        // Group URIs by DataLoader class
+        /** @var array<class-string<DataLoaderInterface>, array{annotation: Link, uris: array<int, string>}> $loaderGroups */
+        $loaderGroups = [];
 
         foreach ($annotations as $annotation) {
             if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {
@@ -221,21 +221,21 @@ final class Linker implements LinkerInterface
                 continue;
             }
 
-            /** @var class-string<BatchResolverInterface> $batchClass */
-            $batchClass = $annotation->batch;
-            $batchGroups[$batchClass] = ['annotation' => $annotation, 'uris' => []];
+            /** @var class-string<DataLoaderInterface> $loaderClass */
+            $loaderClass = $annotation->batch;
+            $loaderGroups[$loaderClass] = ['annotation' => $annotation, 'uris' => []];
 
             foreach ($bodyList as $index => $body) {
                 $uri = uri_template($annotation->href, $body);
-                $batchGroups[$batchClass]['uris'][$index] = $uri;
+                $loaderGroups[$loaderClass]['uris'][$index] = $uri;
             }
         }
 
-        // Execute batch resolvers and distribute results
-        foreach ($batchGroups as $batchClass => $group) {
-            $resolver = $this->getBatchResolver($batchClass);
+        // Execute DataLoaders and distribute results
+        foreach ($loaderGroups as $loaderClass => $group) {
+            $loader = $this->getDataLoader($loaderClass);
             $requests = new Requests(array_values($group['uris']));
-            $results = $resolver($requests);
+            $results = $loader($requests);
 
             foreach ($group['uris'] as $index => $uri) {
                 $bodyList[$index][$group['annotation']->rel] = $results->get($uri);
@@ -244,18 +244,18 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * Get or create a batch resolver instance
+     * Get or create a DataLoader instance
      *
-     * @param class-string<BatchResolverInterface> $class
+     * @param class-string<DataLoaderInterface> $class
      */
-    private function getBatchResolver(string $class): BatchResolverInterface
+    private function getDataLoader(string $class): DataLoaderInterface
     {
-        if (! isset($this->batchResolverCache[$class])) {
-            assert($this->batchResolverFactory !== null);
-            $this->batchResolverCache[$class] = $this->batchResolverFactory->create($class);
+        if (! isset($this->dataLoaderCache[$class])) {
+            assert($this->dataLoaderFactory !== null);
+            $this->dataLoaderCache[$class] = $this->dataLoaderFactory->create($class);
         }
 
-        return $this->batchResolverCache[$class];
+        return $this->dataLoaderCache[$class];
     }
 
     /**
@@ -276,8 +276,8 @@ final class Linker implements LinkerInterface
                 continue;
             }
 
-            // Skip batch-enabled links (already processed by processBatchLinks)
-            if ($annotation->batch !== null && $this->batchResolverFactory !== null) {
+            // Skip DataLoader-enabled links (already processed by processDataLoaderLinks)
+            if ($annotation->batch !== null && $this->dataLoaderFactory !== null) {
                 continue;
             }
 
