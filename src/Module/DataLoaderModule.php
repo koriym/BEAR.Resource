@@ -6,6 +6,7 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\DataLoader\DataLoaderFactory;
 use BEAR\Resource\DataLoader\DataLoaderFactoryInterface;
+use BEAR\Resource\DataLoader\DataLoaderProcessor;
 use Override;
 use Ray\Di\AbstractModule;
 
@@ -21,5 +22,6 @@ final class DataLoaderModule extends AbstractModule
     protected function configure(): void
     {
         $this->bind(DataLoaderFactoryInterface::class)->to(DataLoaderFactory::class);
+        $this->bind(DataLoaderProcessor::class);
     }
 }

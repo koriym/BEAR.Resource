@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link;
-use BEAR\Resource\DataLoader\DataLoaderFactoryInterface;
-use BEAR\Resource\DataLoader\DataLoaderInterface;
-use BEAR\Resource\DataLoader\Requests;
+use BEAR\Resource\DataLoader\DataLoaderProcessor;
 use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
@@ -19,7 +17,6 @@ use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_pop;
-use function array_values;
 use function assert;
 use function count;
 use function is_array;
@@ -43,13 +40,10 @@ final class Linker implements LinkerInterface
      */
     private array $cache = [];
 
-    /** @var array<class-string<DataLoaderInterface>, DataLoaderInterface> */
-    private array $dataLoaderCache = [];
-
     public function __construct(
         private readonly InvokerInterface $invoker,
         private readonly FactoryInterface $factory,
-        private readonly DataLoaderFactoryInterface|null $dataLoaderFactory = null,
+        private readonly DataLoaderProcessor|null $dataLoaderProcessor = null,
     ) {
     }
 
@@ -180,7 +174,7 @@ final class Linker implements LinkerInterface
         $bodyList = $isList ? (array) $current->body : [$current->body];
 
         // Process DataLoader-enabled links first
-        $this->processDataLoaderLinks($annotations, $link, $bodyList);
+        $this->dataLoaderProcessor?->process($annotations, $link, $bodyList);
 
         // Process non-DataLoader links
         /**
@@ -196,72 +190,6 @@ final class Linker implements LinkerInterface
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
-    }
-
-    /**
-     * Process DataLoader-enabled links
-     *
-     * @param ObjectList $annotations
-     * @param QueryList  $bodyList
-     *
-     * @param-out QueryList $bodyList
-     *
-     * @psalm-suppress ReferenceConstraintViolation
-     */
-    private function processDataLoaderLinks(array $annotations, LinkType $link, array &$bodyList): void
-    {
-        if ($this->dataLoaderFactory === null) {
-            return;
-        }
-
-        // Group URIs by DataLoader class
-        /** @var array<class-string<DataLoaderInterface>, array{annotation: Link, uris: array<int, string>}> $loaderGroups */
-        $loaderGroups = [];
-
-        foreach ($annotations as $annotation) {
-            if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {
-                continue;
-            }
-
-            if ($annotation->dataLoader === null) {
-                continue;
-            }
-
-            $loaderClass = $annotation->dataLoader;
-            $loaderGroups[$loaderClass] = ['annotation' => $annotation, 'uris' => []];
-
-            foreach ($bodyList as $index => $body) {
-                $uri = uri_template($annotation->href, $body);
-                $loaderGroups[$loaderClass]['uris'][$index] = $uri;
-            }
-        }
-
-        // Execute DataLoaders and distribute results
-        foreach ($loaderGroups as $loaderClass => $group) {
-            $loader = $this->getDataLoader($loaderClass);
-            $requests = new Requests(array_values($group['uris']));
-            $results = $loader($requests);
-
-            foreach ($group['uris'] as $index => $uri) {
-                /** @psalm-suppress MixedAssignment -- Results::get() returns mixed by design */
-                $bodyList[$index][$group['annotation']->rel] = $results->get($uri);
-            }
-        }
-    }
-
-    /**
-     * Get or create a DataLoader instance
-     *
-     * @param class-string<DataLoaderInterface> $class
-     */
-    private function getDataLoader(string $class): DataLoaderInterface
-    {
-        if (! isset($this->dataLoaderCache[$class])) {
-            assert($this->dataLoaderFactory !== null);
-            $this->dataLoaderCache[$class] = $this->dataLoaderFactory->create($class);
-        }
-
-        return $this->dataLoaderCache[$class];
     }
 
     /**
@@ -282,8 +210,8 @@ final class Linker implements LinkerInterface
                 continue;
             }
 
-            // Skip DataLoader-enabled links (already processed by processDataLoaderLinks)
-            if ($annotation->dataLoader !== null && $this->dataLoaderFactory !== null) {
+            // Skip DataLoader-enabled links (already processed by DataLoaderProcessor)
+            if ($annotation->dataLoader !== null && $this->dataLoaderProcessor !== null) {
                 continue;
             }
 
