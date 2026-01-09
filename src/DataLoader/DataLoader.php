@@ -156,7 +156,6 @@ final class DataLoader
             return [];
         }
 
-        assert(is_string($queryString));
         parse_str($queryString, $params);
         $keys = [];
         /** @psalm-suppress MixedAssignment */
