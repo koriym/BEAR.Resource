@@ -13,6 +13,8 @@ use Ray\Di\AbstractModule;
  *
  * Install this module to enable DataLoader functionality that batches
  * multiple resource requests into a single operation during link crawling.
+ *
+ * @codeCoverageIgnore
  */
 final class DataLoaderModule extends AbstractModule
 {
