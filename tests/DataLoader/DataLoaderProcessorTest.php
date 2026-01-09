@@ -16,8 +16,7 @@ class DataLoaderProcessorTest extends TestCase
 
     protected function setUp(): void
     {
-        $factory = new DataLoaderFactory(new Injector());
-        $this->processor = new DataLoaderProcessor($factory);
+        $this->processor = new DataLoaderProcessor(new Injector());
     }
 
     public function testProcessSkipsNonLinkAnnotations(): void

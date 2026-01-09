@@ -7,8 +7,10 @@ namespace BEAR\Resource\DataLoader;
 use BEAR\Resource\Annotation\Link;
 use BEAR\Resource\LinkType;
 use BEAR\Resource\Types;
+use Ray\Di\InjectorInterface;
 
 use function array_values;
+use function assert;
 use function uri_template;
 
 /**
@@ -24,7 +26,7 @@ final class DataLoaderProcessor
     private array $cache = [];
 
     public function __construct(
-        private readonly DataLoaderFactoryInterface $factory,
+        private readonly InjectorInterface $injector,
     ) {
     }
 
@@ -83,7 +85,9 @@ final class DataLoaderProcessor
     private function getDataLoader(string $class): DataLoaderInterface
     {
         if (! isset($this->cache[$class])) {
-            $this->cache[$class] = $this->factory->create($class);
+            $instance = $this->injector->getInstance($class);
+            assert($instance instanceof DataLoaderInterface);
+            $this->cache[$class] = $instance;
         }
 
         return $this->cache[$class];
