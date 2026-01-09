@@ -5,28 +5,32 @@ declare(strict_types=1);
 namespace BEAR\Resource\DataLoader;
 
 /**
- * Interface for data loaders that process multiple URIs efficiently
+ * Interface for data loaders that batch multiple resource requests
  *
- * Implementations should:
- * 1. Extract query parameters from URIs using Requests::getQueryParam()
- * 2. Execute a bulk query (e.g., SELECT ... WHERE id IN (...))
- * 3. Map results back to URIs using Requests::mapResults()
+ * Implementations receive query parameters and return database rows.
+ * The framework handles URI parsing and result distribution.
  *
  * Example:
  * ```php
- * class LikeDataLoader implements DataLoaderInterface
+ * class MetaDataLoader implements DataLoaderInterface
  * {
- *     public function __invoke(Requests $requests): Results
+ *     public function __invoke(array $queries): array
  *     {
- *         $ids = $requests->getQueryParam('comment_id');
- *         $rows = $this->fetchByIds($ids);
- *
- *         return $requests->mapResults($rows, 'comment_id');
+ *         $postIds = array_column($queries, 'post_id');
+ *         return $this->query->findByPostIds($postIds);
  *     }
  * }
  * ```
+ *
+ * @psalm-type Query = array<string, string>
+ * @psalm-type Row = array<string, mixed>
  */
 interface DataLoaderInterface
 {
-    public function __invoke(Requests $requests): Results;
+    /**
+     * @param list<Query> $queries Query parameters extracted from URIs
+     *
+     * @return list<Row> Rows that contain the query key columns for matching
+     */
+    public function __invoke(array $queries): array;
 }

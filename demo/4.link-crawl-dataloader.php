@@ -21,13 +21,14 @@ namespace MyVendor\DataLoaderDemo\DataLoader {
     require dirname(__DIR__) . '/vendor/autoload.php';
 
     use BEAR\Resource\DataLoader\DataLoaderInterface;
-    use BEAR\Resource\DataLoader\Requests;
-    use BEAR\Resource\DataLoader\Results;
+
+    use function array_column;
+    use function array_merge;
 
     /**
      * DataLoader for Like resources
      *
-     * Receives multiple URIs, fetches all data in one query, and maps results back to URIs.
+     * Receives queries, fetches all data in one query, and returns rows.
      */
     class LikeDataLoader implements DataLoaderInterface
     {
@@ -47,15 +48,15 @@ namespace MyVendor\DataLoaderDemo\DataLoader {
             ],
         ];
 
-        public function __invoke(Requests $requests): Results
+        public function __invoke(array $queries): array
         {
-            echo "  [DataLoader] Called once with URIs:\n";
-            foreach ($requests->uris() as $uri) {
-                echo "    - {$uri}\n";
+            echo "  [DataLoader] Called once with queries:\n";
+            foreach ($queries as $query) {
+                echo "    - comment_id={$query['comment_id']}\n";
             }
 
-            // 1. Extract comment_ids from URIs
-            $commentIds = $requests->getQueryParam('comment_id');
+            // 1. Extract comment_ids from queries
+            $commentIds = array_column($queries, 'comment_id');
 
             // 2. Bulk fetch: SELECT * FROM likes WHERE comment_id IN (...)
             $rows = [];
@@ -64,8 +65,8 @@ namespace MyVendor\DataLoaderDemo\DataLoader {
                 $rows = array_merge($rows, $likes);
             }
 
-            // 3. Map results back to URIs
-            return $requests->mapResults($rows, 'comment_id');
+            // 3. Return rows (framework handles distribution)
+            return $rows;
         }
     }
 }
@@ -164,10 +165,10 @@ namespace Main {
 //
 // Fetching Article with Comments and Likes using DataLoader...
 //
-//   [DataLoader] Called once with URIs:
-//     - app://self/like?comment_id=10
-//     - app://self/like?comment_id=11
-//     - app://self/like?comment_id=12
+//   [DataLoader] Called once with queries:
+//     - comment_id=10
+//     - comment_id=11
+//     - comment_id=12
 //
 // Result:
 // {
