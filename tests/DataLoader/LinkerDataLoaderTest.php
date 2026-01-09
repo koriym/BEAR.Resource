@@ -117,4 +117,52 @@ class LinkerDataLoaderTest extends TestCase
         // DataLoader should NOT be called
         $this->assertSame(0, LikeDataLoader::$callCount);
     }
+
+    public function testDataLoaderCalledOncePerInvoke(): void
+    {
+        // First invoke
+        $invoker = (new InvokerFactory())();
+        $this->request = new Request(
+            $invoker,
+            (new FakeRo())(new Article()),
+            Request::GET,
+            ['id' => 1],
+            [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
+        );
+
+        $this->linker->invoke($this->request);
+        $this->assertSame(1, LikeDataLoader::$callCount);
+
+        // Second invoke - should call DataLoader again
+        $this->request = new Request(
+            $invoker,
+            (new FakeRo())(new Article()),
+            Request::GET,
+            ['id' => 1],
+            [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
+        );
+
+        $this->linker->invoke($this->request);
+        $this->assertSame(2, LikeDataLoader::$callCount);
+    }
+
+    public function testDataLoaderWithEmptyComments(): void
+    {
+        $invoker = (new InvokerFactory())();
+        // Article 99 has no comments
+        $this->request = new Request(
+            $invoker,
+            (new FakeRo())(new Article()),
+            Request::GET,
+            ['id' => 99],
+            [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
+        );
+
+        $result = $this->linker->invoke($this->request);
+
+        $this->assertSame(99, $result->body['id']);
+        $this->assertSame([], $result->body['comment']);
+        // DataLoader is called once with empty URI list (handles gracefully)
+        $this->assertSame(1, LikeDataLoader::$callCount);
+    }
 }

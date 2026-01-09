@@ -133,4 +133,59 @@ class RequestsTest extends TestCase
 
         $this->assertSame([], $results->get('app://self/like?comment_id=20'));
     }
+
+    public function testEmptyUris(): void
+    {
+        $requests = new Requests([]);
+
+        $this->assertSame([], $requests->uris());
+        $this->assertSame([], $requests->getQueryParam('comment_id'));
+        $this->assertSame([], $requests->groupBy('comment_id'));
+    }
+
+    public function testUrisWithoutQueryString(): void
+    {
+        $uris = [
+            'app://self/like',
+            'app://self/comment',
+        ];
+        $requests = new Requests($uris);
+
+        $this->assertSame([], $requests->getQueryParam('comment_id'));
+        $this->assertSame([], $requests->groupBy('comment_id'));
+    }
+
+    public function testMapResultsWithMissingKeyColumn(): void
+    {
+        $uris = [
+            'app://self/like?comment_id=10',
+        ];
+        $requests = new Requests($uris);
+
+        // Row without keyColumn should be skipped
+        $rows = [
+            ['id' => 1, 'user_id' => 'user1'], // no comment_id
+        ];
+
+        $results = $requests->mapResults($rows, 'comment_id');
+
+        $this->assertSame([], $results->get('app://self/like?comment_id=10'));
+    }
+
+    public function testMapResultsWithUnmatchedKeyValue(): void
+    {
+        $uris = [
+            'app://self/like?comment_id=10',
+        ];
+        $requests = new Requests($uris);
+
+        // Row with comment_id that doesn't match any URI
+        $rows = [
+            ['id' => 1, 'comment_id' => '999', 'user_id' => 'user1'],
+        ];
+
+        $results = $requests->mapResults($rows, 'comment_id');
+
+        $this->assertSame([], $results->get('app://self/like?comment_id=10'));
+    }
 }

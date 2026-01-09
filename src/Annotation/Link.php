@@ -52,7 +52,7 @@ final class Link implements JsonSerializable
      *
      * @var class-string<DataLoaderInterface>|null
      */
-    public $batch;
+    public $dataLoader;
 
     /**
      * @return string[]
@@ -73,7 +73,7 @@ final class Link implements JsonSerializable
         return $json;
     }
 
-    /** @param array{rel?: string, href?: string, method?: string, title?: string, crawl?: string, batch?: class-string<DataLoaderInterface>|null} $values */
+    /** @param array{rel?: string, href?: string, method?: string, title?: string, crawl?: string, dataLoader?: class-string<DataLoaderInterface>|null} $values */
     public function __construct(
         array $values = [],
         string $rel = '',
@@ -81,13 +81,15 @@ final class Link implements JsonSerializable
         string $method = 'get',
         string $title = '',
         string $crawl = '',
-        string|null $batch = null,
+        string|null $dataLoader = null,
     ) {
         $this->rel = $values['rel'] ?? $rel;
         $this->href = $values['href'] ?? $href;
         $this->method = $values['method'] ?? $method;
         $this->title = $values['title'] ?? $title;
         $this->crawl = $values['crawl'] ?? $crawl;
-        $this->batch = $values['batch'] ?? $batch;
+        /** @var class-string<DataLoaderInterface>|null $resolvedDataLoader */
+        $resolvedDataLoader = $values['dataLoader'] ?? $dataLoader;
+        $this->dataLoader = $resolvedDataLoader;
     }
 }

@@ -22,7 +22,7 @@ class Comment extends ResourceObject
         ],
     ];
 
-    #[Link(crawl: 'comment-tree', rel: 'like', href: 'app://self/batch/like?comment_id={id}', batch: LikeDataLoader::class)]
+    #[Link(crawl: 'comment-tree', rel: 'like', href: 'app://self/batch/like?comment_id={id}', dataLoader: LikeDataLoader::class)]
     public function onGet(int $article_id = 0): static
     {
         $this->body = self::$data[$article_id] ?? [];

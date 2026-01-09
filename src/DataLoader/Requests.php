@@ -120,6 +120,7 @@ final class Requests
 
         parse_str($queryString, $query);
 
+        /** @var array<string, mixed> $query */
         return $query;
     }
 }

@@ -217,12 +217,12 @@ final class Linker implements LinkerInterface
                 continue;
             }
 
-            if ($annotation->batch === null) {
+            if ($annotation->dataLoader === null) {
                 continue;
             }
 
             /** @var class-string<DataLoaderInterface> $loaderClass */
-            $loaderClass = $annotation->batch;
+            $loaderClass = $annotation->dataLoader;
             $loaderGroups[$loaderClass] = ['annotation' => $annotation, 'uris' => []];
 
             foreach ($bodyList as $index => $body) {
@@ -277,7 +277,7 @@ final class Linker implements LinkerInterface
             }
 
             // Skip DataLoader-enabled links (already processed by processDataLoaderLinks)
-            if ($annotation->batch !== null && $this->dataLoaderFactory !== null) {
+            if ($annotation->dataLoader !== null && $this->dataLoaderFactory !== null) {
                 continue;
             }
 
