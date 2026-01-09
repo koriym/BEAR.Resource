@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link;
+use BEAR\Resource\Batch\BatchResolverFactoryInterface;
+use BEAR\Resource\Batch\BatchResolverInterface;
+use BEAR\Resource\Batch\Requests;
 use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
@@ -16,6 +19,7 @@ use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_pop;
+use function array_values;
 use function assert;
 use function count;
 use function is_array;
@@ -39,9 +43,13 @@ final class Linker implements LinkerInterface
      */
     private array $cache = [];
 
+    /** @var array<class-string<BatchResolverInterface>, BatchResolverInterface> */
+    private array $batchResolverCache = [];
+
     public function __construct(
         private readonly InvokerInterface $invoker,
         private readonly FactoryInterface $factory,
+        private readonly BatchResolverFactoryInterface|null $batchResolverFactory = null,
     ) {
     }
 
@@ -170,6 +178,11 @@ final class Linker implements LinkerInterface
         $isList = $this->isList($current->body);
         /** @var QueryList $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
+
+        // Process batch links first
+        $this->processBatchLinks($annotations, $link, $bodyList);
+
+        // Process non-batch links
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
         }
@@ -179,6 +192,70 @@ final class Linker implements LinkerInterface
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
+    }
+
+    /**
+     * Process batch-enabled links
+     *
+     * @param ObjectList $annotations
+     * @param QueryList  $bodyList
+     *
+     * @param-out QueryList $bodyList
+     */
+    private function processBatchLinks(array $annotations, LinkType $link, array &$bodyList): void
+    {
+        if ($this->batchResolverFactory === null) {
+            return;
+        }
+
+        // Group URIs by batch resolver class
+        /** @var array<class-string<BatchResolverInterface>, array{annotation: Link, uris: array<int, string>}> $batchGroups */
+        $batchGroups = [];
+
+        foreach ($annotations as $annotation) {
+            if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {
+                continue;
+            }
+
+            if ($annotation->batch === null) {
+                continue;
+            }
+
+            /** @var class-string<BatchResolverInterface> $batchClass */
+            $batchClass = $annotation->batch;
+            $batchGroups[$batchClass] = ['annotation' => $annotation, 'uris' => []];
+
+            foreach ($bodyList as $index => $body) {
+                $uri = uri_template($annotation->href, $body);
+                $batchGroups[$batchClass]['uris'][$index] = $uri;
+            }
+        }
+
+        // Execute batch resolvers and distribute results
+        foreach ($batchGroups as $batchClass => $group) {
+            $resolver = $this->getBatchResolver($batchClass);
+            $requests = new Requests(array_values($group['uris']));
+            $results = $resolver($requests);
+
+            foreach ($group['uris'] as $index => $uri) {
+                $bodyList[$index][$group['annotation']->rel] = $results->get($uri);
+            }
+        }
+    }
+
+    /**
+     * Get or create a batch resolver instance
+     *
+     * @param class-string<BatchResolverInterface> $class
+     */
+    private function getBatchResolver(string $class): BatchResolverInterface
+    {
+        if (! isset($this->batchResolverCache[$class])) {
+            assert($this->batchResolverFactory !== null);
+            $this->batchResolverCache[$class] = $this->batchResolverFactory->create($class);
+        }
+
+        return $this->batchResolverCache[$class];
     }
 
     /**
@@ -196,6 +273,11 @@ final class Linker implements LinkerInterface
     {
         foreach ($annotations as $annotation) {
             if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {
+                continue;
+            }
+
+            // Skip batch-enabled links (already processed by processBatchLinks)
+            if ($annotation->batch !== null && $this->batchResolverFactory !== null) {
                 continue;
             }
 

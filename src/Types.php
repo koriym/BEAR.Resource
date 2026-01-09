@@ -123,6 +123,13 @@ use ReflectionParameter;
  * @psalm-type ClassNameList = list<class-string>
  * @psalm-type StatusMessageMap = array<int, string>
  *
+ * Batch Processing Types
+ * @psalm-type BatchResolverClass = class-string<\BEAR\Resource\Batch\BatchResolverInterface>
+ * @psalm-type UriList = list<string>
+ * @psalm-type UriResultMap = array<string, mixed>
+ * @psalm-type BatchPendingRequest = array{uri: string, rel: string, bodyRef: int}
+ * @psalm-type BatchGroup = array<BatchResolverClass, list<BatchPendingRequest>>
+ *
  * @phpcs:enable
  */
 final class Types
