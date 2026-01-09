@@ -134,4 +134,15 @@ class DataLoaderProcessorTest extends TestCase
         // Row without required key
         $method->invoke($processor, ['id' => 1, 'title' => 'test'], ['post_id']);
     }
+
+    public function testParseQueryWithNoQueryString(): void
+    {
+        $processor = new DataLoaderProcessor(new Injector());
+        $reflection = new ReflectionClass($processor);
+        $method = $reflection->getMethod('parseQuery');
+
+        // URI without query string
+        $query = $method->invoke($processor, 'app://self/resource');
+        $this->assertSame([], $query);
+    }
 }
