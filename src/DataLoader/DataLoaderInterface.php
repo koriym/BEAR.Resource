@@ -10,15 +10,18 @@ namespace BEAR\Resource\DataLoader;
  * Implementations receive query parameters and return database rows.
  * The framework handles URI parsing and result distribution.
  *
- * Example:
+ * $queries is passed as an array of associative arrays (not just values)
+ * to support multiple key parameters:
+ *
+ * Single key: app://self/meta{?post_id}
  * ```php
- * class MetaDataLoader implements DataLoaderInterface
- * {
- *     public function __invoke(array $queries): array
- *     {
- *         $postIds = array_column($queries, 'post_id');
- *         return $this->query->findByPostIds($postIds);
- *     }
+ * $postIds = array_column($queries, 'post_id');
+ * ```
+ *
+ * Multiple keys: app://self/translation?post_id={post_id}&locale={locale}
+ * ```php
+ * foreach ($queries as $q) {
+ *     // Use both $q['post_id'] and $q['locale']
  * }
  * ```
  *
