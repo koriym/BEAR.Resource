@@ -58,9 +58,7 @@ class RequestsTest extends TestCase
                 'app://self/like?comment_id=10',
                 'app://self/like?comment_id=10',
             ],
-            '20' => [
-                'app://self/like?comment_id=20',
-            ],
+            '20' => ['app://self/like?comment_id=20'],
         ];
         $this->assertSame($expected, $requests->groupBy('comment_id'));
     }
@@ -157,9 +155,7 @@ class RequestsTest extends TestCase
 
     public function testMapResultsWithMissingKeyColumn(): void
     {
-        $uris = [
-            'app://self/like?comment_id=10',
-        ];
+        $uris = ['app://self/like?comment_id=10'];
         $requests = new Requests($uris);
 
         // Row without keyColumn should be skipped
@@ -174,9 +170,7 @@ class RequestsTest extends TestCase
 
     public function testMapResultsWithUnmatchedKeyValue(): void
     {
-        $uris = [
-            'app://self/like?comment_id=10',
-        ];
+        $uris = ['app://self/like?comment_id=10'];
         $requests = new Requests($uris);
 
         // Row with comment_id that doesn't match any URI

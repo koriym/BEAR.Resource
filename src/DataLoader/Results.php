@@ -11,9 +11,7 @@ use function array_key_exists;
  */
 final class Results
 {
-    /**
-     * @param array<string, mixed> $results URI => result mapping
-     */
+    /** @param array<string, mixed> $results URI => result mapping */
     public function __construct(
         private readonly array $results,
     ) {

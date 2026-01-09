@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\DataLoader;
 
-use function array_map;
 use function parse_str;
 use function parse_url;
 
@@ -17,13 +16,9 @@ use const PHP_URL_QUERY;
  */
 final class Requests
 {
-    /** @var list<string> */
-    private readonly array $uris;
-
     /** @param list<string> $uris */
-    public function __construct(array $uris)
+    public function __construct(private readonly array $uris)
     {
-        $this->uris = $uris;
     }
 
     /**
@@ -46,9 +41,12 @@ final class Requests
         $values = [];
         foreach ($this->uris as $uri) {
             $query = $this->parseQuery($uri);
-            if (isset($query[$name])) {
-                $values[] = $query[$name];
+            if (! isset($query[$name])) {
+                continue;
             }
+
+            /** @psalm-suppress MixedAssignment -- $query values are mixed by design */
+            $values[] = $query[$name];
         }
 
         return $values;
@@ -64,10 +62,12 @@ final class Requests
         $grouped = [];
         foreach ($this->uris as $uri) {
             $query = $this->parseQuery($uri);
-            if (isset($query[$paramName])) {
-                $key = (string) $query[$paramName];
-                $grouped[$key][] = $uri;
+            if (! isset($query[$paramName])) {
+                continue;
             }
+
+            $key = (string) $query[$paramName];
+            $grouped[$key][] = $uri;
         }
 
         return $grouped;

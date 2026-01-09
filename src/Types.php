@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Embed;
 use BEAR\Resource\Annotation\Link;
+use BEAR\Resource\DataLoader\DataLoaderInterface;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 use ReflectionParameter;
 
@@ -124,7 +125,7 @@ use ReflectionParameter;
  * @psalm-type StatusMessageMap = array<int, string>
  *
  * DataLoader Types
- * @psalm-type DataLoaderClass = class-string<\BEAR\Resource\DataLoader\DataLoaderInterface>
+ * @psalm-type DataLoaderClass = class-string<DataLoaderInterface>
  * @psalm-type UriList = list<string>
  * @psalm-type UriResultMap = array<string, mixed>
  * @psalm-type DataLoaderPendingRequest = array{uri: string, rel: string, bodyRef: int}

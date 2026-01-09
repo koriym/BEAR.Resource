@@ -183,12 +183,16 @@ final class Linker implements LinkerInterface
         $this->processDataLoaderLinks($annotations, $link, $bodyList);
 
         // Process non-DataLoader links
+        /**
+         * @psalm-suppress MixedAssignment
+         * @psalm-suppress MixedArgument
+         */
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
         }
 
         unset($body);
-        /** @psalm-suppress PossiblyUndefinedArrayOffset */
+        /** @psalm-suppress PossiblyUndefinedArrayOffset, InvalidArrayAccess */
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
@@ -201,6 +205,8 @@ final class Linker implements LinkerInterface
      * @param QueryList  $bodyList
      *
      * @param-out QueryList $bodyList
+     *
+     * @psalm-suppress ReferenceConstraintViolation
      */
     private function processDataLoaderLinks(array $annotations, LinkType $link, array &$bodyList): void
     {
@@ -221,7 +227,6 @@ final class Linker implements LinkerInterface
                 continue;
             }
 
-            /** @var class-string<DataLoaderInterface> $loaderClass */
             $loaderClass = $annotation->dataLoader;
             $loaderGroups[$loaderClass] = ['annotation' => $annotation, 'uris' => []];
 
@@ -238,6 +243,7 @@ final class Linker implements LinkerInterface
             $results = $loader($requests);
 
             foreach ($group['uris'] as $index => $uri) {
+                /** @psalm-suppress MixedAssignment -- Results::get() returns mixed by design */
                 $bodyList[$index][$group['annotation']->rel] = $results->get($uri);
             }
         }
