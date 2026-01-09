@@ -122,6 +122,25 @@ class DataLoaderTest extends TestCase
         $this->assertSame([], $keys);
     }
 
+    public function testExtractKeysFromTemplateWithMultipleParameters(): void
+    {
+        $dataLoader = new DataLoader(new Injector());
+        $reflection = new ReflectionClass($dataLoader);
+        $method = $reflection->getMethod('extractKeysFromTemplate');
+
+        // Multiple keys in query expansion: {?var1,var2}
+        $keys = $method->invoke($dataLoader, 'app://self/translation{?post_id,locale}');
+        $this->assertSame(['post_id', 'locale'], $keys);
+
+        // Multiple keys in equals format
+        $keys = $method->invoke($dataLoader, 'app://self/translation?post_id={post_id}&locale={locale}');
+        $this->assertSame(['post_id', 'locale'], $keys);
+
+        // Mixed: query expansion + continuation
+        $keys = $method->invoke($dataLoader, 'app://self/item{?id}{&type,format}');
+        $this->assertSame(['id', 'type', 'format'], $keys);
+    }
+
     public function testRowMustContainKeyException(): void
     {
         $this->expectException(RowMustContainKeyInDataLoaderException::class);
