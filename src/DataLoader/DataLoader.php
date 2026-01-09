@@ -25,13 +25,13 @@ use function uri_template;
 use const PHP_URL_QUERY;
 
 /**
- * Processes DataLoader-enabled links in batch
+ * Loads data in batch for DataLoader-enabled links
  *
  * @psalm-import-type Query from Types
  * @psalm-import-type QueryList from Types
  * @psalm-import-type ObjectList from Types
  */
-final class DataLoaderProcessor
+final class DataLoader
 {
     /** @var array<class-string<DataLoaderInterface>, DataLoaderInterface> */
     private array $cache = [];
@@ -42,7 +42,7 @@ final class DataLoaderProcessor
     }
 
     /**
-     * Process DataLoader-enabled links
+     * Load data for DataLoader-enabled links
      *
      * @param ObjectList $annotations
      * @param QueryList  $bodyList
@@ -51,7 +51,7 @@ final class DataLoaderProcessor
      *
      * @psalm-suppress ReferenceConstraintViolation
      */
-    public function process(array $annotations, LinkType $link, array &$bodyList): void
+    public function load(array $annotations, LinkType $link, array &$bodyList): void
     {
         foreach ($annotations as $annotation) {
             if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {

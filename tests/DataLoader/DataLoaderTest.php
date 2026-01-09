@@ -12,13 +12,13 @@ use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use ReflectionClass;
 
-class DataLoaderProcessorTest extends TestCase
+class DataLoaderTest extends TestCase
 {
-    private DataLoaderProcessor $processor;
+    private DataLoader $dataLoader;
 
     protected function setUp(): void
     {
-        $this->processor = new DataLoaderProcessor(new Injector());
+        $this->dataLoader = new DataLoader(new Injector());
     }
 
     public function testProcessSkipsNonLinkAnnotations(): void
@@ -33,7 +33,7 @@ class DataLoaderProcessorTest extends TestCase
         ];
 
         // Should not throw, should skip Embed annotation
-        $this->processor->process($annotations, $link, $bodyList);
+        $this->dataLoader->load($annotations, $link, $bodyList);
 
         // No assertion needed - we just verify it doesn't crash
         $this->assertTrue(true);
@@ -50,7 +50,7 @@ class DataLoaderProcessorTest extends TestCase
         ];
 
         // Should skip since crawl key doesn't match
-        $this->processor->process($annotations, $link, $bodyList);
+        $this->dataLoader->load($annotations, $link, $bodyList);
 
         // Body should be unchanged (no 'items' key added)
         $this->assertArrayNotHasKey('items', $bodyList[0]);
@@ -67,7 +67,7 @@ class DataLoaderProcessorTest extends TestCase
         ];
 
         // Should skip since no dataLoader specified
-        $this->processor->process($annotations, $link, $bodyList);
+        $this->dataLoader->load($annotations, $link, $bodyList);
 
         // Body should be unchanged
         $this->assertArrayNotHasKey('items', $bodyList[0]);
@@ -75,50 +75,50 @@ class DataLoaderProcessorTest extends TestCase
 
     public function testExtractKeysFromTemplateWithEqualsFormat(): void
     {
-        $processor = new DataLoaderProcessor(new Injector());
-        $reflection = new ReflectionClass($processor);
+        $dataLoader = new DataLoader(new Injector());
+        $reflection = new ReflectionClass($dataLoader);
         $method = $reflection->getMethod('extractKeysFromTemplate');
 
         // Single key: param={var}
-        $keys = $method->invoke($processor, 'app://self/meta?post_id={id}');
+        $keys = $method->invoke($dataLoader, 'app://self/meta?post_id={id}');
         $this->assertSame(['post_id'], $keys);
 
         // Multiple keys
-        $keys = $method->invoke($processor, 'app://self/translation?post_id={id}&locale={locale}');
+        $keys = $method->invoke($dataLoader, 'app://self/translation?post_id={id}&locale={locale}');
         $this->assertSame(['post_id', 'locale'], $keys);
 
         // Mixed placeholders and literals
-        $keys = $method->invoke($processor, 'app://self/meta?post_id={id}&type=full');
+        $keys = $method->invoke($dataLoader, 'app://self/meta?post_id={id}&type=full');
         $this->assertSame(['post_id'], $keys);
     }
 
     public function testExtractKeysFromTemplateWithQueryExpansion(): void
     {
-        $processor = new DataLoaderProcessor(new Injector());
-        $reflection = new ReflectionClass($processor);
+        $dataLoader = new DataLoader(new Injector());
+        $reflection = new ReflectionClass($dataLoader);
         $method = $reflection->getMethod('extractKeysFromTemplate');
 
         // Single key: {?var}
-        $keys = $method->invoke($processor, 'app://self/meta{?post_id}');
+        $keys = $method->invoke($dataLoader, 'app://self/meta{?post_id}');
         $this->assertSame(['post_id'], $keys);
 
         // Multiple keys: {?var1,var2}
-        $keys = $method->invoke($processor, 'app://self/payment{?order_id,amount}');
+        $keys = $method->invoke($dataLoader, 'app://self/payment{?order_id,amount}');
         $this->assertSame(['order_id', 'amount'], $keys);
 
         // Query continuation: {&var}
-        $keys = $method->invoke($processor, 'app://self/search?q=test{&page,limit}');
+        $keys = $method->invoke($dataLoader, 'app://self/search?q=test{&page,limit}');
         $this->assertSame(['page', 'limit'], $keys);
     }
 
     public function testExtractKeysFromTemplateWithNoQueryString(): void
     {
-        $processor = new DataLoaderProcessor(new Injector());
-        $reflection = new ReflectionClass($processor);
+        $dataLoader = new DataLoader(new Injector());
+        $reflection = new ReflectionClass($dataLoader);
         $method = $reflection->getMethod('extractKeysFromTemplate');
 
         // No query string
-        $keys = $method->invoke($processor, 'app://self/meta');
+        $keys = $method->invoke($dataLoader, 'app://self/meta');
         $this->assertSame([], $keys);
     }
 
@@ -127,22 +127,22 @@ class DataLoaderProcessorTest extends TestCase
         $this->expectException(RowMustContainKeyInDataLoaderException::class);
         $this->expectExceptionMessage('post_id');
 
-        $processor = new DataLoaderProcessor(new Injector());
-        $reflection = new ReflectionClass($processor);
+        $dataLoader = new DataLoader(new Injector());
+        $reflection = new ReflectionClass($dataLoader);
         $method = $reflection->getMethod('buildGroupKey');
 
         // Row without required key
-        $method->invoke($processor, ['id' => 1, 'title' => 'test'], ['post_id']);
+        $method->invoke($dataLoader, ['id' => 1, 'title' => 'test'], ['post_id']);
     }
 
     public function testParseQueryWithNoQueryString(): void
     {
-        $processor = new DataLoaderProcessor(new Injector());
-        $reflection = new ReflectionClass($processor);
+        $dataLoader = new DataLoader(new Injector());
+        $reflection = new ReflectionClass($dataLoader);
         $method = $reflection->getMethod('parseQuery');
 
         // URI without query string
-        $query = $method->invoke($processor, 'app://self/resource');
+        $query = $method->invoke($dataLoader, 'app://self/resource');
         $this->assertSame([], $query);
     }
 }

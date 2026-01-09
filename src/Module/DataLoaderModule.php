@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Module;
 
-use BEAR\Resource\DataLoader\DataLoaderProcessor;
+use BEAR\Resource\DataLoader\DataLoader;
 use Override;
 use Ray\Di\AbstractModule;
 
@@ -21,6 +21,6 @@ final class DataLoaderModule extends AbstractModule
     #[Override]
     protected function configure(): void
     {
-        $this->bind(DataLoaderProcessor::class);
+        $this->bind(DataLoader::class);
     }
 }

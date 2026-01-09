@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\DataLoader;
 
+use BEAR\Resource\Types;
+
 /**
  * Interface for data loaders that batch multiple resource requests
  *
@@ -25,15 +27,15 @@ namespace BEAR\Resource\DataLoader;
  * }
  * ```
  *
- * @psalm-type Query = array<string, string>
- * @psalm-type Row = array<string, mixed>
+ * @psalm-import-type DataLoaderQueries from Types
+ * @psalm-import-type DataLoaderRows from Types
  */
 interface DataLoaderInterface
 {
     /**
-     * @param list<Query> $queries Query parameters extracted from URIs
+     * @param DataLoaderQueries $queries Query parameters extracted from URIs
      *
-     * @return list<Row> Rows that contain the query key columns for matching
+     * @return DataLoaderRows Rows that contain the query key columns for matching
      */
     public function __invoke(array $queries): array;
 }

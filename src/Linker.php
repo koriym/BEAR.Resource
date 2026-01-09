@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link;
-use BEAR\Resource\DataLoader\DataLoaderProcessor;
+use BEAR\Resource\DataLoader\DataLoader;
 use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
@@ -43,7 +43,7 @@ final class Linker implements LinkerInterface
     public function __construct(
         private readonly InvokerInterface $invoker,
         private readonly FactoryInterface $factory,
-        private readonly DataLoaderProcessor|null $dataLoaderProcessor = null,
+        private readonly DataLoader|null $dataLoader = null,
     ) {
     }
 
@@ -174,7 +174,7 @@ final class Linker implements LinkerInterface
         $bodyList = $isList ? (array) $current->body : [$current->body];
 
         // Process DataLoader-enabled links first
-        $this->dataLoaderProcessor?->process($annotations, $link, $bodyList);
+        $this->dataLoader?->load($annotations, $link, $bodyList);
 
         // Process non-DataLoader links
         /**
@@ -210,8 +210,8 @@ final class Linker implements LinkerInterface
                 continue;
             }
 
-            // Skip DataLoader-enabled links (already processed by DataLoaderProcessor)
-            if ($annotation->dataLoader !== null && $this->dataLoaderProcessor !== null) {
+            // Skip DataLoader-enabled links (already processed by DataLoader)
+            if ($annotation->dataLoader !== null && $this->dataLoader !== null) {
                 continue;
             }
 

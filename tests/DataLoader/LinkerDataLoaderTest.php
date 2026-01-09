@@ -34,12 +34,12 @@ class LinkerDataLoaderTest extends TestCase
             ->host('self')
             ->toAdapter(new AppAdapter($injector, 'FakeVendor\Sandbox'));
 
-        $dataLoaderProcessor = new DataLoaderProcessor($injector);
+        $dataLoader = new DataLoader($injector);
 
         $this->linker = new Linker(
             $invoker,
             new Factory($schemeCollection, new UriFactory()),
-            $dataLoaderProcessor,
+            $dataLoader,
         );
     }
 

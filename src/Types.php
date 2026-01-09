@@ -125,11 +125,11 @@ use ReflectionParameter;
  * @psalm-type StatusMessageMap = array<int, string>
  *
  * DataLoader Types
+ * @psalm-type DataLoaderQuery = array<string, string>
+ * @psalm-type DataLoaderRow = array<string, mixed>
+ * @psalm-type DataLoaderQueries = list<DataLoaderQuery>
+ * @psalm-type DataLoaderRows = list<DataLoaderRow>
  * @psalm-type DataLoaderClass = class-string<DataLoaderInterface>
- * @psalm-type UriList = list<string>
- * @psalm-type UriResultMap = array<string, mixed>
- * @psalm-type DataLoaderPendingRequest = array{uri: string, rel: string, bodyRef: int}
- * @psalm-type DataLoaderGroup = array<DataLoaderClass, list<DataLoaderPendingRequest>>
  *
  * @phpcs:enable
  */
