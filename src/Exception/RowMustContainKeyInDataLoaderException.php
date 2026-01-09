@@ -13,6 +13,6 @@ final class RowMustContainKeyInDataLoaderException extends RuntimeException impl
 {
     public function __construct(string $key)
     {
-        parent::__construct("DataLoader row must contain key column: {$key}");
+        parent::__construct($key);
     }
 }
