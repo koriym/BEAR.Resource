@@ -130,16 +130,15 @@ namespace MyVendor\DataLoaderDemo\Resource\App {
 
 namespace MyVendor\DataLoaderDemo\Module {
 
-    use BEAR\Resource\Module\DataLoaderModule as BearDataLoaderModule;
     use BEAR\Resource\Module\ResourceModule;
     use Ray\Di\AbstractModule;
 
-    class DataLoaderModule extends AbstractModule
+    class AppModule extends AbstractModule
     {
         protected function configure(): void
         {
+            // DataLoader is included in ResourceModule by default
             $this->install(new ResourceModule('MyVendor\DataLoaderDemo'));
-            $this->install(new BearDataLoaderModule());
         }
     }
 }
@@ -147,13 +146,13 @@ namespace MyVendor\DataLoaderDemo\Module {
 namespace Main {
 
     use BEAR\Resource\ResourceInterface;
-    use MyVendor\DataLoaderDemo\Module\DataLoaderModule;
+    use MyVendor\DataLoaderDemo\Module\AppModule;
     use Ray\Di\Injector;
 
     echo "=== DataLoader Demo ===\n\n";
     echo "Fetching Article with Comments and Likes using DataLoader...\n\n";
 
-    $resource = (new Injector(new DataLoaderModule(), __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
+    $resource = (new Injector(new AppModule(), __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
     $article = $resource->get->uri('app://self/article')->withQuery(['id' => 1])->linkCrawl('tree')();
 
     echo "\nResult:\n";
