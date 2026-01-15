@@ -6,6 +6,7 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\Anchor;
 use BEAR\Resource\AnchorInterface;
+use BEAR\Resource\DataLoader\DataLoader;
 use BEAR\Resource\ExtraMethodInvoker;
 use BEAR\Resource\Factory;
 use BEAR\Resource\FactoryInterface;
@@ -98,6 +99,7 @@ final class ResourceClientModule extends AbstractModule
         $this->bind(PhpClassInvoker::class);
         $this->bind(InputQueryInterface::class)->to(InputQuery::class);
         $this->bind(FileUploadFactoryInterface::class)->to(FileUploadFactory::class);
+        $this->bind(DataLoader::class);
     }
 
     /** @psalm-suppress DeprecatedClass */

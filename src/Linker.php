@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link;
+use BEAR\Resource\DataLoader\DataLoader;
 use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
@@ -42,6 +43,7 @@ final class Linker implements LinkerInterface
     public function __construct(
         private readonly InvokerInterface $invoker,
         private readonly FactoryInterface $factory,
+        private readonly DataLoader|null $dataLoader = null,
     ) {
     }
 
@@ -170,12 +172,21 @@ final class Linker implements LinkerInterface
         $isList = $this->isList($current->body);
         /** @var QueryList $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
+
+        // Process DataLoader-enabled links first
+        $this->dataLoader?->load($annotations, $link, $bodyList);
+
+        // Process non-DataLoader links
+        /**
+         * @psalm-suppress MixedAssignment
+         * @psalm-suppress MixedArgument
+         */
         foreach ($bodyList as &$body) {
             $this->crawl($annotations, $link, $body);
         }
 
         unset($body);
-        /** @psalm-suppress PossiblyUndefinedArrayOffset */
+        /** @psalm-suppress PossiblyUndefinedArrayOffset, InvalidArrayAccess */
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
@@ -196,6 +207,11 @@ final class Linker implements LinkerInterface
     {
         foreach ($annotations as $annotation) {
             if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {
+                continue;
+            }
+
+            // Skip DataLoader-enabled links (already processed by DataLoader)
+            if ($annotation->dataLoader !== null && $this->dataLoader !== null) {
                 continue;
             }
 

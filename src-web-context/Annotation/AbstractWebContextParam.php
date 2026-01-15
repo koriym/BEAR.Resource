@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ray\WebContextParam\Annotation;
 
 abstract class AbstractWebContextParam
 {
-    /**
-     * Key of Super global value
-     */
-    const GLOBAL_KEY = '';
+    /** Key of Super global value */
+    public const GLOBAL_KEY = '';
 
-    /**
-     * @param string $key Key of query parameter
-     */
+    /** @param string $key Key of query parameter */
     public function __construct(public string $key)
     {
     }

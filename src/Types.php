@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Embed;
 use BEAR\Resource\Annotation\Link;
+use BEAR\Resource\DataLoader\DataLoaderInterface;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 use ReflectionParameter;
 
@@ -122,6 +123,13 @@ use ReflectionParameter;
  * @psalm-type MetaMap = array<string, Meta>
  * @psalm-type ClassNameList = list<class-string>
  * @psalm-type StatusMessageMap = array<int, string>
+ *
+ * DataLoader Types
+ * @psalm-type DataLoaderQuery = array<string, string>
+ * @psalm-type DataLoaderRow = array<string, mixed>
+ * @psalm-type DataLoaderQueries = list<DataLoaderQuery>
+ * @psalm-type DataLoaderRows = list<DataLoaderRow>
+ * @psalm-type DataLoaderClass = class-string<DataLoaderInterface>
  *
  * @phpcs:enable
  */
