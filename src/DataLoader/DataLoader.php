@@ -152,7 +152,11 @@ final class DataLoader
     private function extractEqualsFormatKeys(string $template): array
     {
         $queryString = parse_url($template, PHP_URL_QUERY);
-        if (! is_string($queryString) || ! str_contains($queryString, '=')) {
+        if (! is_string($queryString)) {
+            return [];
+        }
+
+        if (! str_contains($queryString, '=')) {
             return [];
         }
 
@@ -178,7 +182,7 @@ final class DataLoader
     private function parseQuery(string $uri): array
     {
         $queryString = parse_url($uri, PHP_URL_QUERY);
-        if ($queryString === null || $queryString === false) {
+        if (! is_string($queryString)) {
             return [];
         }
 
