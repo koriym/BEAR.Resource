@@ -9,7 +9,6 @@ use BEAR\Resource\Exception\BadRequestException;
 use BEAR\Resource\Exception\EmbedException;
 use BEAR\Resource\Exception\LinkException;
 use Override;
-use Ray\Aop\MethodInterceptor;
 use Ray\Aop\MethodInvocation;
 
 use function array_shift;
@@ -19,7 +18,7 @@ use function is_string;
 use function uri_template;
 
 /** @psalm-import-type Query from Types */
-final readonly class EmbedInterceptor implements MethodInterceptor
+final readonly class EmbedInterceptor implements EmbedInterceptorInterface
 {
     private const SELF_LINK = '_self';
 
