@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.30.0] - 2026-01-24
+
+### Added
+- `EmbedInterceptorInterface` for swappable embed implementations
+  - Allows alternative implementations (e.g., async/parallel embed resolution) to be injected via DI
+  - `EmbedInterceptor` now implements this interface
+  - `EmbedResourceModule` binds via the interface for extensibility
+
+## [1.29.0] - 2026-01-20
+
+### Added
+- Psalm taint annotations for improved security analysis
+  - Added `@psalm-taint-specialize` to `AbstractUri::__toString()`
+  - Enhanced static analysis for detecting potential security issues
+
 ## [1.28.0] - 2024-12-09
 
 ### Added
@@ -124,7 +139,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.30.0...HEAD
+[1.30.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.29.0...1.30.0
+[1.29.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...1.29.0
 [1.28.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.27.0...1.28.0
 [1.27.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.26.3...1.27.0
 [1.26.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.25.0...1.26.0
