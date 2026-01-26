@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\Di\NullModule;
+use Ray\Di\ProviderInterface;
 
 use function assert;
 use function serialize;
@@ -41,8 +42,21 @@ class ResourceTest extends TestCase
             ->scheme('nop')->host('self')->toAdapter(new FakeNop());
         $invoker = (new InvokerFactory())();
         $factory = new Factory($scheme, new UriFactory());
+        /** @var ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+        $linkCrawlerProvider = new class ($invoker, $factory) implements ProviderInterface {
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+            ) {
+            }
+
+            public function get(): LinkCrawlerInterface
+            {
+                return new LinkCrawler($this->invoker, $this->factory);
+            }
+        };
         $uri = new UriFactory('app://self');
-        $resource = new Resource($factory, $invoker, new Anchor(), new Linker($invoker, $factory), $uri);
+        $resource = new Resource($factory, $invoker, new Anchor(), new Linker($invoker, $factory, $linkCrawlerProvider), $uri);
         $this->assertInstanceOf(ResourceInterface::class, $resource);
     }
 

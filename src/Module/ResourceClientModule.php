@@ -14,6 +14,8 @@ use BEAR\Resource\HalLink;
 use BEAR\Resource\HalLinker;
 use BEAR\Resource\Invoker;
 use BEAR\Resource\InvokerInterface;
+use BEAR\Resource\LinkCrawler;
+use BEAR\Resource\LinkCrawlerInterface;
 use BEAR\Resource\Linker;
 use BEAR\Resource\LinkerInterface;
 use BEAR\Resource\LoggerInterface;
@@ -81,6 +83,7 @@ final class ResourceClientModule extends AbstractModule
         $this->bind(UriFactory::class);
         $this->bind(ResourceInterface::class)->to(Resource::class)->in(Scope::SINGLETON);
         $this->bind(InvokerInterface::class)->to(Invoker::class);
+        $this->bind(LinkCrawlerInterface::class)->to(LinkCrawler::class);
         $this->bind(LinkerInterface::class)->to(Linker::class);
         $this->bind(FactoryInterface::class)->to(Factory::class);
         $this->bind(SchemeCollectionInterface::class)->toProvider(SchemeCollectionProvider::class);

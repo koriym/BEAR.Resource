@@ -11,6 +11,7 @@ use FakeVendor\Sandbox\Resource\App\Blog;
 use FakeVendor\Sandbox\Resource\App\Link\Scalar\Name;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\Di\ProviderInterface;
 
 class LinkerTest extends TestCase
 {
@@ -25,9 +26,25 @@ class LinkerTest extends TestCase
             ->scheme('app')
             ->host('self')
             ->toAdapter(new AppAdapter(new Injector(), 'FakeVendor\Sandbox'));
+        $factory = new Factory($schemeCollection, new UriFactory());
+        $invoker = $this->invoker;
+        /** @var ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+        $linkCrawlerProvider = new class ($invoker, $factory) implements ProviderInterface {
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+            ) {
+            }
+
+            public function get(): LinkCrawlerInterface
+            {
+                return new LinkCrawler($this->invoker, $this->factory);
+            }
+        };
         $this->linker = new Linker(
             $this->invoker,
-            new Factory($schemeCollection, new UriFactory()),
+            $factory,
+            $linkCrawlerProvider,
         );
     }
 
