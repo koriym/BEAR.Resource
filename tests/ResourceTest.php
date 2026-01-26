@@ -20,8 +20,12 @@ use Ray\Di\NullModule;
 use Ray\Di\ProviderInterface;
 
 use function assert;
+use function restore_error_handler;
 use function serialize;
+use function set_error_handler;
 use function unserialize;
+
+use const E_USER_DEPRECATED;
 
 class ResourceTest extends TestCase
 {
@@ -71,7 +75,7 @@ class ResourceTest extends TestCase
             }
         };
         $uri = new UriFactory('app://self');
-        $resource = new Resource($factory, $invoker, new Anchor(), $linkerProvider, $uri);
+        $resource = new ResourcePure($factory, $invoker, new Anchor(), $linkerProvider, $uri);
         $this->assertInstanceOf(ResourceInterface::class, $resource);
     }
 
@@ -426,5 +430,71 @@ class ResourceTest extends TestCase
         $this->assertInstanceOf(RequestInterface::class, $request);
         assert($request instanceof Request);
         $this->assertSame('post', $request->method);
+    }
+
+    public function testLegacyFluentInterfaceFallback(): void
+    {
+        // ResourcePure.__get() falls back to legacy Resource with deprecation warning
+        set_error_handler(static function (int $errno, string $errstr): bool {
+            return true; // Suppress the deprecation warning
+        }, E_USER_DEPRECATED);
+
+        try {
+            /** @var ResourcePure $resourcePure */
+            $resourcePure = $this->resource;
+            $legacyResource = $resourcePure->get; // @phpstan-ignore-line
+
+            // Returns a legacy Resource instance
+            $this->assertInstanceOf(Resource::class, $legacyResource);
+
+            // The legacy Resource can use the fluent interface
+            $request = $legacyResource->uri('page://self/index');
+            $this->assertInstanceOf(RequestInterface::class, $request);
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public function testLegacyResourceManualConstruction(): void
+    {
+        $injector = new Injector(new NullModule(), __DIR__ . '/tmp');
+        $scheme = (new SchemeCollection())
+            ->scheme('app')->host('self')->toAdapter(new AppAdapter($injector, 'FakeVendor\Sandbox'))
+            ->scheme('page')->host('self')->toAdapter(new AppAdapter($injector, 'FakeVendor\Sandbox'))
+            ->scheme('nop')->host('self')->toAdapter(new FakeNop());
+        $invoker = (new InvokerFactory())();
+        $factory = new Factory($scheme, new UriFactory());
+        /** @var ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+        $linkCrawlerProvider = new class ($invoker, $factory) implements ProviderInterface {
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+            ) {
+            }
+
+            public function get(): LinkCrawlerInterface
+            {
+                return new LinkCrawler($this->invoker, $this->factory);
+            }
+        };
+        $linker = new Linker($invoker, $factory, $linkCrawlerProvider);
+        $uri = new UriFactory('app://self');
+
+        // Legacy Resource takes LinkerInterface directly (not provider)
+        $resource = new Resource($factory, $invoker, new Anchor(), $linker, $uri);
+        $this->assertInstanceOf(ResourceInterface::class, $resource);
+
+        // Test that fluent interface works
+        set_error_handler(static function (int $errno, string $errstr): bool {
+            return true; // Suppress the deprecation warning
+        }, E_USER_DEPRECATED);
+
+        try {
+            /** @psalm-suppress DeprecatedMethod */
+            $request = $resource->get->uri('page://self/index');
+            $this->assertInstanceOf(RequestInterface::class, $request);
+        } finally {
+            restore_error_handler();
+        }
     }
 }

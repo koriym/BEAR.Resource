@@ -5,59 +5,63 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use Override;
+use Ray\Di\Di\Set;
+use Ray\Di\ProviderInterface;
 
 use function array_merge;
 use function assert;
 use function is_string;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 /**
- * Resource client with mutable state - supports legacy fluent interface
+ * Pure singleton Resource client - coroutine safe
  *
- * This class maintains internal state for the fluent interface pattern.
- * It is NOT coroutine-safe due to mutable $method and $request properties.
- * For coroutine-safe usage, use ResourcePure instead.
+ * This class is stateless and can be safely shared across coroutines.
+ * For legacy fluent interface usage ($resource->get->uri()), a deprecation
+ * warning is triggered and a new Resource instance is created for fallback.
  *
- * @property $this $get
- * @property $this $post
- * @property $this $put
- * @property $this $patch
- * @property $this $delete
- * @property $this $head
- * @property $this $options
  * @psalm-import-type Query from Types
  */
-final class Resource implements ResourceInterface
+final class ResourcePure implements ResourceInterface
 {
-    /** @psalm-suppress PropertyNotSetInConstructor */
-    private Request $request;
-    private string $method = 'get';
-
     /**
-     * @param FactoryInterface $factory Resource factory
-     * @param InvokerInterface $invoker Resource request invoker
-     * @param AnchorInterface  $anchor  Resource anchor
-     * @param LinkerInterface  $linker  Resource linker
-     * @param UriFactory       $uri     URI factory
+     * @param FactoryInterface                   $factory        Resource factory
+     * @param InvokerInterface                   $invoker        Resource request invoker
+     * @param AnchorInterface                    $anchor         Resource anchor
+     * @param ProviderInterface<LinkerInterface> $linkerProvider Resource linker provider
+     * @param UriFactory                         $uri            URI factory
      */
     public function __construct(
         private readonly FactoryInterface $factory,
         private readonly InvokerInterface $invoker,
         private readonly AnchorInterface $anchor,
-        private readonly LinkerInterface $linker,
+        #[Set(LinkerInterface::class)]
+        private readonly ProviderInterface $linkerProvider,
         private readonly UriFactory $uri,
     ) {
     }
 
     /**
-     * Set HTTP method for fluent interface
+     * Fallback to legacy Resource for deprecated fluent interface
      *
-     * @deprecated Use createRequest() instead
+     * @deprecated Use createRequest() or direct method calls instead
+     * @psalm-suppress DeprecatedMethod
      */
-    public function __get(string $name): self
+    public function __get(string $name): Resource
     {
-        $this->method = $name;
+        trigger_error(
+            'Fluent interface ($resource->get->uri()) is deprecated. Use createRequest() instead.',
+            E_USER_DEPRECATED,
+        );
 
-        return $this;
+        // Create a new mutable Resource instance for legacy compatibility
+        $linker = $this->linkerProvider->get();
+        $resource = new Resource($this->factory, $this->invoker, $this->anchor, $linker, $this->uri);
+
+        // Set the method and return for chaining
+        return $resource->__get($name);
     }
 
     /**
@@ -79,7 +83,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function object(ResourceObject $ro): RequestInterface
     {
-        return new Request($this->invoker, $ro, $this->method);
+        return new Request($this->invoker, $ro, Request::GET);
     }
 
     /**
@@ -90,13 +94,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function uri($uri): RequestInterface
     {
-        $method = $this->method; // save method, this may change on newInstance(), this is singleton!
-        $this->method = 'get';
-        $ro = $this->newInstance($uri);
-        $ro->uri->method = $method;
-        $this->request = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query, [], $this->linker);
-
-        return $this->request;
+        return $this->createRequest(Request::GET, (string) $uri);
     }
 
     /**
@@ -105,12 +103,12 @@ final class Resource implements ResourceInterface
     #[Override]
     public function createRequest(string $method, string $uri, array $query = []): RequestInterface
     {
+        $linker = $this->linkerProvider->get();
         $ro = $this->newInstance($uri);
         $ro->uri->method = $method;
         $ro->uri->query = array_merge($ro->uri->query, $query);
-        $this->request = new Request($this->invoker, $ro, $method, $ro->uri->query, [], $this->linker);
 
-        return $this->request;
+        return new Request($this->invoker, $ro, $method, $ro->uri->query, [], $linker);
     }
 
     /**
@@ -214,11 +212,8 @@ final class Resource implements ResourceInterface
         return $this->methodUri(Request::HEAD, $uri)($query);
     }
 
-    /** @psalm-suppress DeprecatedMethod */
     private function methodUri(string $method, string $uri): RequestInterface
     {
-        $this->method = $method;
-
-        return $this->uri($uri);
+        return $this->createRequest($method, $uri);
     }
 }
