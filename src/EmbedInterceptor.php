@@ -10,6 +10,8 @@ use BEAR\Resource\Exception\EmbedException;
 use BEAR\Resource\Exception\LinkException;
 use Override;
 use Ray\Aop\MethodInvocation;
+use Ray\Di\Di\Set;
+use Ray\Di\ProviderInterface;
 
 use function array_shift;
 use function assert;
@@ -22,12 +24,11 @@ final readonly class EmbedInterceptor implements EmbedInterceptorInterface
 {
     private const SELF_LINK = '_self';
 
-    private ResourceInterface $resource;
-
+    /** @param ProviderInterface<ResourceInterface> $resourceProvider */
     public function __construct(
-        ResourceInterface $resource,
+        #[Set(ResourceInterface::class)]
+        private ProviderInterface $resourceProvider,
     ) {
-        $this->resource = clone $resource;
     }
 
     /**
@@ -52,12 +53,11 @@ final readonly class EmbedInterceptor implements EmbedInterceptorInterface
      * @param Query               $query
      *
      * @throws EmbedException
-     *
-     * @psalm-suppress NoInterfaceProperties
-     * @psalm-suppress MixedMethodCall
      */
     private function embedResource(array $embeds, ResourceObject $ro, array $query): void
     {
+        $resource = $this->resourceProvider->get();
+
         foreach ($embeds as $embed) {
             if (! $embed instanceof Embed) {
                 continue;
@@ -66,8 +66,8 @@ final readonly class EmbedInterceptor implements EmbedInterceptorInterface
             try {
                 $templateUri = $this->getFullUri($embed->src, $ro);
                 $uri = uri_template($templateUri, $query);
-                /** @var Request $request */ // phpcs:ignore SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion
-                $request = $this->resource->get->uri($uri); // @phpstan-ignore-line
+                $request = $resource->createRequest(Request::GET, $uri);
+                assert($request instanceof Request);
                 $this->prepareBody($ro, $embed);
 
                 if ($embed->rel === self::SELF_LINK) {

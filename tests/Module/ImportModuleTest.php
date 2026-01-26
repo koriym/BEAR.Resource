@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\Module;
 
 use BEAR\Resource\ImportApp;
+use BEAR\Resource\Request;
 use BEAR\Resource\ResourceInterface;
 use FakeVendor\Sandbox\Module\AppModule;
 use PHPUnit\Framework\TestCase;
@@ -42,11 +43,7 @@ class ImportModuleTest extends TestCase
         $resource = (new Injector($module, __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
         assert($resource instanceof ResourceInterface);
         // request
-        $news = $resource
-            ->get
-            ->uri('app://self/news')
-            ->withQuery(['date' => 'today'])
-            ->request();
+        $news = $resource->createRequest(Request::GET, 'app://self/news', ['date' => 'today'])->request();
         $expect = '{
     "weather": {
         "today": "the weather of today is sunny"
@@ -63,11 +60,7 @@ class ImportModuleTest extends TestCase
 ';
         $this->assertJsonStringEqualsJsonString($expect, (string) $news);
 
-        $news = $resource
-            ->get
-            ->uri('app://blog/news')
-            ->withQuery(['date' => 'today'])
-            ->request();
+        $news = $resource->createRequest(Request::GET, 'app://blog/news', ['date' => 'today'])->request();
         $expect = '{
     "weather": {
         "today": "the weather of today is sunny"

@@ -4,50 +4,51 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
-use BEAR\Resource\Exception\MethodException;
+use BadMethodCallException;
 use Override;
+use Ray\Di\Di\Set;
+use Ray\Di\ProviderInterface;
 
+use function array_merge;
 use function assert;
 use function is_string;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 /**
- * @property $this $get
- * @property $this $post
- * @property $this $put
- * @property $this $patch
- * @property $this $delete
- * @property $this $head
- * @property $this $options
+ * Pure singleton Resource client - coroutine safe
+ *
  * @psalm-import-type Query from Types
  */
 final class Resource implements ResourceInterface
 {
-    /** @psalm-suppress PropertyNotSetInConstructor */
-    private Request $request;
-    private string $method = 'get';
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
     /**
-     * @param FactoryInterface $factory Resource factory
-     * @param InvokerInterface $invoker Resource request invoker
-     * @param AnchorInterface  $anchor  Resource anchor
-     * @param LinkerInterface  $linker  Resource linker
-     * @param UriFactory       $uri     URI factory
+     * @param FactoryInterface                   $factory        Resource factory
+     * @param InvokerInterface                   $invoker        Resource request invoker
+     * @param AnchorInterface                    $anchor         Resource anchor
+     * @param ProviderInterface<LinkerInterface> $linkerProvider Resource linker provider
+     * @param UriFactory                         $uri            URI factory
      */
     public function __construct(
         private readonly FactoryInterface $factory,
         private readonly InvokerInterface $invoker,
         private readonly AnchorInterface $anchor,
-        private readonly LinkerInterface $linker,
+        #[Set(LinkerInterface::class)]
+        private readonly ProviderInterface $linkerProvider,
         private readonly UriFactory $uri,
     ) {
     }
 
-    public function __get(string $name): self
+    /** @deprecated Use createRequest() or direct method calls instead */
+    public function __get(string $name): never
     {
-        $this->method = $name;
+        trigger_error(
+            'Fluent interface ($resource->get->uri()) is deprecated. Use createRequest() instead.',
+            E_USER_DEPRECATED,
+        );
 
-        return $this;
+        throw new BadMethodCallException('Fluent interface is no longer supported. Use createRequest() or method calls like get(), post().');
     }
 
     /**
@@ -65,45 +66,74 @@ final class Resource implements ResourceInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @throws MethodException
      */
     #[Override]
     public function object(ResourceObject $ro): RequestInterface
     {
-        return new Request($this->invoker, $ro, $this->method);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    #[Override]
-    public function uri($uri): RequestInterface
-    {
-        $method = $this->method; // save method, this may change on newInstance(), this is singleton!
-        $this->method = 'get';
-        $ro = $this->newInstance($uri);
-        $ro->uri->method = $method;
-        $this->request = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query, [], $this->linker);
-
-        return $this->request;
+        return new Request($this->invoker, $ro, Request::GET);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @psalm-suppress MixedPropertyFetch
+     * @deprecated Use createRequest() instead
      */
     #[Override]
-    public function href(string $rel, array $query = []): ResourceObject
+    public function uri($uri): RequestInterface
     {
-        [$method, $uri] = $this->anchor->href($rel, $this->request, $query);
-        // Dynamic property access via magic __get() returns mixed
-        /** @psalm-suppress MixedMethodCall */
-        $resourceObject = $this->{$method}->uri($uri)->addQuery($query)->eager->request(); // @phpstan-ignore-line
-        assert($resourceObject instanceof ResourceObject);
+        return $this->createRequest(Request::GET, (string) $uri);
+    }
 
-        return $resourceObject;
+    /**
+     * {@inheritDoc}
+     */
+    #[Override]
+    public function createRequest(string $method, string $uri, array $query = []): RequestInterface
+    {
+        $linker = $this->linkerProvider->get();
+        $ro = $this->newInstance($uri);
+        $ro->uri->method = $method;
+        $ro->uri->query = array_merge($ro->uri->query, $query);
+
+        return new Request($this->invoker, $ro, $method, $ro->uri->query, [], $linker);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @psalm-suppress NoInterfaceProperties
+     * @psalm-suppress MixedMethodCall
+     */
+    #[Override]
+    public function crawl(string $uri, string $linkKey, array $query = []): ResourceObject
+    {
+        /** @var Request $request */
+        $request = $this->createRequest(Request::GET, $uri, $query)->linkCrawl($linkKey);
+        $request->in = 'eager';
+        $ro = $request->request();
+        assert($ro instanceof ResourceObject);
+
+        return $ro;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @psalm-suppress NoInterfaceProperties
+     * @psalm-suppress MixedMethodCall
+     */
+    #[Override]
+    public function href(string $rel, ResourceObject $ro, array $query = []): ResourceObject
+    {
+        $sourceRequest = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query);
+        [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
+        /** @var Request $request */
+        $request = $this->createRequest($method, $uri, $query);
+        $request->in = 'eager';
+        $result = $request->request();
+        assert($result instanceof ResourceObject);
+
+        return $result;
     }
 
     /**
@@ -171,8 +201,6 @@ final class Resource implements ResourceInterface
 
     private function methodUri(string $method, string $uri): RequestInterface
     {
-        $this->method = $method;
-
-        return $this->uri($uri);
+        return $this->createRequest($method, $uri);
     }
 }

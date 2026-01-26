@@ -12,7 +12,6 @@ parameters:
     - '#^Access to an undefined property BEAR\\Resource\\(ResourceInterface|HttpResourceObject)::\$\w+\.$#'
     - '#^Access to an undefined property Koriym\\FileUpload\\FileUpload::\$(code|body)\.$#'
     # Method chaining on ResourceInterface returns mixed from magic methods
-    - '#^Cannot call method .* on mixed\.$#'
     - '#^Cannot access (property|offset) .* on mixed\.$#'
     # Test assertions and type operations
     - '#^(Instanceof between|Call to (function|method) .* with) .* will always evaluate to (true|false)\.$#'

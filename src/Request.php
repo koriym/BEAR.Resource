@@ -26,7 +26,10 @@ final class Request extends AbstractRequest
     public const HEAD = 'head';
     public const OPTIONS = 'options';
 
-    /** @psalm-suppress ImplementedReturnTypeMismatch */
+    /**
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress PossiblyUnusedReturnValue - Return value used implicitly via magic property access
+     */
     #[Override]
     public function __get(string $name): mixed
     {

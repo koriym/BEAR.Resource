@@ -55,8 +55,23 @@ class ResourceTest extends TestCase
                 return new LinkCrawler($this->invoker, $this->factory);
             }
         };
+        /** @var ProviderInterface<LinkerInterface> $linkerProvider */
+        $linkerProvider = new class ($invoker, $factory, $linkCrawlerProvider) implements ProviderInterface {
+            /** @param ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+                private readonly ProviderInterface $linkCrawlerProvider,
+            ) {
+            }
+
+            public function get(): LinkerInterface
+            {
+                return new Linker($this->invoker, $this->factory, $this->linkCrawlerProvider);
+            }
+        };
         $uri = new UriFactory('app://self');
-        $resource = new Resource($factory, $invoker, new Anchor(), new Linker($invoker, $factory, $linkCrawlerProvider), $uri);
+        $resource = new Resource($factory, $invoker, new Anchor(), $linkerProvider, $uri);
         $this->assertInstanceOf(ResourceInterface::class, $resource);
     }
 
@@ -68,27 +83,33 @@ class ResourceTest extends TestCase
 
     public function testLazyRequest(): void
     {
-        $instance = $this->resource->get->uri('page://self/index')->request();
+        $instance = $this->resource->createRequest(Request::GET, 'page://self/index')->request();
         $this->assertInstanceOf(Request::class, $instance);
     }
 
     public function testEagerRequest(): void
     {
-        $instance = $this->resource->get->uri('page://self/index')->eager->request();
+        $request = $this->resource->createRequest(Request::GET, 'page://self/index');
+        assert($request instanceof Request);
+        $instance = $request->eager->request();
         $this->assertInstanceOf(Index::class, $instance);
     }
 
     public function testWithQueryRequest(): void
     {
-        $instance = $this->resource->get->uri('page://self/index')->withQuery(['id' => 1])->eager->request();
+        $request = $this->resource->createRequest(Request::GET, 'page://self/index', ['id' => 1]);
+        assert($request instanceof Request);
+        $instance = $request->eager->request();
         $this->assertSame(1, $instance->body);
     }
 
     public function testWithAddRequestOverrideQuery(): void
     {
-        $instance = $this->resource->get->uri('page://self/index')->withQuery(['id' => 1])->addQuery(
+        $request = $this->resource->createRequest(Request::GET, 'page://self/index', ['id' => 1])->addQuery(
             ['id' => 2],
-        )->eager->request();
+        );
+        assert($request instanceof Request);
+        $instance = $request->eager->request();
         $this->assertSame(2, $instance->body);
     }
 
@@ -96,20 +117,22 @@ class ResourceTest extends TestCase
     {
         $ro = new Index();
         $ro->uri = new Uri('page://self/index');
-        $instance = $this->resource->get->object($ro)->eager->request();
+        $request = $this->resource->object($ro);
+        assert($request instanceof Request);
+        $instance = $request->eager->request();
         $this->assertInstanceOf(Index::class, $instance);
     }
 
     public function testHref(): void
     {
-        $this->resource->get->uri('app://self/author')->withQuery(['id' => 1])->eager->request();
-        $blog = $this->resource->href('blog');
+        $author = $this->resource->get('app://self/author', ['id' => 1]);
+        $blog = $this->resource->href('blog', $author);
         $this->assertInstanceOf(Blog::class, $blog);
     }
 
     public function testHrefInResourceObject(): void
     {
-        $origin = $this->resource->get->uri('app://self/href/origin')->withQuery(['id' => 1])->eager->request();
+        $origin = $this->resource->get('app://self/href/origin', ['id' => 1]);
         assert($origin instanceof ResourceObject);
         $this->assertInstanceOf(Origin::class, $origin);
         $this->assertInstanceOf(Target::class, $origin['next']);
@@ -120,7 +143,7 @@ class ResourceTest extends TestCase
 
     public function testHrefInResourceObjectHasEmbed(): void
     {
-        $origin = $this->resource->get->uri('app://self/href/hasembed')->withQuery(['id' => 1])->eager->request();
+        $origin = $this->resource->get('app://self/href/hasembed', ['id' => 1]);
         assert($origin instanceof ResourceObject);
         $this->assertInstanceOf(Hasembed::class, $origin);
         $this->assertInstanceOf(Target::class, $origin['next']);
@@ -131,7 +154,7 @@ class ResourceTest extends TestCase
 
     public function testLinkSelf(): void
     {
-        $request = $this->resource->get->uri('app://self/author')->withQuery(['id' => 1])->linkSelf('blog')->request();
+        $request = $this->resource->createRequest(Request::GET, 'app://self/author', ['id' => 1])->linkSelf('blog')->request();
         assert($request instanceof Request);
         $this->assertSame('blog', $request->links[0]->key);
         $this->assertSame(LinkType::SELF_LINK, $request->links[0]->type);
@@ -142,7 +165,7 @@ class ResourceTest extends TestCase
 
     public function testLinkNew(): void
     {
-        $request = $this->resource->get->uri('app://self/author')->withQuery(['id' => 1])->linkNew('blog')->request();
+        $request = $this->resource->createRequest(Request::GET, 'app://self/author', ['id' => 1])->linkNew('blog')->request();
         assert($request instanceof Request);
         $this->assertSame('blog', $request->links[0]->key);
         $this->assertSame(LinkType::NEW_LINK, $request->links[0]->type);
@@ -162,7 +185,7 @@ class ResourceTest extends TestCase
     /** @return array<string, array<mixed>|int|string> */
     public function testLinkCrawl(): array
     {
-        $request = $this->resource->get->uri('app://self/blog')->withQuery(['id' => 11])->linkCrawl('tree')->request();
+        $request = $this->resource->createRequest(Request::GET, 'app://self/blog', ['id' => 11])->linkCrawl('tree')->request();
         assert($request instanceof Request);
         $this->assertSame('tree', $request->links[0]->key);
         $this->assertSame(LinkType::CRAWL_LINK, $request->links[0]->type);
@@ -215,12 +238,61 @@ class ResourceTest extends TestCase
         return $expected;
     }
 
+    public function testCrawl(): void
+    {
+        $ro = $this->resource->crawl('app://self/blog', 'tree', ['id' => 11]);
+        $this->assertSame(200, $ro->code);
+        $expected = [
+            'id' => 11,
+            'name' => 'Athos blog',
+            'post' => [
+                'id' => '1',
+                'author_id' => '1',
+                'body' => 'Anna post #1',
+                'meta' => [
+                    0 => [
+                        'id' => '1',
+                        'post_id' => '1',
+                        'data' => 'meta 1',
+                    ],
+                ],
+                'tag' => [
+                    0 => [
+                        'id' => '1',
+                        'post_id' => '1',
+                        'tag_id' => '1',
+                        'tag_name' => [
+                            0 => [
+                                'id' => '1',
+                                'name' => 'zim',
+                            ],
+                        ],
+                        'tag_type' => [0 => 'type1'],
+                    ],
+                    1 => [
+                        'id' => '2',
+                        'post_id' => '1',
+                        'tag_id' => '2',
+                        'tag_name' => [
+                            0 => [
+                                'id' => '2',
+                                'name' => 'dib',
+                            ],
+                        ],
+                        'tag_type' => [0 => 'type1'],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expected, $ro->body);
+    }
+
     public function testHal(): void
     {
         $resource = (new Injector(new HalModule(new ResourceModule('FakeVendor\Sandbox')), __DIR__ . '/tmp'))->getInstance(
             ResourceInterface::class,
         );
-        $user = $resource->get->uri('app://self/author')->withQuery(['id' => 1])->eager->request();
+        $user = $resource->get('app://self/author', ['id' => 1]);
         $expected = '{
     "name": "Aramis",
     "age": 16,
@@ -240,7 +312,7 @@ class ResourceTest extends TestCase
 
     public function testConstructorHasAnotherResourceRequest(): void
     {
-        $body = $this->resource->post->uri('app://self/holder')->eager->request()->body;
+        $body = $this->resource->post('app://self/holder')->body;
         $this->assertTrue($body);
     }
 
@@ -248,7 +320,7 @@ class ResourceTest extends TestCase
     {
         $injector = new Injector(new FakeAssistedModule(new FakeSchemeModule(new ResourceModule('FakeVendor\Sandbox'))), __DIR__ . '/tmp');
         $this->resource = $injector->getInstance(ResourceInterface::class);
-        $ro = $this->resource->get->uri('page://self/assist')->eager->request();
+        $ro = $this->resource->get('page://self/assist');
         /** @var ResourceObject $ro */
         $this->assertSame('login_id:assisted01', $ro->body);
 
@@ -258,7 +330,7 @@ class ResourceTest extends TestCase
     #[Depends('testAssistedParameter')]
     public function testPreventAssistedParameterOverride(ResourceInterface $resource): void
     {
-        $ro = $resource->get->uri('page://self/assist')->withQuery(['login_id' => '_WILL_BE_IGNORED_'])->eager->request();
+        $ro = $resource->get('page://self/assist', ['login_id' => '_WILL_BE_IGNORED_']);
         /** @var ResourceObject $ro */
         $this->assertSame('login_id:assisted01', $ro->body);
     }
@@ -345,6 +417,14 @@ class ResourceTest extends TestCase
     public function testInvokeWrongType(): void
     {
         $this->expectException(BadRequestException::class);
-        $this->resource->uri('app://self/stone')(['id' => '']);
+        $this->resource->createRequest(Request::GET, 'app://self/stone')(['id' => '']);
+    }
+
+    public function testCreateRequest(): void
+    {
+        $request = $this->resource->createRequest(Request::POST, 'app://self/blog', ['name' => 'test']);
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        assert($request instanceof Request);
+        $this->assertSame('post', $request->method);
     }
 }
