@@ -47,7 +47,7 @@ interface ResourceInterface
      *
      * @param Query $query
      */
-    public function href(string $rel, ResourceObject $ro, array $query = []): ResourceObject;
+    public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject;
 
     /**
      * Invoke GET request

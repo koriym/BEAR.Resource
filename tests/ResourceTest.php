@@ -130,7 +130,7 @@ class ResourceTest extends TestCase
     public function testHref(): void
     {
         $author = $this->resource->get('app://self/author', ['id' => 1]);
-        $blog = $this->resource->href('blog', $author);
+        $blog = $this->resource->href('blog', [], $author);
         $this->assertInstanceOf(Blog::class, $blog);
     }
 

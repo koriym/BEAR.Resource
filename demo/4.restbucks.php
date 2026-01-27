@@ -100,7 +100,7 @@ $payment = [
 
 // then use hyper link to pay
 /* @var Order $ro */
-$ro = $resource->href('payment', $payment);
+$ro = $resource->href('payment', [], $payment);
 
 // payment done, enjoy coffee !
 $code = new Code;

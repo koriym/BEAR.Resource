@@ -136,8 +136,9 @@ final class ResourcePure implements ResourceInterface
      * @psalm-suppress MixedMethodCall
      */
     #[Override]
-    public function href(string $rel, ResourceObject $ro, array $query = []): ResourceObject
+    public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject
     {
+        assert($ro instanceof ResourceObject, 'ResourceObject is required for ResourcePure::href()');
         $sourceRequest = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query);
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */

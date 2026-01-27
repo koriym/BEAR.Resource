@@ -19,7 +19,7 @@ class Hasembed extends ResourceObject
     #[Link(rel: "next", href: "app://self/href/target?id={id}")]
     public function onGet(int $id)
     {
-        $this['next'] = $this->resource->href('next', $this, ['id' => $id]);
+        $this['next'] = $this->resource->href('next', ['id' => $id], $this);
 
         return $this;
     }

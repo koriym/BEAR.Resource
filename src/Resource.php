@@ -139,9 +139,11 @@ final class Resource implements ResourceInterface
      * @psalm-suppress MixedMethodCall
      */
     #[Override]
-    public function href(string $rel, ResourceObject $ro, array $query = []): ResourceObject
+    public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject
     {
-        $sourceRequest = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query);
+        $sourceRequest = $ro !== null
+            ? new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query)
+            : $this->request;
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */
         $request = $this->createRequest($method, $uri, $query);
