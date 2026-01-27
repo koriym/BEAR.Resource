@@ -173,7 +173,14 @@ final class LinkCrawler implements LinkCrawlerInterface
         );
     }
 
-    private function isList(mixed $value): bool
+    /**
+     * Determine if the value is a list (multiple rows) or a single row
+     *
+     * List: [['id' => 1], ['id' => 2]] - crawl processes each row
+     * Single row: ['id' => 1, 'name' => 'foo'] - crawl wraps in array, processes, unwraps
+     */
+    #[Override]
+    public function isList(mixed $value): bool
     {
         assert(is_array($value));
         /** @var BodyList $list */
@@ -188,6 +195,10 @@ final class LinkCrawler implements LinkCrawlerInterface
     }
 
     /**
+     * Multiple rows with same column structure
+     *
+     * Example: [['id' => 1, 'name' => 'a'], ['id' => 2, 'name' => 'b']]
+     *
      * @param list<array-key> $keys
      * @psalm-param BodyList   $list
      */
@@ -206,13 +217,23 @@ final class LinkCrawler implements LinkCrawlerInterface
         return true;
     }
 
-    /** @param array<mixed> $value */
+    /**
+     * Numeric-indexed array where each element is an array
+     *
+     * Example: [0 => ['id' => 1], 1 => ['id' => 2]]
+     *
+     * @param array<mixed> $value
+     */
     private function isMultiColumnList(array $value, mixed $firstRow): bool
     {
         return is_array($firstRow) && array_filter(array_keys($value), is_numeric(...)) === array_keys($value);
     }
 
     /**
+     * Single element list
+     *
+     * Example: [0 => ['id' => 1]]
+     *
      * @param array<mixed>    $value
      * @param list<array-key> $keys
      * @param array<mixed>    $list

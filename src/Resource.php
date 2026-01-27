@@ -25,7 +25,6 @@ use function is_string;
  * @property $this $head
  * @property $this $options
  * @psalm-import-type Query from Types
- *
  * @codeCoverageIgnore Deprecated legacy class - use ResourcePure instead
  */
 final class Resource implements ResourceInterface

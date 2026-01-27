@@ -14,24 +14,13 @@ use Ray\Di\Di\Set;
 use Ray\Di\ProviderInterface;
 use ReflectionMethod;
 
-use function array_filter;
-use function array_keys;
 use function array_map;
-use function array_pop;
 use function assert;
-use function count;
 use function is_array;
-use function is_numeric;
 use function ucfirst;
 use function uri_template;
 
-/**
- * @psalm-import-type Body from Types
- * @psalm-import-type BodyList from Types
- * @psalm-import-type BodyOrStringList from Types
- * @psalm-import-type Query from Types
- * @psalm-import-type QueryList from Types
- */
+/** @psalm-import-type Body from Types */
 final class Linker implements LinkerInterface
 {
     /** @param ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
@@ -167,7 +156,7 @@ final class Linker implements LinkerInterface
      */
     private function annotationCrawl(array $annotations, LinkType $link, ResourceObject $current, LinkCrawlerInterface $linkCrawler): ResourceObject
     {
-        $isList = $this->isList($current->body);
+        $isList = $linkCrawler->isList($current->body);
         /** @var list<array<string, mixed>> $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
 
@@ -177,54 +166,5 @@ final class Linker implements LinkerInterface
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
-    }
-
-    private function isList(mixed $value): bool
-    {
-        assert(is_array($value));
-        /** @var BodyList $list */
-        $list = $value;
-        /** @var mixed $firstRow */
-        $firstRow = array_pop($list);
-        $keys = array_keys((array) $firstRow);
-
-        return $this->isSingleColumnList($value, $keys, $list)
-            || $this->isMultiColumnMultiRowList($keys, $list)
-            || $this->isMultiColumnList($value, $firstRow);
-    }
-
-    /**
-     * @param list<array-key> $keys
-     * @psalm-param BodyList   $list
-     */
-    private function isMultiColumnMultiRowList(array $keys, array $list): bool
-    {
-        if ($keys === [0 => 0]) {
-            return false;
-        }
-
-        foreach ($list as $item) {
-            if ($keys !== array_keys((array) $item)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /** @param array<mixed> $value */
-    private function isMultiColumnList(array $value, mixed $firstRow): bool
-    {
-        return is_array($firstRow) && array_filter(array_keys($value), is_numeric(...)) === array_keys($value);
-    }
-
-    /**
-     * @param array<mixed>    $value
-     * @param list<array-key> $keys
-     * @param array<mixed>    $list
-     */
-    private function isSingleColumnList(array $value, array $keys, array $list): bool
-    {
-        return (count($value) === 1) && $keys === array_keys($list);
     }
 }

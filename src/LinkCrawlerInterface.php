@@ -27,4 +27,9 @@ interface LinkCrawlerInterface
      * @param-out array<array-key, array<string, mixed>> $bodyList
      */
     public function crawl(array $annotations, LinkType $link, array &$bodyList): void;
+
+    /**
+     * Determine if the value is a list (multiple rows) or a single row
+     */
+    public function isList(mixed $value): bool;
 }
