@@ -9,6 +9,7 @@ use BEAR\Resource\Exception\LinkRelException;
 use FakeVendor\Sandbox\Resource\App\Author;
 use FakeVendor\Sandbox\Resource\App\Blog;
 use FakeVendor\Sandbox\Resource\App\Link\Scalar\Name;
+use FakeVendor\Sandbox\Resource\App\Marshal\NullBody;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\Di\ProviderInterface;
@@ -328,5 +329,23 @@ class LinkerTest extends TestCase
         );
         $this->linker->invoke($request);
         $this->assertSame(['message' => 'blog not found'], $request->body);
+    }
+
+    public function testCrawlWithNullBody(): void
+    {
+        $request = new Request(
+            $this->invoker,
+            (new FakeRo())(new NullBody()),
+            Request::GET,
+            ['id' => 1],
+            [new LinkType('tree', LinkType::CRAWL_LINK)],
+        );
+        $result = $this->linker->invoke($request);
+        $expected = [
+            'id' => 1,
+            'name' => 'test',
+            'child' => null,
+        ];
+        $this->assertSame($expected, $result->body);
     }
 }
