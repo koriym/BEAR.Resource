@@ -156,7 +156,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function get(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::GET, $uri)($query);
+        return $this->createRequest(Request::GET, $uri)($query);
     }
 
     /**
@@ -165,7 +165,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function post(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::POST, $uri)($query);
+        return $this->createRequest(Request::POST, $uri)($query);
     }
 
     /**
@@ -174,7 +174,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function put(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::PUT, $uri)($query);
+        return $this->createRequest(Request::PUT, $uri)($query);
     }
 
     /**
@@ -183,7 +183,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function patch(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::PATCH, $uri)($query);
+        return $this->createRequest(Request::PATCH, $uri)($query);
     }
 
     /**
@@ -192,7 +192,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function delete(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::DELETE, $uri)($query);
+        return $this->createRequest(Request::DELETE, $uri)($query);
     }
 
     /**
@@ -201,7 +201,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function options(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::OPTIONS, $uri)($query);
+        return $this->createRequest(Request::OPTIONS, $uri)($query);
     }
 
     /**
@@ -210,11 +210,6 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function head(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Request::HEAD, $uri)($query);
-    }
-
-    private function methodUri(string $method, string $uri): RequestInterface
-    {
-        return $this->createRequest($method, $uri);
+        return $this->createRequest(Request::HEAD, $uri)($query);
     }
 }
