@@ -75,8 +75,8 @@ class ResourceTest extends TestCase
             }
         };
         $uri = new UriFactory('app://self');
-        $resource = new ResourcePure($factory, $invoker, new Anchor(), $linkerProvider, $uri);
-        $this->assertInstanceOf(ResourceInterface::class, $resource);
+        $resource = new ResourceClient($factory, $invoker, new Anchor(), $linkerProvider, $uri);
+        $this->assertInstanceOf(ResourceClientInterface::class, $resource);
     }
 
     public function testNewInstance(): void
@@ -434,20 +434,21 @@ class ResourceTest extends TestCase
 
     public function testLegacyFluentInterfaceFallback(): void
     {
-        // ResourcePure.__get() falls back to legacy Resource with deprecation warning
+        // Resource.__get() supports legacy fluent interface with deprecation warning
         set_error_handler(static function (int $errno, string $errstr): bool {
             return true; // Suppress the deprecation warning
         }, E_USER_DEPRECATED);
 
         try {
-            /** @var ResourcePure $resourcePure */
-            $resourcePure = $this->resource;
-            $legacyResource = $resourcePure->get; // @phpstan-ignore-line
+            /** @var Resource $resource */
+            $resource = $this->resource;
+            $legacyResource = $resource->get;
 
-            // Returns a legacy Resource instance
+            // Returns the same Resource instance
             $this->assertInstanceOf(Resource::class, $legacyResource);
 
             // The legacy Resource can use the fluent interface
+            /** @psalm-suppress DeprecatedMethod */
             $request = $legacyResource->uri('page://self/index');
             $this->assertInstanceOf(RequestInterface::class, $request);
         } finally {
@@ -480,8 +481,17 @@ class ResourceTest extends TestCase
         $linker = new Linker($invoker, $factory, $linkCrawlerProvider);
         $uri = new UriFactory('app://self');
 
-        // Legacy Resource takes LinkerInterface directly (not provider)
-        $resource = new Resource($factory, $invoker, new Anchor(), $linker, $uri);
+        $linkerProvider = new /** @template-implements ProviderInterface<LinkerInterface> */ class ($linker) implements ProviderInterface {
+            public function __construct(private readonly LinkerInterface $linker)
+            {
+            }
+
+            public function get(): LinkerInterface
+            {
+                return $this->linker;
+            }
+        };
+        $resource = new Resource($factory, $invoker, new Anchor(), $linkerProvider, $uri);
         $this->assertInstanceOf(ResourceInterface::class, $resource);
 
         // Test that fluent interface works

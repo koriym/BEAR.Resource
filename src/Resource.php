@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use Override;
+use Ray\Di\Di\Set;
+use Ray\Di\ProviderInterface;
 
 use function array_merge;
 use function assert;
@@ -15,7 +17,7 @@ use function is_string;
  *
  * This class maintains internal state for the fluent interface pattern.
  * It is NOT coroutine-safe due to mutable $method and $request properties.
- * For coroutine-safe usage, use ResourcePure instead.
+ * For coroutine-safe usage, use ResourceClient instead.
  *
  * @property $this $get
  * @property $this $post
@@ -25,7 +27,7 @@ use function is_string;
  * @property $this $head
  * @property $this $options
  * @psalm-import-type Query from Types
- * @codeCoverageIgnore Deprecated legacy class - use ResourcePure instead
+ * @codeCoverageIgnore Deprecated legacy class - use ResourceClient instead
  */
 final class Resource implements ResourceInterface
 {
@@ -34,17 +36,18 @@ final class Resource implements ResourceInterface
     private string $method = 'get';
 
     /**
-     * @param FactoryInterface $factory Resource factory
-     * @param InvokerInterface $invoker Resource request invoker
-     * @param AnchorInterface  $anchor  Resource anchor
-     * @param LinkerInterface  $linker  Resource linker
-     * @param UriFactory       $uri     URI factory
+     * @param FactoryInterface                   $factory        Resource factory
+     * @param InvokerInterface                   $invoker        Resource request invoker
+     * @param AnchorInterface                    $anchor         Resource anchor
+     * @param ProviderInterface<LinkerInterface> $linkerProvider Resource linker provider
+     * @param UriFactory                         $uri            URI factory
      */
     public function __construct(
         private readonly FactoryInterface $factory,
         private readonly InvokerInterface $invoker,
         private readonly AnchorInterface $anchor,
-        private readonly LinkerInterface $linker,
+        #[Set(LinkerInterface::class)]
+        private readonly ProviderInterface $linkerProvider,
         private readonly UriFactory $uri,
     ) {
     }
@@ -95,7 +98,7 @@ final class Resource implements ResourceInterface
         $this->method = 'get';
         $ro = $this->newInstance($uri);
         $ro->uri->method = $method;
-        $this->request = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query, [], $this->linker);
+        $this->request = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query, [], $this->linkerProvider);
 
         return $this->request;
     }
@@ -109,7 +112,7 @@ final class Resource implements ResourceInterface
         $ro = $this->newInstance($uri);
         $ro->uri->method = $method;
         $ro->uri->query = array_merge($ro->uri->query, $query);
-        $this->request = new Request($this->invoker, $ro, $method, $ro->uri->query, [], $this->linker);
+        $this->request = new Request($this->invoker, $ro, $method, $ro->uri->query, [], $this->linkerProvider);
 
         return $this->request;
     }

@@ -11,20 +11,15 @@ use Ray\Di\ProviderInterface;
 use function array_merge;
 use function assert;
 use function is_string;
-use function trigger_error;
-
-use const E_USER_DEPRECATED;
 
 /**
- * Pure singleton Resource client - coroutine safe
+ * Stateless resource client - coroutine safe
  *
  * This class is stateless and can be safely shared across coroutines.
- * For legacy fluent interface usage ($resource->get->uri()), a deprecation
- * warning is triggered and a new Resource instance is created for fallback.
  *
  * @psalm-import-type Query from Types
  */
-final class ResourcePure implements ResourceInterface
+final class ResourceClient implements ResourceClientInterface
 {
     /**
      * @param FactoryInterface                   $factory        Resource factory
@@ -44,27 +39,6 @@ final class ResourcePure implements ResourceInterface
     }
 
     /**
-     * Fallback to legacy Resource for deprecated fluent interface
-     *
-     * @deprecated Use createRequest() or direct method calls instead
-     * @psalm-suppress DeprecatedMethod
-     */
-    public function __get(string $name): Resource
-    {
-        trigger_error(
-            'Fluent interface ($resource->get->uri()) is deprecated. Use createRequest() instead.',
-            E_USER_DEPRECATED,
-        );
-
-        // Create a new mutable Resource instance for legacy compatibility
-        $linker = $this->linkerProvider->get();
-        $resource = new Resource($this->factory, $this->invoker, $this->anchor, $linker, $this->uri);
-
-        // Set the method and return for chaining
-        return $resource->__get($name);
-    }
-
-    /**
      * {@inheritDoc}
      */
     #[Override]
@@ -81,34 +55,13 @@ final class ResourcePure implements ResourceInterface
      * {@inheritDoc}
      */
     #[Override]
-    public function object(ResourceObject $ro): RequestInterface
+    public function newRequest(string $method, string $uri, array $query = []): RequestInterface
     {
-        return new Request($this->invoker, $ro, Request::GET);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use createRequest() instead
-     */
-    #[Override]
-    public function uri($uri): RequestInterface
-    {
-        return $this->createRequest(Request::GET, (string) $uri);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    #[Override]
-    public function createRequest(string $method, string $uri, array $query = []): RequestInterface
-    {
-        $linker = $this->linkerProvider->get();
         $ro = $this->newInstance($uri);
         $ro->uri->method = $method;
         $ro->uri->query = array_merge($ro->uri->query, $query);
 
-        return new Request($this->invoker, $ro, $method, $ro->uri->query, [], $linker);
+        return new Request($this->invoker, $ro, $method, $ro->uri->query, [], $this->linkerProvider);
     }
 
     /**
@@ -121,7 +74,7 @@ final class ResourcePure implements ResourceInterface
     public function crawl(string $uri, string $linkKey, array $query = []): ResourceObject
     {
         /** @var Request $request */
-        $request = $this->createRequest(Request::GET, $uri, $query)->linkCrawl($linkKey);
+        $request = $this->newRequest(Request::GET, $uri, $query)->linkCrawl($linkKey);
         $request->in = 'eager';
         $ro = $request->request();
         assert($ro instanceof ResourceObject);
@@ -136,13 +89,12 @@ final class ResourcePure implements ResourceInterface
      * @psalm-suppress MixedMethodCall
      */
     #[Override]
-    public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject
+    public function href(string $rel, array $query, ResourceObject $ro): ResourceObject
     {
-        assert($ro instanceof ResourceObject, 'ResourceObject is required for ResourcePure::href()');
         $sourceRequest = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query);
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */
-        $request = $this->createRequest($method, $uri, $query);
+        $request = $this->newRequest($method, $uri, $query);
         $request->in = 'eager';
         $result = $request->request();
         assert($result instanceof ResourceObject);
@@ -156,7 +108,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function get(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::GET, $uri)($query);
+        return $this->newRequest(Request::GET, $uri)($query);
     }
 
     /**
@@ -165,7 +117,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function post(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::POST, $uri)($query);
+        return $this->newRequest(Request::POST, $uri)($query);
     }
 
     /**
@@ -174,7 +126,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function put(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::PUT, $uri)($query);
+        return $this->newRequest(Request::PUT, $uri)($query);
     }
 
     /**
@@ -183,7 +135,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function patch(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::PATCH, $uri)($query);
+        return $this->newRequest(Request::PATCH, $uri)($query);
     }
 
     /**
@@ -192,7 +144,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function delete(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::DELETE, $uri)($query);
+        return $this->newRequest(Request::DELETE, $uri)($query);
     }
 
     /**
@@ -201,7 +153,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function options(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::OPTIONS, $uri)($query);
+        return $this->newRequest(Request::OPTIONS, $uri)($query);
     }
 
     /**
@@ -210,6 +162,6 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function head(string $uri, array $query = []): ResourceObject
     {
-        return $this->createRequest(Request::HEAD, $uri)($query);
+        return $this->newRequest(Request::HEAD, $uri)($query);
     }
 }
