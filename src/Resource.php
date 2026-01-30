@@ -15,7 +15,7 @@ use function is_string;
  *
  * This class maintains internal state for the fluent interface pattern.
  * It is NOT coroutine-safe due to mutable $method and $request properties.
- * For coroutine-safe usage, use ResourcePure instead.
+ * For coroutine-safe usage, use ResourceClient instead.
  *
  * @property $this $get
  * @property $this $post
@@ -25,7 +25,7 @@ use function is_string;
  * @property $this $head
  * @property $this $options
  * @psalm-import-type Query from Types
- * @codeCoverageIgnore Deprecated legacy class - use ResourcePure instead
+ * @codeCoverageIgnore Deprecated legacy class - use ResourceClient instead
  */
 final class Resource implements ResourceInterface
 {

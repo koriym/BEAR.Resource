@@ -16,7 +16,7 @@ use function trigger_error;
 use const E_USER_DEPRECATED;
 
 /**
- * Pure singleton Resource client - coroutine safe
+ * Stateless Resource client - coroutine safe
  *
  * This class is stateless and can be safely shared across coroutines.
  * For legacy fluent interface usage ($resource->get->uri()), a deprecation
@@ -24,7 +24,7 @@ use const E_USER_DEPRECATED;
  *
  * @psalm-import-type Query from Types
  */
-final class ResourcePure implements ResourceInterface
+final class ResourceClient implements ResourceInterface
 {
     /**
      * @param FactoryInterface                   $factory        Resource factory
@@ -138,7 +138,7 @@ final class ResourcePure implements ResourceInterface
     #[Override]
     public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject
     {
-        assert($ro instanceof ResourceObject, 'ResourceObject is required for ResourcePure::href()');
+        assert($ro instanceof ResourceObject, 'ResourceObject is required for ResourceClient::href()');
         $sourceRequest = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query);
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */

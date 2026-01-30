@@ -75,7 +75,7 @@ class ResourceTest extends TestCase
             }
         };
         $uri = new UriFactory('app://self');
-        $resource = new ResourcePure($factory, $invoker, new Anchor(), $linkerProvider, $uri);
+        $resource = new ResourceClient($factory, $invoker, new Anchor(), $linkerProvider, $uri);
         $this->assertInstanceOf(ResourceInterface::class, $resource);
     }
 
@@ -434,13 +434,13 @@ class ResourceTest extends TestCase
 
     public function testLegacyFluentInterfaceFallback(): void
     {
-        // ResourcePure.__get() falls back to legacy Resource with deprecation warning
+        // ResourceClient.__get() falls back to legacy Resource with deprecation warning
         set_error_handler(static function (int $errno, string $errstr): bool {
             return true; // Suppress the deprecation warning
         }, E_USER_DEPRECATED);
 
         try {
-            /** @var ResourcePure $resourcePure */
+            /** @var ResourceClient $resourcePure */
             $resourcePure = $this->resource;
             $legacyResource = $resourcePure->get; // @phpstan-ignore-line
 
