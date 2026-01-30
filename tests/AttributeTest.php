@@ -43,7 +43,7 @@ class AttributeTest extends TestCase
     #[Depends('testNewInstance')]
     public function testLink(News $news): void
     {
-        $request = $this->resource->createRequest(Request::GET, 'app://self/news', ['date' => '2021/7/23'])->linkSelf('event')->request();
+        $request = $this->resource->newRequest(Request::GET, 'app://self/news', ['date' => '2021/7/23'])->linkSelf('event')->request();
         assert($request instanceof Request);
         $this->assertSame('event', $request->links[0]->key);
         $this->assertSame(LinkType::SELF_LINK, $request->links[0]->type);

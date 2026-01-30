@@ -104,7 +104,7 @@ final class Resource implements ResourceInterface
      * {@inheritDoc}
      */
     #[Override]
-    public function createRequest(string $method, string $uri, array $query = []): RequestInterface
+    public function newRequest(string $method, string $uri, array $query = []): RequestInterface
     {
         $ro = $this->newInstance($uri);
         $ro->uri->method = $method;
@@ -124,7 +124,7 @@ final class Resource implements ResourceInterface
     public function crawl(string $uri, string $linkKey, array $query = []): ResourceObject
     {
         /** @var Request $request */
-        $request = $this->createRequest(Request::GET, $uri, $query)->linkCrawl($linkKey);
+        $request = $this->newRequest(Request::GET, $uri, $query)->linkCrawl($linkKey);
         $request->in = 'eager';
         $ro = $request->request();
         assert($ro instanceof ResourceObject);
@@ -146,7 +146,7 @@ final class Resource implements ResourceInterface
             : $this->request;
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */
-        $request = $this->createRequest($method, $uri, $query);
+        $request = $this->newRequest($method, $uri, $query);
         $request->in = 'eager';
         $result = $request->request();
         assert($result instanceof ResourceObject);

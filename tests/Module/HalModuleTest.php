@@ -23,7 +23,7 @@ class HalModuleTest extends TestCase
         $resource = (new Injector(new AppModule(), __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
         assert($resource instanceof ResourceInterface);
         // request
-        $news = $resource->createRequest(Request::GET, 'app://self/news', ['date' => 'today'])->request();
+        $news = $resource->newRequest(Request::GET, 'app://self/news', ['date' => 'today'])->request();
         $expect = '{
     "weather": {
         "today": "the weather of today is sunny"

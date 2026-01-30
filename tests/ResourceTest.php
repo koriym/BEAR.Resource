@@ -87,13 +87,13 @@ class ResourceTest extends TestCase
 
     public function testLazyRequest(): void
     {
-        $instance = $this->resource->createRequest(Request::GET, 'page://self/index')->request();
+        $instance = $this->resource->newRequest(Request::GET, 'page://self/index')->request();
         $this->assertInstanceOf(Request::class, $instance);
     }
 
     public function testEagerRequest(): void
     {
-        $request = $this->resource->createRequest(Request::GET, 'page://self/index');
+        $request = $this->resource->newRequest(Request::GET, 'page://self/index');
         assert($request instanceof Request);
         $instance = $request->eager->request();
         $this->assertInstanceOf(Index::class, $instance);
@@ -101,7 +101,7 @@ class ResourceTest extends TestCase
 
     public function testWithQueryRequest(): void
     {
-        $request = $this->resource->createRequest(Request::GET, 'page://self/index', ['id' => 1]);
+        $request = $this->resource->newRequest(Request::GET, 'page://self/index', ['id' => 1]);
         assert($request instanceof Request);
         $instance = $request->eager->request();
         $this->assertSame(1, $instance->body);
@@ -109,7 +109,7 @@ class ResourceTest extends TestCase
 
     public function testWithAddRequestOverrideQuery(): void
     {
-        $request = $this->resource->createRequest(Request::GET, 'page://self/index', ['id' => 1])->addQuery(
+        $request = $this->resource->newRequest(Request::GET, 'page://self/index', ['id' => 1])->addQuery(
             ['id' => 2],
         );
         assert($request instanceof Request);
@@ -158,7 +158,7 @@ class ResourceTest extends TestCase
 
     public function testLinkSelf(): void
     {
-        $request = $this->resource->createRequest(Request::GET, 'app://self/author', ['id' => 1])->linkSelf('blog')->request();
+        $request = $this->resource->newRequest(Request::GET, 'app://self/author', ['id' => 1])->linkSelf('blog')->request();
         assert($request instanceof Request);
         $this->assertSame('blog', $request->links[0]->key);
         $this->assertSame(LinkType::SELF_LINK, $request->links[0]->type);
@@ -169,7 +169,7 @@ class ResourceTest extends TestCase
 
     public function testLinkNew(): void
     {
-        $request = $this->resource->createRequest(Request::GET, 'app://self/author', ['id' => 1])->linkNew('blog')->request();
+        $request = $this->resource->newRequest(Request::GET, 'app://self/author', ['id' => 1])->linkNew('blog')->request();
         assert($request instanceof Request);
         $this->assertSame('blog', $request->links[0]->key);
         $this->assertSame(LinkType::NEW_LINK, $request->links[0]->type);
@@ -189,7 +189,7 @@ class ResourceTest extends TestCase
     /** @return array<string, array<mixed>|int|string> */
     public function testLinkCrawl(): array
     {
-        $request = $this->resource->createRequest(Request::GET, 'app://self/blog', ['id' => 11])->linkCrawl('tree')->request();
+        $request = $this->resource->newRequest(Request::GET, 'app://self/blog', ['id' => 11])->linkCrawl('tree')->request();
         assert($request instanceof Request);
         $this->assertSame('tree', $request->links[0]->key);
         $this->assertSame(LinkType::CRAWL_LINK, $request->links[0]->type);
@@ -421,12 +421,12 @@ class ResourceTest extends TestCase
     public function testInvokeWrongType(): void
     {
         $this->expectException(BadRequestException::class);
-        $this->resource->createRequest(Request::GET, 'app://self/stone')(['id' => '']);
+        $this->resource->newRequest(Request::GET, 'app://self/stone')(['id' => '']);
     }
 
     public function testCreateRequest(): void
     {
-        $request = $this->resource->createRequest(Request::POST, 'app://self/blog', ['name' => 'test']);
+        $request = $this->resource->newRequest(Request::POST, 'app://self/blog', ['name' => 'test']);
         $this->assertInstanceOf(RequestInterface::class, $request);
         assert($request instanceof Request);
         $this->assertSame('post', $request->method);

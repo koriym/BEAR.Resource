@@ -33,7 +33,7 @@ interface ResourceInterface
      *
      * @param Query $query
      */
-    public function createRequest(string $method, string $uri, array $query = []): RequestInterface;
+    public function newRequest(string $method, string $uri, array $query = []): RequestInterface;
 
     /**
      * Execute a GET request with link crawl

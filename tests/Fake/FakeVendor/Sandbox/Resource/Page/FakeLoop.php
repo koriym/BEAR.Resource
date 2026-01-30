@@ -16,7 +16,7 @@ class FakeLoop extends ResourceObject
 
     public function onGet(): ResourceObject
     {
-        $request = $this->resource->createRequest(Request::GET, '/fake-loop-item');
+        $request = $this->resource->newRequest(Request::GET, '/fake-loop-item');
         foreach (range(1, 5) as $i) {
             $this->body[(string) $i] = $request(['num' => (string) $i]);
         }

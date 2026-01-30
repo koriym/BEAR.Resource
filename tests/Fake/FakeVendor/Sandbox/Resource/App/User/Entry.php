@@ -30,7 +30,7 @@ class Entry extends ResourceObject
 
     public function onLinkComment(ResourceObject $ro)
     {
-        $request = $this->resource->createRequest(
+        $request = $this->resource->newRequest(
             Request::GET,
             'app://self/User/Entry/Comment',
             ['entry_id' => $ro->body['id']],

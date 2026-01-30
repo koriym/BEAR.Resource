@@ -21,7 +21,7 @@ class News extends ResourceObject
         unset($date);
         $this['headline'] = "40th anniversary of Rubik's Cube invention.";
         $this['sports'] = "Pieter Weening wins Giro d'Italia.";
-        $this['user'] = $this->resource->createRequest(Request::GET, 'app://self/user', ['id' => 1])->request();
+        $this['user'] = $this->resource->newRequest(Request::GET, 'app://self/user', ['id' => 1])->request();
 
         return $this;
     }

@@ -20,7 +20,7 @@ class News extends ResourceObject
     {
         unset($date);
         $this['technology'] = 'Microsoft to stop producing Windows versions';
-        $this['user'] = $this->resource->createRequest(Request::GET, 'app://self/user', ['id' => 2])->request();
+        $this['user'] = $this->resource->newRequest(Request::GET, 'app://self/user', ['id' => 2])->request();
 
         return $this;
     }

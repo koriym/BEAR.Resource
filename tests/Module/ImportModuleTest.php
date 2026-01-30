@@ -43,7 +43,7 @@ class ImportModuleTest extends TestCase
         $resource = (new Injector($module, __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
         assert($resource instanceof ResourceInterface);
         // request
-        $news = $resource->createRequest(Request::GET, 'app://self/news', ['date' => 'today'])->request();
+        $news = $resource->newRequest(Request::GET, 'app://self/news', ['date' => 'today'])->request();
         $expect = '{
     "weather": {
         "today": "the weather of today is sunny"
@@ -60,7 +60,7 @@ class ImportModuleTest extends TestCase
 ';
         $this->assertJsonStringEqualsJsonString($expect, (string) $news);
 
-        $news = $resource->createRequest(Request::GET, 'app://blog/news', ['date' => 'today'])->request();
+        $news = $resource->newRequest(Request::GET, 'app://blog/news', ['date' => 'today'])->request();
         $expect = '{
     "weather": {
         "today": "the weather of today is sunny"
