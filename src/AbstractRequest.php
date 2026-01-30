@@ -12,7 +12,6 @@ use IteratorAggregate;
 use JsonSerializable;
 use LogicException;
 use Override;
-use Ray\Di\ProviderInterface;
 use ReturnTypeWillChange;
 use Serializable;
 use Stringable;
@@ -93,8 +92,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
         public array $query = [],
         // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint
         public array $links = [],
-        /** @var ProviderInterface<LinkerInterface>|null */
-        private readonly ProviderInterface|null $linkerProvider = null,
+        private readonly LinkerInterface|null $linker = null,
     ) {
         if (! in_array(strtolower($method), ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'], true)) {
             throw new MethodException($method, 400);
@@ -134,8 +132,8 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
         }
 
         $this->resourceObject->uri->query = $this->query;
-        if ($this->links && $this->linkerProvider !== null) {
-            return $this->linkerProvider->get()->invoke($this);
+        if ($this->links && $this->linker instanceof LinkerInterface) {
+            return $this->linker->invoke($this);
         }
 
         return clone $this->invoker->invoke($this);
