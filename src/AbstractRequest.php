@@ -279,6 +279,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
         unset($data);
     }
 
+    /** Lazy evaluation with memoization - delegates to __invoke() on first call */
     private function invoke(): ResourceObject
     {
         if ($this->result === null) {
