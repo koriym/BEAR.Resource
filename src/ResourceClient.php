@@ -46,13 +46,13 @@ final class ResourceClient implements ResourceInterface
     /**
      * Fallback to legacy Resource for deprecated fluent interface
      *
-     * @deprecated Use createRequest() or direct method calls instead
+     * @deprecated Use newRequest() or direct method calls instead
      * @psalm-suppress DeprecatedMethod
      */
     public function __get(string $name): Resource
     {
         trigger_error(
-            'Fluent interface ($resource->get->uri()) is deprecated. Use createRequest() instead.',
+            'Fluent interface ($resource->get->uri()) is deprecated. Use newRequest() instead.',
             E_USER_DEPRECATED,
         );
 
@@ -89,7 +89,7 @@ final class ResourceClient implements ResourceInterface
     /**
      * {@inheritDoc}
      *
-     * @deprecated Use createRequest() instead
+     * @deprecated Use newRequest() instead
      */
     #[Override]
     public function uri($uri): RequestInterface

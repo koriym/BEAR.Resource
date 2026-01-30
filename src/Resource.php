@@ -52,7 +52,7 @@ final class Resource implements ResourceInterface
     /**
      * Set HTTP method for fluent interface
      *
-     * @deprecated Use createRequest() instead
+     * @deprecated Use newRequest() instead
      */
     public function __get(string $name): self
     {
@@ -86,7 +86,7 @@ final class Resource implements ResourceInterface
     /**
      * {@inheritDoc}
      *
-     * @deprecated Use createRequest() instead
+     * @deprecated Use newRequest() instead
      */
     #[Override]
     public function uri($uri): RequestInterface
