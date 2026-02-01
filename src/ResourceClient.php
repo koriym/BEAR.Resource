@@ -11,9 +11,6 @@ use Ray\Di\ProviderInterface;
 use function array_merge;
 use function assert;
 use function is_string;
-use function trigger_error;
-
-use const E_USER_DEPRECATED;
 
 /**
  * Stateless Resource client - coroutine safe
@@ -51,11 +48,6 @@ final class ResourceClient implements ResourceInterface
      */
     public function __get(string $name): Resource
     {
-        trigger_error(
-            'Fluent interface ($resource->get->uri()) is deprecated. Use newRequest() instead.',
-            E_USER_DEPRECATED,
-        );
-
         // Create a new mutable Resource instance for legacy compatibility
         $linker = $this->linkerProvider->get();
         $resource = new Resource($this->factory, $this->invoker, $this->anchor, $linker, $this->uri);
