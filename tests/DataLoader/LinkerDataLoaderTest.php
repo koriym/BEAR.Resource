@@ -14,6 +14,7 @@ use BEAR\Resource\LinkCrawler;
 use BEAR\Resource\LinkCrawlerInterface;
 use BEAR\Resource\Linker;
 use BEAR\Resource\LinkType;
+use BEAR\Resource\Method;
 use BEAR\Resource\Request;
 use BEAR\Resource\SchemeCollection;
 use BEAR\Resource\UriFactory;
@@ -69,7 +70,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -137,7 +138,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -160,7 +161,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -172,7 +173,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -188,7 +189,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 99],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );

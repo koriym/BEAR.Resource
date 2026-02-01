@@ -96,7 +96,7 @@ final class Linker implements LinkerInterface
             throw new Exception\LinkQueryException('Only array is allowed for link in ' . $current::class, 500);
         }
 
-        $annotations = $this->getLinkAnnotations($current, $request->method);
+        $annotations = $this->getLinkAnnotations($current, $request->method->value);
         if ($link->type === LinkType::CRAWL_LINK) {
             return $this->annotationCrawl($annotations, $link, $current, $linkCrawler);
         }
@@ -141,7 +141,7 @@ final class Linker implements LinkerInterface
             $uri = uri_template($annotation->href, (array) $current->body);
             $rel = $this->factory->newInstance($uri);
             $query = (new Uri($uri))->query;
-            $request = new Request($this->invoker, $rel, Request::GET, $query);
+            $request = new Request($this->invoker, $rel, Method::GET, $query);
 
             return $this->invoker->invoke($request);
         }

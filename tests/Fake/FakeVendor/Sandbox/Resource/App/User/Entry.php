@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FakeVendor\Sandbox\Resource\App\User;
 
-use BEAR\Resource\Request;
+use BEAR\Resource\Method;
 use BEAR\Resource\ResourceInterface;
 use BEAR\Resource\ResourceObject;
 
@@ -31,7 +31,7 @@ class Entry extends ResourceObject
     public function onLinkComment(ResourceObject $ro)
     {
         $request = $this->resource->newRequest(
-            Request::GET,
+            Method::GET,
             'app://self/User/Entry/Comment',
             ['entry_id' => $ro->body['id']],
         )->request();

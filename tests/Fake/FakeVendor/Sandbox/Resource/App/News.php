@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace FakeVendor\Sandbox\Resource\App;
 
 use BEAR\Resource\Annotation\Embed;
-use BEAR\Resource\Request;
+use BEAR\Resource\Method;
 use BEAR\Resource\ResourceInterface;
 use BEAR\Resource\ResourceObject;
 
@@ -21,7 +21,7 @@ class News extends ResourceObject
         unset($date);
         $this['headline'] = "40th anniversary of Rubik's Cube invention.";
         $this['sports'] = "Pieter Weening wins Giro d'Italia.";
-        $this['user'] = $this->resource->newRequest(Request::GET, 'app://self/user', ['id' => 1])->request();
+        $this['user'] = $this->resource->newRequest(Method::GET, 'app://self/user', ['id' => 1])->request();
 
         return $this;
     }

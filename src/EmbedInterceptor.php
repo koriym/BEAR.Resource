@@ -66,7 +66,7 @@ final readonly class EmbedInterceptor implements EmbedInterceptorInterface
             try {
                 $templateUri = $this->getFullUri($embed->src, $ro);
                 $uri = uri_template($templateUri, $query);
-                $request = $resource->newRequest(Request::GET, $uri);
+                $request = $resource->newRequest(Method::GET, $uri);
                 assert($request instanceof Request);
                 $this->prepareBody($ro, $embed);
 

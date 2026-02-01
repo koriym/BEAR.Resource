@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace FakeVendor\Blog\Resource\App;
 
 use BEAR\Resource\Annotation\Embed;
-use BEAR\Resource\Request;
+use BEAR\Resource\Method;
 use BEAR\Resource\ResourceInterface;
 use BEAR\Resource\ResourceObject;
 
@@ -20,7 +20,7 @@ class News extends ResourceObject
     {
         unset($date);
         $this['technology'] = 'Microsoft to stop producing Windows versions';
-        $this['user'] = $this->resource->newRequest(Request::GET, 'app://self/user', ['id' => 2])->request();
+        $this['user'] = $this->resource->newRequest(Method::GET, 'app://self/user', ['id' => 2])->request();
 
         return $this;
     }

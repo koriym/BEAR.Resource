@@ -80,10 +80,10 @@ class ResourceFluentTest extends TestCase
 
     public function testNewRequest(): void
     {
-        $request = $this->resource->newRequest(Request::POST, 'app://self/blog', ['name' => 'test']);
+        $request = $this->resource->newRequest(Method::POST, 'app://self/blog', ['name' => 'test']);
         $this->assertInstanceOf(RequestInterface::class, $request);
         assert($request instanceof Request);
-        $this->assertSame('post', $request->method);
+        $this->assertSame(Method::POST, $request->method);
     }
 
     public function testCrawl(): void

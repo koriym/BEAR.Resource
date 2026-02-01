@@ -78,7 +78,7 @@ final class LinkCrawler implements LinkCrawlerInterface
             $uri = uri_template($annotation->href, $body);
             $rel = $this->factory->newInstance($uri);
             $query = (new Uri($uri))->query;
-            $request = new Request($this->invoker, $rel, Request::GET, $query);
+            $request = new Request($this->invoker, $rel, Method::GET, $query);
             $hash = $request->hash();
 
             if (array_key_exists($hash, $this->cache)) {
@@ -99,7 +99,7 @@ final class LinkCrawler implements LinkCrawlerInterface
                 continue;
             }
 
-            $this->processNestedCrawl($ro, $request->method, $link, $annotation->rel, $body);
+            $this->processNestedCrawl($ro, $request->method->value, $link, $annotation->rel, $body);
         }
     }
 

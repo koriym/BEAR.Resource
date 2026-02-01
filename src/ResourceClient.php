@@ -72,7 +72,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function object(ResourceObject $ro): RequestInterface
     {
-        return new Request($this->invoker, $ro, Request::GET);
+        return new Request($this->invoker, $ro, Method::GET);
     }
 
     /**
@@ -81,18 +81,18 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function uri($uri): RequestInterface
     {
-        return $this->newRequest(Request::GET, (string) $uri);
+        return $this->newRequest(Method::GET, (string) $uri);
     }
 
     /**
      * {@inheritDoc}
      */
     #[Override]
-    public function newRequest(string $method, string $uri, array $query = []): RequestInterface
+    public function newRequest(Method $method, string $uri, array $query = []): RequestInterface
     {
         $linker = $this->linkerProvider->get();
         $ro = $this->newInstance($uri);
-        $ro->uri->method = $method;
+        $ro->uri->method = $method->value;
         $ro->uri->query = array_merge($ro->uri->query, $query);
 
         return new Request($this->invoker, $ro, $method, $ro->uri->query, [], $linker);
@@ -108,7 +108,7 @@ final class ResourceClient implements ResourceInterface
     public function crawl(string $uri, string $linkKey, array $query = []): ResourceObject
     {
         /** @var Request $request */
-        $request = $this->newRequest(Request::GET, $uri, $query)->linkCrawl($linkKey);
+        $request = $this->newRequest(Method::GET, $uri, $query)->linkCrawl($linkKey);
         $request->in = 'eager';
         $ro = $request->request();
         assert($ro instanceof ResourceObject);
@@ -126,10 +126,10 @@ final class ResourceClient implements ResourceInterface
     public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject
     {
         assert($ro instanceof ResourceObject, 'ResourceObject is required for ResourceClient::href()');
-        $sourceRequest = new Request($this->invoker, $ro, $ro->uri->method, $ro->uri->query);
+        $sourceRequest = new Request($this->invoker, $ro, Method::from($ro->uri->method), $ro->uri->query);
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */
-        $request = $this->newRequest($method, $uri, $query);
+        $request = $this->newRequest(Method::from($method), $uri, $query);
         $request->in = 'eager';
         $result = $request->request();
         assert($result instanceof ResourceObject);
@@ -143,7 +143,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function get(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::GET, $uri)($query);
+        return $this->newRequest(Method::GET, $uri)($query);
     }
 
     /**
@@ -152,7 +152,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function post(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::POST, $uri)($query);
+        return $this->newRequest(Method::POST, $uri)($query);
     }
 
     /**
@@ -161,7 +161,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function put(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::PUT, $uri)($query);
+        return $this->newRequest(Method::PUT, $uri)($query);
     }
 
     /**
@@ -170,7 +170,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function patch(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::PATCH, $uri)($query);
+        return $this->newRequest(Method::PATCH, $uri)($query);
     }
 
     /**
@@ -179,7 +179,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function delete(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::DELETE, $uri)($query);
+        return $this->newRequest(Method::DELETE, $uri)($query);
     }
 
     /**
@@ -188,7 +188,7 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function options(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::OPTIONS, $uri)($query);
+        return $this->newRequest(Method::OPTIONS, $uri)($query);
     }
 
     /**
@@ -197,6 +197,6 @@ final class ResourceClient implements ResourceInterface
     #[Override]
     public function head(string $uri, array $query = []): ResourceObject
     {
-        return $this->newRequest(Request::HEAD, $uri)($query);
+        return $this->newRequest(Method::HEAD, $uri)($query);
     }
 }

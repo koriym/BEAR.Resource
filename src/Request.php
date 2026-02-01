@@ -18,12 +18,25 @@ use function in_array;
  */
 final class Request extends AbstractRequest
 {
+    /** @deprecated Use Method::GET instead */
     public const GET = 'get';
+
+    /** @deprecated Use Method::POST instead */
     public const POST = 'post';
+
+    /** @deprecated Use Method::PUT instead */
     public const PUT = 'put';
+
+    /** @deprecated Use Method::PATCH instead */
     public const PATCH = 'patch';
+
+    /** @deprecated Use Method::DELETE instead */
     public const DELETE = 'delete';
+
+    /** @deprecated Use Method::HEAD instead */
     public const HEAD = 'head';
+
+    /** @deprecated Use Method::OPTIONS instead */
     public const OPTIONS = 'options';
 
     /**
@@ -78,7 +91,7 @@ final class Request extends AbstractRequest
     {
         $uri = $this->toUri();
 
-        return "{$this->method} {$uri}";
+        return "{$this->method->value} {$uri}";
     }
 
     /**
