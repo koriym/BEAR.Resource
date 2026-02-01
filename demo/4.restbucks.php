@@ -90,7 +90,7 @@ class Payment extends ResourceObject
 
 /* @var ResourceInterface $resource */
 $resource = (new Injector(new HalModule(new ResourceModule('MyVendor\Demo')), __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
-$resource->post->uri('app://self/order')(['drink' => 'latte']);
+$order = $resource->post('app://self/order', ['drink' => 'latte']);
 $payment = [
     'credit_card_number' => '123456789',
     'expires' => '07/07',
@@ -100,7 +100,7 @@ $payment = [
 
 // then use hyper link to pay
 /* @var Order $ro */
-$ro = $resource->href('payment', [], $payment);
+$ro = $resource->href('payment', $payment, $order);
 
 // payment done, enjoy coffee !
 $code = new Code;

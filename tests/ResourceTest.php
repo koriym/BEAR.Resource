@@ -20,12 +20,8 @@ use Ray\Di\NullModule;
 use Ray\Di\ProviderInterface;
 
 use function assert;
-use function restore_error_handler;
 use function serialize;
-use function set_error_handler;
 use function unserialize;
-
-use const E_USER_DEPRECATED;
 
 class ResourceTest extends TestCase
 {
@@ -432,27 +428,19 @@ class ResourceTest extends TestCase
         $this->assertSame('post', $request->method);
     }
 
-    public function testLegacyFluentInterfaceFallback(): void
+    public function testFluentInterfaceFallback(): void
     {
-        // ResourceClient.__get() falls back to legacy Resource with deprecation warning
-        set_error_handler(static function (int $errno, string $errstr): bool {
-            return true; // Suppress the deprecation warning
-        }, E_USER_DEPRECATED);
+        // ResourceClient.__get() delegates to Resource for fluent interface
+        /** @var ResourceClient $resourceClient */
+        $resourceClient = $this->resource;
+        $legacyResource = $resourceClient->get; // @phpstan-ignore-line
 
-        try {
-            /** @var ResourceClient $resourcePure */
-            $resourcePure = $this->resource;
-            $legacyResource = $resourcePure->get; // @phpstan-ignore-line
+        // Returns a Resource instance for fluent interface
+        $this->assertInstanceOf(Resource::class, $legacyResource);
 
-            // Returns a legacy Resource instance
-            $this->assertInstanceOf(Resource::class, $legacyResource);
-
-            // The legacy Resource can use the fluent interface
-            $request = $legacyResource->uri('page://self/index');
-            $this->assertInstanceOf(RequestInterface::class, $request);
-        } finally {
-            restore_error_handler();
-        }
+        // The Resource instance can use the fluent interface
+        $request = $legacyResource->uri('page://self/index');
+        $this->assertInstanceOf(RequestInterface::class, $request);
     }
 
     public function testLegacyResourceManualConstruction(): void
@@ -485,16 +473,7 @@ class ResourceTest extends TestCase
         $this->assertInstanceOf(ResourceInterface::class, $resource);
 
         // Test that fluent interface works
-        set_error_handler(static function (int $errno, string $errstr): bool {
-            return true; // Suppress the deprecation warning
-        }, E_USER_DEPRECATED);
-
-        try {
-            /** @psalm-suppress DeprecatedMethod */
-            $request = $resource->get->uri('page://self/index');
-            $this->assertInstanceOf(RequestInterface::class, $request);
-        } finally {
-            restore_error_handler();
-        }
+        $request = $resource->get->uri('page://self/index');
+        $this->assertInstanceOf(RequestInterface::class, $request);
     }
 }

@@ -16,8 +16,8 @@ use function is_string;
  * Stateless Resource client - coroutine safe
  *
  * This class is stateless and can be safely shared across coroutines.
- * For legacy fluent interface usage ($resource->get->uri()), a deprecation
- * warning is triggered and a new Resource instance is created for fallback.
+ * For fluent interface usage ($resource->get->uri()), a new Resource
+ * instance is created to support the mutable fluent interface pattern.
  *
  * @psalm-import-type Query from Types
  */
@@ -41,14 +41,11 @@ final class ResourceClient implements ResourceInterface
     }
 
     /**
-     * Fallback to legacy Resource for deprecated fluent interface
-     *
-     * @deprecated Use newRequest() or direct method calls instead
-     * @psalm-suppress DeprecatedMethod
+     * Delegate to Resource for fluent interface support
      */
     public function __get(string $name): Resource
     {
-        // Create a new mutable Resource instance for legacy compatibility
+        // Create a new mutable Resource instance for fluent interface
         $linker = $this->linkerProvider->get();
         $resource = new Resource($this->factory, $this->invoker, $this->anchor, $linker, $this->uri);
 
@@ -80,8 +77,6 @@ final class ResourceClient implements ResourceInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @deprecated Use newRequest() instead
      */
     #[Override]
     public function uri($uri): RequestInterface

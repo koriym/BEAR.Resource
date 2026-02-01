@@ -11,7 +11,7 @@ use function assert;
 use function is_string;
 
 /**
- * Resource client with mutable state - supports legacy fluent interface
+ * Resource client with mutable state - supports fluent interface
  *
  * This class maintains internal state for the fluent interface pattern.
  * It is NOT coroutine-safe due to mutable $method and $request properties.
@@ -25,7 +25,6 @@ use function is_string;
  * @property $this $head
  * @property $this $options
  * @psalm-import-type Query from Types
- * @codeCoverageIgnore Deprecated legacy class - use ResourceClient instead
  */
 final class Resource implements ResourceInterface
 {
@@ -51,8 +50,6 @@ final class Resource implements ResourceInterface
 
     /**
      * Set HTTP method for fluent interface
-     *
-     * @deprecated Use newRequest() instead
      */
     public function __get(string $name): self
     {
@@ -85,8 +82,6 @@ final class Resource implements ResourceInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @deprecated Use newRequest() instead
      */
     #[Override]
     public function uri($uri): RequestInterface
@@ -217,7 +212,6 @@ final class Resource implements ResourceInterface
         return $this->methodUri(Request::HEAD, $uri)($query);
     }
 
-    /** @psalm-suppress DeprecatedMethod */
     private function methodUri(string $method, string $uri): RequestInterface
     {
         $this->method = $method;

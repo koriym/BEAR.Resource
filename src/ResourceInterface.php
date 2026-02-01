@@ -23,8 +23,6 @@ interface ResourceInterface
      * Set URI
      *
      * @param AbstractUri|string $uri
-     *
-     * @deprecated Use newRequest() instead
      */
     public function uri($uri): RequestInterface;
 
