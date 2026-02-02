@@ -31,7 +31,7 @@ use BEAR\Resource\OptionsRenderer;
 use BEAR\Resource\PhpClassInvoker;
 use BEAR\Resource\PrettyJsonRenderer;
 use BEAR\Resource\RenderInterface;
-use BEAR\Resource\ResourceClient;
+use BEAR\Resource\Resource;
 use BEAR\Resource\ResourceInterface;
 use BEAR\Resource\ReverseLinkerInterface;
 use BEAR\Resource\ReverseLinkInterface;
@@ -81,7 +81,7 @@ final class ResourceClientModule extends AbstractModule
     protected function configure(): void
     {
         $this->bind(UriFactory::class);
-        $this->bind(ResourceInterface::class)->to(ResourceClient::class)->in(Scope::SINGLETON);
+        $this->bind(ResourceInterface::class)->to(Resource::class)->in(Scope::SINGLETON);
         $this->bind(InvokerInterface::class)->to(Invoker::class);
         $this->bind(LinkCrawlerInterface::class)->to(LinkCrawler::class);
         $this->bind(LinkerInterface::class)->to(Linker::class);
