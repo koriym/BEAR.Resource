@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.31.0] - 2026-02-03
+
+### Added
+- `ResourceClient` class — stateless `ResourceInterface` implementation safe for coroutine/async environments
+- `Method` enum for type-safe HTTP method parameters
+- `ResourceClient::newRequest()` for direct request creation without fluent interface
+- `LinkCrawler` extracted from `Linker` for coroutine safety
+
+### Changed
+- `Linker` delegates list detection to `LinkCrawler` for shared logic
+
 ## [1.30.0] - 2026-01-24
 
 ### Added
@@ -139,7 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.30.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.0...HEAD
+[1.31.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.30.0...1.31.0
 [1.30.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.29.0...1.30.0
 [1.29.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...1.29.0
 [1.28.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.27.0...1.28.0
