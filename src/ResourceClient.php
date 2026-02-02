@@ -19,7 +19,12 @@ use function is_string;
  * For fluent interface usage ($resource->get->uri()), a new Resource
  * instance is created to support the mutable fluent interface pattern.
  *
+ * Not bound by default in 1.x (ResourceInterface defaults to Resource).
+ * Async modules (e.g. Swoole Module) override the binding to this class.
+ * Coverage is provided by the consuming module's test suite.
+ *
  * @psalm-import-type Query from Types
+ * @codeCoverageIgnore
  */
 final class ResourceClient implements ResourceInterface
 {
