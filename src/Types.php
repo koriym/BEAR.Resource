@@ -23,6 +23,7 @@ use ReflectionParameter;
  * @psalm-type QueryList = list<Query>
  * @psalm-type StringList = list<string>
  * @psalm-type Body = array<array-key, mixed>
+ * @psalm-type BodyList = array<array-key, array<string, mixed>|string>
  * @psalm-type BodyOrStringList = array<Body|string>
  * @psalm-type Schema = array<array-key, mixed>
  * @psalm-type ObjectList = list<object>

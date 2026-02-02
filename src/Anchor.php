@@ -29,7 +29,7 @@ final class Anchor implements AnchorInterface
     #[Override]
     public function href(string $rel, AbstractRequest $request, array $query): array
     {
-        $classMethod = 'on' . ucfirst($request->method);
+        $classMethod = 'on' . ucfirst($request->method->value);
         $annotations = (new ReflectionMethod($request->resourceObject::class, $classMethod))->getAnnotations();
         foreach ($annotations as $annotation) {
             if ($this->isValidLinkAnnotation($annotation, $rel)) {

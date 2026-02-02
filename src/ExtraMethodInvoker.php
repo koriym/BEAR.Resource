@@ -17,22 +17,22 @@ final readonly class ExtraMethodInvoker
 
     public function __invoke(AbstractRequest $request, InvokerInterface $invoker): ResourceObject
     {
-        if ($request->method === Request::OPTIONS) {
+        if ($request->method === Method::OPTIONS) {
             $ro = $request->resourceObject;
             $ro->view = $this->optionsRenderer->render($request->resourceObject);
 
             return $ro;
         }
 
-        if ($request->method === Request::HEAD) {
+        if ($request->method === Method::HEAD) {
             $getRequest = clone $request;
-            $getRequest->method = 'get';
+            $getRequest->method = Method::GET;
             $ro = $invoker->invoke($getRequest);
             $ro->body = null;
 
             return $ro;
         }
 
-        throw new MethodNotAllowedException($request->resourceObject::class . "::{({$request->method}}()", 405);
+        throw new MethodNotAllowedException($request->resourceObject::class . "::{({$request->method->value}}()", 405);
     }
 }

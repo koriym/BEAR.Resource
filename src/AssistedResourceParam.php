@@ -29,7 +29,7 @@ final readonly class AssistedResourceParam implements ParamInterface
         unset($varName);
         $resource = $injector->getInstance(ResourceInterface::class);
         $uri = $this->resourceParam->templated === true ? uri_template($this->resourceParam->uri, $query) : $this->resourceParam->uri;
-        $resourceResult = $resource->uri($uri)();
+        $resourceResult = $resource->newRequest(Method::GET, $uri)();
         $fragment = (string) parse_url($uri, PHP_URL_FRAGMENT);
 
         return $resourceResult[$fragment];

@@ -31,7 +31,7 @@ class ShortSyntaxTest extends TestCase
 
     public function testShortSyntaxWithQuery(): void
     {
-        $ro = $this->resource->get->uri('page://self/index?id=koriym')();
+        $ro = $this->resource->newRequest(Method::GET, 'page://self/index?id=koriym')();
         /** @var ResourceObject $ro */
         $this->assertInstanceOf(Index::class, $ro);
         $this->assertSame('koriym', $ro->body);
@@ -39,14 +39,14 @@ class ShortSyntaxTest extends TestCase
 
     public function testShortSyntaxInvoke(): void
     {
-        $ro = $this->resource->get->uri('page://self/index?id=koriym')->__invoke(['id' => 'koriym']);
+        $ro = $this->resource->newRequest(Method::GET, 'page://self/index?id=koriym')->__invoke(['id' => 'koriym']);
         $this->assertInstanceOf(Index::class, $ro);
         $this->assertSame('koriym', $ro->body);
     }
 
     public function testShortSyntaxFunction(): AbstractRequest
     {
-        $index = $this->resource->get->uri('page://self/index?id=koriym');
+        $index = $this->resource->newRequest(Method::GET, 'page://self/index?id=koriym');
         $ro = $index(['id' => 'koriym']);
         $this->assertInstanceOf(AbstractRequest::class, $index);
         $this->assertInstanceOf(Index::class, $ro);
@@ -64,7 +64,7 @@ class ShortSyntaxTest extends TestCase
 
     public function testShortSyntaxFunctionWithDefaultGetMethod(): void
     {
-        $ro = $this->resource->uri('page://self/index')();
+        $ro = $this->resource->newRequest(Method::GET, 'page://self/index')();
         $this->assertInstanceOf(Index::class, $ro);
     }
 }

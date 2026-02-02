@@ -18,14 +18,14 @@ class AnchorTest extends TestCase
         $invoker = (new InvokerFactory())();
         $author = new Author();
         $author->onGet(1);
-        $this->request = new Request($invoker, $author, Request::GET, ['id' => 1]);
+        $this->request = new Request($invoker, $author, Method::GET, ['id' => 1]);
         $this->anchor = new Anchor();
     }
 
     public function testHref(): void
     {
         [$method, $uri] = $this->anchor->href('blog', $this->request, []);
-        $this->assertSame(Request::GET, $method);
+        $this->assertSame('get', $method);
         $this->assertSame('app://self/blog?id=12', $uri);
     }
 

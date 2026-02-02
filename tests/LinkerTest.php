@@ -9,8 +9,10 @@ use BEAR\Resource\Exception\LinkRelException;
 use FakeVendor\Sandbox\Resource\App\Author;
 use FakeVendor\Sandbox\Resource\App\Blog;
 use FakeVendor\Sandbox\Resource\App\Link\Scalar\Name;
+use FakeVendor\Sandbox\Resource\App\Marshal\NullBody;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\Di\ProviderInterface;
 
 class LinkerTest extends TestCase
 {
@@ -25,9 +27,25 @@ class LinkerTest extends TestCase
             ->scheme('app')
             ->host('self')
             ->toAdapter(new AppAdapter(new Injector(), 'FakeVendor\Sandbox'));
+        $factory = new Factory($schemeCollection, new UriFactory());
+        $invoker = $this->invoker;
+        /** @var ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+        $linkCrawlerProvider = new class ($invoker, $factory) implements ProviderInterface {
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+            ) {
+            }
+
+            public function get(): LinkCrawlerInterface
+            {
+                return new LinkCrawler($this->invoker, $this->factory);
+            }
+        };
         $this->linker = new Linker(
             $this->invoker,
-            new Factory($schemeCollection, new UriFactory()),
+            $factory,
+            $linkCrawlerProvider,
         );
     }
 
@@ -36,7 +54,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Author()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('blog', LinkType::SELF_LINK)],
         );
@@ -53,7 +71,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Author()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('blog', LinkType::NEW_LINK)],
         );
@@ -75,7 +93,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Blog()),
-            Request::GET,
+            Method::GET,
             ['id' => 11],
             [new LinkType('tree', LinkType::CRAWL_LINK)],
         );
@@ -130,7 +148,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Blog()),
-            Request::GET,
+            Method::GET,
             ['id' => 16],
             [new LinkType('tree', LinkType::CRAWL_LINK)],
         );
@@ -227,7 +245,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Blog()),
-            Request::GET,
+            Method::GET,
             ['id' => 17],
             [new LinkType('tree', LinkType::CRAWL_LINK)],
         );
@@ -260,7 +278,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Name()),
-            Request::GET,
+            Method::GET,
             ['name' => 'bear'],
             [new LinkType('blog', LinkType::SELF_LINK)],
         );
@@ -273,7 +291,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Author()),
-            Request::GET,
+            Method::GET,
             ['id' => '1'],
             [new LinkType('invalid-link', LinkType::SELF_LINK)],
         );
@@ -285,7 +303,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Blog\NotFound()),
-            Request::GET,
+            Method::GET,
             [],
             [new LinkType('meta', LinkType::CRAWL_LINK)],
         );
@@ -295,7 +313,7 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Blog\NotFound()),
-            Request::GET,
+            Method::GET,
             [],
             [new LinkType('user', LinkType::SELF_LINK)],
         );
@@ -305,11 +323,29 @@ class LinkerTest extends TestCase
         $request = new Request(
             $this->invoker,
             (new FakeRo())(new Blog\NotFound()),
-            Request::GET,
+            Method::GET,
             [],
             [new LinkType('user', LinkType::NEW_LINK)],
         );
         $this->linker->invoke($request);
         $this->assertSame(['message' => 'blog not found'], $request->body);
+    }
+
+    public function testCrawlWithNullBody(): void
+    {
+        $request = new Request(
+            $this->invoker,
+            (new FakeRo())(new NullBody()),
+            Method::GET,
+            ['id' => 1],
+            [new LinkType('tree', LinkType::CRAWL_LINK)],
+        );
+        $result = $this->linker->invoke($request);
+        $expected = [
+            'id' => 1,
+            'name' => 'test',
+            'child' => null,
+        ];
+        $this->assertSame($expected, $result->body);
     }
 }

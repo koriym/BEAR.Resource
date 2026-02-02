@@ -35,7 +35,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethod(): DocPhp7
     {
         $ro = new DocPhp7();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'GET, POST';
@@ -123,7 +123,7 @@ class OptionsTest extends TestCase
     #[DataProvider('roProvider')]
     public function testAssistedResource(ResourceObject $ro): void
     {
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $this->assertSame('GET, POST, PUT, DELETE', $ro->headers['Allow']);
         $actual = (string) $ro->view;
@@ -212,7 +212,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithJsonSchema(): void
     {
         $ro = new DocUser();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'GET';
@@ -259,7 +259,7 @@ class OptionsTest extends TestCase
     public function testOptionsNoSchemaFile(): void
     {
         $ro = new DocInvalidFile();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $expected = '{
     "GET": {
@@ -282,7 +282,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithInputAttribute(): void
     {
         $ro = new UserResource();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'POST';
@@ -313,7 +313,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithInputAttributeWithDefaults(): void
     {
         $ro = new InputResourceWithDefaults();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'POST';
@@ -347,7 +347,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithInputAttributeBuiltinType(): void
     {
         $ro = new InputResourceBuiltinType();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'POST';
@@ -374,7 +374,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithInputAttributeNoConstructor(): void
     {
         $ro = new InputResourceNoConstructor();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'POST';
@@ -401,7 +401,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithInputAttributeMixedParams(): void
     {
         $ro = new InputResourceWithMixedParams();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'POST';
@@ -436,7 +436,7 @@ class OptionsTest extends TestCase
     public function testOptionsMethodWithInputAttributeUntyped(): void
     {
         $ro = new InputResourceWithUntyped();
-        $request = new Request($this->invoker, $ro, Request::OPTIONS);
+        $request = new Request($this->invoker, $ro, Method::OPTIONS);
         $this->invoker->invoke($request);
         $actual = $ro->headers['Allow'];
         $expected = 'POST';

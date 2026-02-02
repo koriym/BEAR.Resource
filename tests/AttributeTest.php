@@ -43,7 +43,7 @@ class AttributeTest extends TestCase
     #[Depends('testNewInstance')]
     public function testLink(News $news): void
     {
-        $request = $this->resource->get->uri('app://self/news')->withQuery(['date' => '2021/7/23'])->linkSelf('event')->request();
+        $request = $this->resource->newRequest(Method::GET, 'app://self/news', ['date' => '2021/7/23'])->linkSelf('event')->request();
         assert($request instanceof Request);
         $this->assertSame('event', $request->links[0]->key);
         $this->assertSame(LinkType::SELF_LINK, $request->links[0]->type);
@@ -56,13 +56,13 @@ class AttributeTest extends TestCase
 
     public function testResourceParam(): void
     {
-        $ro = $this->resource->get->uri('app://self/greeting')->eager->request();
+        $ro = $this->resource->get('app://self/greeting');
         $this->assertSame('kumakun', $ro->body['nickname']);
     }
 
     public function testResourceParamInUriTemplate(): void
     {
-        $ro = $this->resource->post->uri('app://self/greeting')->withQuery(['name' => 'BEAR'])->eager->request();
+        $ro = $this->resource->post('app://self/greeting', ['name' => 'BEAR']);
         $this->assertSame('login:BEAR', $ro->body['id']);
     }
 

@@ -5,57 +5,57 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use Override;
+use Ray\Di\Di\Set;
+use Ray\Di\ProviderInterface;
 
 use function array_merge;
 use function assert;
 use function is_string;
 
 /**
- * Resource client with mutable state - supports fluent interface
+ * Stateless Resource client - coroutine safe
  *
- * This class maintains internal state for the fluent interface pattern.
- * It is NOT coroutine-safe due to mutable $method and $request properties.
- * For coroutine-safe usage, use ResourceClient instead.
+ * This class is stateless and can be safely shared across coroutines.
+ * For fluent interface usage ($resource->get->uri()), a new Resource
+ * instance is created to support the mutable fluent interface pattern.
  *
- * @property $this $get
- * @property $this $post
- * @property $this $put
- * @property $this $patch
- * @property $this $delete
- * @property $this $head
- * @property $this $options
+ * Not bound by default in 1.x (ResourceInterface defaults to Resource).
+ * Async modules (e.g. Swoole Module) override the binding to this class.
+ * Coverage is provided by the consuming module's test suite.
+ *
  * @psalm-import-type Query from Types
+ * @codeCoverageIgnore
  */
-final class Resource implements ResourceInterface
+final class ResourceClient implements ResourceInterface
 {
-    /** @psalm-suppress PropertyNotSetInConstructor */
-    private Request $request;
-    private string $method = 'get';
-
     /**
-     * @param FactoryInterface $factory Resource factory
-     * @param InvokerInterface $invoker Resource request invoker
-     * @param AnchorInterface  $anchor  Resource anchor
-     * @param LinkerInterface  $linker  Resource linker
-     * @param UriFactory       $uri     URI factory
+     * @param FactoryInterface                   $factory        Resource factory
+     * @param InvokerInterface                   $invoker        Resource request invoker
+     * @param AnchorInterface                    $anchor         Resource anchor
+     * @param ProviderInterface<LinkerInterface> $linkerProvider Resource linker provider
+     * @param UriFactory                         $uri            URI factory
      */
     public function __construct(
         private readonly FactoryInterface $factory,
         private readonly InvokerInterface $invoker,
         private readonly AnchorInterface $anchor,
-        private readonly LinkerInterface $linker,
+        #[Set(LinkerInterface::class)]
+        private readonly ProviderInterface $linkerProvider,
         private readonly UriFactory $uri,
     ) {
     }
 
     /**
-     * Set HTTP method for fluent interface
+     * Delegate to Resource for fluent interface support
      */
-    public function __get(string $name): self
+    public function __get(string $name): Resource
     {
-        $this->method = $name;
+        // Create a new mutable Resource instance for fluent interface
+        $linker = $this->linkerProvider->get();
+        $resource = new Resource($this->factory, $this->invoker, $this->anchor, $linker, $this->uri);
 
-        return $this;
+        // Set the method and return for chaining
+        return $resource->__get($name);
     }
 
     /**
@@ -77,7 +77,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function object(ResourceObject $ro): RequestInterface
     {
-        return new Request($this->invoker, $ro, Method::from($this->method));
+        return new Request($this->invoker, $ro, Method::GET);
     }
 
     /**
@@ -86,13 +86,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function uri($uri): RequestInterface
     {
-        $method = $this->method; // save method, this may change on newInstance(), this is singleton!
-        $this->method = 'get';
-        $ro = $this->newInstance($uri);
-        $ro->uri->method = $method;
-        $this->request = new Request($this->invoker, $ro, Method::from($ro->uri->method), $ro->uri->query, [], $this->linker);
-
-        return $this->request;
+        return $this->newRequest(Method::GET, (string) $uri);
     }
 
     /**
@@ -101,12 +95,12 @@ final class Resource implements ResourceInterface
     #[Override]
     public function newRequest(Method $method, string $uri, array $query = []): RequestInterface
     {
+        $linker = $this->linkerProvider->get();
         $ro = $this->newInstance($uri);
         $ro->uri->method = $method->value;
         $ro->uri->query = array_merge($ro->uri->query, $query);
-        $this->request = new Request($this->invoker, $ro, $method, $ro->uri->query, [], $this->linker);
 
-        return $this->request;
+        return new Request($this->invoker, $ro, $method, $ro->uri->query, [], $linker);
     }
 
     /**
@@ -136,9 +130,8 @@ final class Resource implements ResourceInterface
     #[Override]
     public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject
     {
-        $sourceRequest = $ro !== null
-            ? new Request($this->invoker, $ro, Method::from($ro->uri->method), $ro->uri->query)
-            : $this->request;
+        assert($ro instanceof ResourceObject, 'ResourceObject is required for ResourceClient::href()');
+        $sourceRequest = new Request($this->invoker, $ro, Method::from($ro->uri->method), $ro->uri->query);
         [$method, $uri] = $this->anchor->href($rel, $sourceRequest, $query);
         /** @var Request $request */
         $request = $this->newRequest(Method::from($method), $uri, $query);
@@ -155,7 +148,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function get(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::GET, $uri)($query);
+        return $this->newRequest(Method::GET, $uri)($query);
     }
 
     /**
@@ -164,7 +157,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function post(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::POST, $uri)($query);
+        return $this->newRequest(Method::POST, $uri)($query);
     }
 
     /**
@@ -173,7 +166,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function put(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::PUT, $uri)($query);
+        return $this->newRequest(Method::PUT, $uri)($query);
     }
 
     /**
@@ -182,7 +175,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function patch(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::PATCH, $uri)($query);
+        return $this->newRequest(Method::PATCH, $uri)($query);
     }
 
     /**
@@ -191,7 +184,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function delete(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::DELETE, $uri)($query);
+        return $this->newRequest(Method::DELETE, $uri)($query);
     }
 
     /**
@@ -200,7 +193,7 @@ final class Resource implements ResourceInterface
     #[Override]
     public function options(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::OPTIONS, $uri)($query);
+        return $this->newRequest(Method::OPTIONS, $uri)($query);
     }
 
     /**
@@ -209,13 +202,6 @@ final class Resource implements ResourceInterface
     #[Override]
     public function head(string $uri, array $query = []): ResourceObject
     {
-        return $this->methodUri(Method::HEAD, $uri)($query);
-    }
-
-    private function methodUri(Method $method, string $uri): RequestInterface
-    {
-        $this->method = $method->value;
-
-        return $this->uri($uri);
+        return $this->newRequest(Method::HEAD, $uri)($query);
     }
 }

@@ -5,64 +5,46 @@ declare(strict_types=1);
 namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Link;
-use BEAR\Resource\DataLoader\DataLoader;
 use BEAR\Resource\Exception\LinkQueryException;
 use BEAR\Resource\Exception\LinkRelException;
 use BEAR\Resource\Exception\MethodException;
 use BEAR\Resource\Exception\UriException;
 use Override;
-use Ray\Aop\ReflectionMethod;
+use Ray\Di\Di\Set;
+use Ray\Di\ProviderInterface;
+use ReflectionMethod;
 
-use function array_filter;
-use function array_key_exists;
-use function array_keys;
-use function array_pop;
+use function array_map;
 use function assert;
-use function count;
 use function is_array;
-use function is_numeric;
 use function ucfirst;
 use function uri_template;
 
-/**
- * @psalm-import-type Body from Types
- * @psalm-import-type BodyOrStringList from Types
- * @psalm-import-type ObjectList from Types
- * @psalm-import-type Query from Types
- * @psalm-import-type QueryList from Types
- */
+/** @psalm-import-type Body from Types */
 final class Linker implements LinkerInterface
 {
-    /**
-     * memory cache for linker
-     *
-     * @var Query
-     */
-    private array $cache = [];
-
+    /** @param ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
     public function __construct(
         private readonly InvokerInterface $invoker,
         private readonly FactoryInterface $factory,
-        private readonly DataLoader|null $dataLoader = null,
+        #[Set(LinkCrawlerInterface::class)]
+        private readonly ProviderInterface $linkCrawlerProvider,
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[Override]
     public function invoke(AbstractRequest $request)
     {
-        $this->cache = [];
+        $linkCrawler = $this->linkCrawlerProvider->get();
 
-        return $this->invokeRecursive($request);
+        return $this->invokeRecursive($request, $linkCrawler);
     }
 
     /**
      * @throws LinkQueryException
      * @throws LinkRelException
      */
-    private function invokeRecursive(AbstractRequest $request): ResourceObject
+    private function invokeRecursive(AbstractRequest $request, LinkCrawlerInterface $linkCrawler): ResourceObject
     {
         $this->invoker->invoke($request);
         $current = clone $request->resourceObject;
@@ -72,21 +54,16 @@ final class Linker implements LinkerInterface
 
         foreach ($request->links as $link) {
             /** @var Body $nextBody */
-            $nextBody = $this->annotationLink($link, $current, $request)->body;
+            $nextBody = $this->annotationLink($link, $current, $request, $linkCrawler)->body;
             $current = $this->nextLink($link, $current, $nextBody);
         }
 
         return $current;
     }
 
-    /**
-     * @param Body $nextResource
-     *
-     * @return ResourceObject
-     */
+    /** @param Body $nextResource */
     private function nextLink(LinkType $link, ResourceObject $ro, array $nextResource): ResourceObject
     {
-        /** @psalm-suppress MixedAssignment */
         $nextBody = $nextResource;
 
         if ($link->type === LinkType::SELF_LINK) {
@@ -113,27 +90,41 @@ final class Linker implements LinkerInterface
      * @throws LinkRelException
      * @throws Exception\LinkQueryException
      */
-    private function annotationLink(LinkType $link, ResourceObject $current, AbstractRequest $request): ResourceObject
+    private function annotationLink(LinkType $link, ResourceObject $current, AbstractRequest $request, LinkCrawlerInterface $linkCrawler): ResourceObject
     {
         if (! is_array($current->body)) {
             throw new Exception\LinkQueryException('Only array is allowed for link in ' . $current::class, 500);
         }
 
-        $classMethod = 'on' . ucfirst($request->method);
-        /** @var list<Link> $annotations */
-        $annotations = (new ReflectionMethod($current::class, $classMethod))->getAnnotations();
+        $annotations = $this->getLinkAnnotations($current, $request->method->value);
         if ($link->type === LinkType::CRAWL_LINK) {
-            return $this->annotationCrawl($annotations, $link, $current);
+            return $this->annotationCrawl($annotations, $link, $current, $linkCrawler);
         }
 
-        /* @noinspection ExceptionsAnnotatingAndHandlingInspection */
         return $this->annotationRel($annotations, $link, $current);
+    }
+
+    /**
+     * Get Link annotations from a ResourceObject method using PHP 8 attributes
+     *
+     * @return list<Link>
+     */
+    private function getLinkAnnotations(ResourceObject $ro, string $method): array
+    {
+        $classMethod = 'on' . ucfirst($method);
+        $refMethod = new ReflectionMethod($ro, $classMethod);
+        $attributes = $refMethod->getAttributes(Link::class);
+
+        return array_map(
+            static fn ($attr) => $attr->newInstance(),
+            $attributes,
+        );
     }
 
     /**
      * Annotation link (new, self)
      *
-     * @param Link[] $annotations
+     * @param list<Link> $annotations
      *
      * @throws UriException
      * @throws MethodException
@@ -142,7 +133,6 @@ final class Linker implements LinkerInterface
      */
     private function annotationRel(array $annotations, LinkType $link, ResourceObject $current): ResourceObject
     {
-        /* @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($annotations as $annotation) {
             if ($annotation->rel !== $link->key) {
                 continue;
@@ -150,9 +140,8 @@ final class Linker implements LinkerInterface
 
             $uri = uri_template($annotation->href, (array) $current->body);
             $rel = $this->factory->newInstance($uri);
-            /* @noinspection UnnecessaryParenthesesInspection */
             $query = (new Uri($uri))->query;
-            $request = new Request($this->invoker, $rel, Request::GET, $query);
+            $request = new Request($this->invoker, $rel, Method::GET, $query);
 
             return $this->invoker->invoke($request);
         }
@@ -161,137 +150,21 @@ final class Linker implements LinkerInterface
     }
 
     /**
-     * Link annotation crawl
+     * Link annotation crawl - delegate to LinkCrawlerInterface
      *
-     * @param ObjectList $annotations
-     *
-     * @throws MethodException
+     * @param list<Link> $annotations
      */
-    private function annotationCrawl(array $annotations, LinkType $link, ResourceObject $current): ResourceObject
+    private function annotationCrawl(array $annotations, LinkType $link, ResourceObject $current, LinkCrawlerInterface $linkCrawler): ResourceObject
     {
-        $isList = $this->isList($current->body);
-        /** @var QueryList $bodyList */
+        $isList = $linkCrawler->isList($current->body);
+        /** @var list<array<string, mixed>> $bodyList */
         $bodyList = $isList ? (array) $current->body : [$current->body];
 
-        // Process DataLoader-enabled links first
-        $this->dataLoader?->load($annotations, $link, $bodyList);
+        // Delegate to LinkCrawler
+        $linkCrawler->crawl($annotations, $link, $bodyList);
 
-        // Process non-DataLoader links
-        /**
-         * @psalm-suppress MixedAssignment
-         * @psalm-suppress MixedArgument
-         */
-        foreach ($bodyList as &$body) {
-            $this->crawl($annotations, $link, $body);
-        }
-
-        unset($body);
-        /** @psalm-suppress PossiblyUndefinedArrayOffset, InvalidArrayAccess */
         $current->body = $isList ? $bodyList : $bodyList[0];
 
         return $current;
-    }
-
-    /**
-     * @param ObjectList $annotations
-     * @param Body       $body
-     *
-     * @throws LinkQueryException
-     * @throws MethodException
-     * @throws LinkRelException
-     * @throws UriException
-     *
-     * @param-out Body $body
-     */
-    private function crawl(array $annotations, LinkType $link, array &$body): void
-    {
-        foreach ($annotations as $annotation) {
-            if (! $annotation instanceof Link || $annotation->crawl !== $link->key) {
-                continue;
-            }
-
-            // Skip DataLoader-enabled links (already processed by DataLoader)
-            if ($annotation->dataLoader !== null && $this->dataLoader !== null) {
-                continue;
-            }
-
-            $uri = uri_template($annotation->href, $body);
-            $rel = $this->factory->newInstance($uri);
-            /* @noinspection UnnecessaryParenthesesInspection */
-            $query = (new Uri($uri))->query;
-            $request = new Request($this->invoker, $rel, Request::GET, $query, [$link], $this);
-            $hash = $request->hash();
-            if (array_key_exists($hash, $this->cache)) {
-                /** @var Body $cachedResponse */
-                $cachedResponse = $this->cache[$hash];
-                $body[$annotation->rel] = $cachedResponse;
-                continue;
-            }
-
-            $this->cache[$hash] = $body[$annotation->rel] = $this->getResponseBody($request);
-        }
-    }
-
-    /** @return Body|null */
-    private function getResponseBody(Request $request): array|null
-    {
-        $body = $this->invokeRecursive($request)->body;
-        assert(is_array($body) || $body === null);
-
-        return $body;
-    }
-
-    private function isList(mixed $value): bool
-    {
-        assert(is_array($value));
-        /** @var BodyOrStringList $list */
-        $list = $value;
-        /** @var Body $firstRow */
-        $firstRow = array_pop($list);
-        /** @var Query|string $firstRow */
-        $keys = array_keys((array) $firstRow);
-        $isMultiColumnMultiRowList = $this->isMultiColumnMultiRowList($keys, $list);
-        $isMultiColumnList = $this->isMultiColumnList($value, $firstRow);
-        $isSingleColumnList = $this->isSingleColumnList($value, $keys, $list);
-
-        return $isSingleColumnList || $isMultiColumnMultiRowList || $isMultiColumnList;
-    }
-
-    /**
-     * @param list<array-key>  $keys
-     * @param BodyOrStringList $list
-     */
-    private function isMultiColumnMultiRowList(array $keys, array $list): bool
-    {
-        if ($keys === [0 => 0]) {
-            return false;
-        }
-
-        foreach ($list as $item) {
-            if ($keys !== array_keys((array) $item)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param Body $value
-     * @psalm-param Query|scalar $firstRow
-     */
-    private function isMultiColumnList(array $value, mixed $firstRow): bool
-    {
-        return is_array($firstRow) && array_filter(array_keys($value), is_numeric(...)) === array_keys($value);
-    }
-
-    /**
-     * @param Body            $value
-     * @param list<array-key> $keys
-     * @param Body            $list
-     */
-    private function isSingleColumnList(array $value, array $keys, array $list): bool
-    {
-        return (count($value) === 1) && $keys === array_keys($list);
     }
 }

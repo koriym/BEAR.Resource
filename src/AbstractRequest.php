@@ -6,7 +6,6 @@ namespace BEAR\Resource;
 
 use ArrayAccess;
 use ArrayIterator;
-use BEAR\Resource\Exception\MethodException;
 use BEAR\Resource\Exception\OutOfBoundsException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -20,11 +19,9 @@ use Throwable;
 use function array_key_exists;
 use function array_merge;
 use function assert;
-use function in_array;
 use function is_array;
 use function md5;
 use function serialize;
-use function strtolower;
 use function trigger_error;
 
 use const E_USER_ERROR;
@@ -53,10 +50,8 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
 
     /**
      * Method
-     *
-     * @var string
      */
-    public $method = '';
+    public Method $method = Method::GET;
 
     /**
      * Options
@@ -82,22 +77,16 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     /**
      * @param Query          $query
      * @param list<LinkType> $links
-     *
-     * @throws MethodException
      */
     public function __construct(
         protected InvokerInterface $invoker,
         public ResourceObject $resourceObject,
-        string $method = Request::GET,
+        Method $method = Method::GET,
         public array $query = [],
         // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint
         public array $links = [],
         private readonly LinkerInterface|null $linker = null,
     ) {
-        if (! in_array(strtolower($method), ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'], true)) {
-            throw new MethodException($method, 400);
-        }
-
         $this->method = $method;
     }
 
@@ -254,7 +243,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     #[Override]
     public function hash(): string
     {
-        return md5($this->resourceObject::class . $this->method . serialize($this->query) . serialize($this->links));
+        return md5($this->resourceObject::class . $this->method->value . serialize($this->query) . serialize($this->links));
     }
 
     /**
@@ -279,6 +268,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
         unset($data);
     }
 
+    /** Lazy evaluation with memoization - delegates to __invoke() on first call */
     private function invoke(): ResourceObject
     {
         if ($this->result === null) {

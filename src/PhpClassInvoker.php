@@ -25,7 +25,7 @@ final readonly class PhpClassInvoker implements InvokerInterface
     #[\Override]
     public function invoke(AbstractRequest $request): ResourceObject
     {
-        $callable = [$request->resourceObject, 'on' . ucfirst($request->method)];
+        $callable = [$request->resourceObject, 'on' . ucfirst($request->method->value)];
         if (! is_callable($callable)) {
             // OPTIONS or HEAD
             return ($this->extraMethod)($request, $this);

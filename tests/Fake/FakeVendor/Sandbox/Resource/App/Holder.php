@@ -11,7 +11,7 @@ class Holder extends ResourceObject
 {
     public function __construct(ResourceInterface $resource)
     {
-        $resource->get->uri('app://self/author?id=1')->eager->request();
+        $resource->get('app://self/author', ['id' => 1]);
     }
 
     public function onPost()

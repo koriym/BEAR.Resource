@@ -4,16 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
-/**
- * @property $this $get
- * @property $this $post
- * @property $this $put
- * @property $this $patch
- * @property $this $delete
- * @property $this $head
- * @property $this $options
- * @psalm-import-type Query from Types
- */
+/** @psalm-import-type Query from Types */
 interface ResourceInterface
 {
     /**
@@ -36,11 +27,25 @@ interface ResourceInterface
     public function uri($uri): RequestInterface;
 
     /**
+     * Create a request atomically (coroutine-safe)
+     *
+     * @param Query $query
+     */
+    public function newRequest(Method $method, string $uri, array $query = []): RequestInterface;
+
+    /**
+     * Execute a GET request with link crawl
+     *
+     * @param Query $query
+     */
+    public function crawl(string $uri, string $linkKey, array $query = []): ResourceObject;
+
+    /**
      * Hyper reference (Hypertext As The Engine Of Application State)
      *
      * @param Query $query
      */
-    public function href(string $rel, array $query = []): ResourceObject;
+    public function href(string $rel, array $query = [], ResourceObject|null $ro = null): ResourceObject;
 
     /**
      * Invoke GET request

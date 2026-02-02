@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Module;
 
+use BEAR\Resource\Method;
 use BEAR\Resource\Request;
 use BEAR\Resource\ResourceInterface;
 use FakeVendor\Sandbox\Module\AppModule;
@@ -23,10 +24,7 @@ class HalModuleTest extends TestCase
         $resource = (new Injector(new AppModule(), __DIR__ . '/tmp'))->getInstance(ResourceInterface::class);
         assert($resource instanceof ResourceInterface);
         // request
-        $news = $resource
-            ->uri('app://self/news')
-            ->withQuery(['date' => 'today'])
-            ->request();
+        $news = $resource->newRequest(Method::GET, 'app://self/news', ['date' => 'today'])->request();
         $expect = '{
     "weather": {
         "today": "the weather of today is sunny"

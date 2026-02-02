@@ -6,10 +6,15 @@ namespace BEAR\Resource\DataLoader;
 
 use BEAR\Resource\AppAdapter;
 use BEAR\Resource\Factory;
+use BEAR\Resource\FactoryInterface;
 use BEAR\Resource\FakeRo;
 use BEAR\Resource\InvokerFactory;
+use BEAR\Resource\InvokerInterface;
+use BEAR\Resource\LinkCrawler;
+use BEAR\Resource\LinkCrawlerInterface;
 use BEAR\Resource\Linker;
 use BEAR\Resource\LinkType;
+use BEAR\Resource\Method;
 use BEAR\Resource\Request;
 use BEAR\Resource\SchemeCollection;
 use BEAR\Resource\UriFactory;
@@ -17,6 +22,7 @@ use FakeVendor\Sandbox\DataLoader\LikeDataLoader;
 use FakeVendor\Sandbox\Resource\App\Batch\Article;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\Di\ProviderInterface;
 
 class LinkerDataLoaderTest extends TestCase
 {
@@ -34,12 +40,27 @@ class LinkerDataLoaderTest extends TestCase
             ->host('self')
             ->toAdapter(new AppAdapter($injector, 'FakeVendor\Sandbox'));
 
+        $factory = new Factory($schemeCollection, new UriFactory());
         $dataLoader = new DataLoader($injector);
+        /** @var ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+        $linkCrawlerProvider = new class ($invoker, $factory, $dataLoader) implements ProviderInterface {
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+                private readonly DataLoader|null $dataLoader,
+            ) {
+            }
+
+            public function get(): LinkCrawlerInterface
+            {
+                return new LinkCrawler($this->invoker, $this->factory, $this->dataLoader);
+            }
+        };
 
         $this->linker = new Linker(
             $invoker,
-            new Factory($schemeCollection, new UriFactory()),
-            $dataLoader,
+            $factory,
+            $linkCrawlerProvider,
         );
     }
 
@@ -49,7 +70,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -93,16 +114,31 @@ class LinkerDataLoaderTest extends TestCase
             ->host('self')
             ->toAdapter(new AppAdapter(new Injector(), 'FakeVendor\Sandbox'));
 
+        $factory = new Factory($schemeCollection, new UriFactory());
+        /** @var ProviderInterface<LinkCrawlerInterface> $linkCrawlerProvider */
+        $linkCrawlerProvider = new class ($invoker, $factory) implements ProviderInterface {
+            public function __construct(
+                private readonly InvokerInterface $invoker,
+                private readonly FactoryInterface $factory,
+            ) {
+            }
+
+            public function get(): LinkCrawlerInterface
+            {
+                return new LinkCrawler($this->invoker, $this->factory);
+            }
+        };
+
         $linkerWithoutDataLoader = new Linker(
             $invoker,
-            new Factory($schemeCollection, new UriFactory()),
-            null, // No DataLoader factory
+            $factory,
+            $linkCrawlerProvider,
         );
 
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -125,7 +161,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -137,7 +173,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 1],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
@@ -153,7 +189,7 @@ class LinkerDataLoaderTest extends TestCase
         $this->request = new Request(
             $invoker,
             (new FakeRo())(new Article()),
-            Request::GET,
+            Method::GET,
             ['id' => 99],
             [new LinkType('comment-tree', LinkType::CRAWL_LINK)],
         );
