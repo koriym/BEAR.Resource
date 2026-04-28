@@ -18,9 +18,14 @@ use JsonSchema\Validator;
 use Override;
 use Ray\Aop\MethodInvocation;
 use Ray\Di\Di\Named;
+use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\ToArray;
+use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionParameter;
 use stdClass;
 
+use function array_replace;
 use function assert;
 use function file_exists;
 use function is_array;
@@ -218,12 +223,33 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         $parameters = $invocation->getMethod()->getParameters();
         $values = $invocation->getArguments();
+        /** @var Query $arguments */
         $arguments = [];
         foreach ($parameters as $index => $parameter) {
             /** @psalm-suppress MixedAssignment */
-            $arguments[$parameter->name] = $values[$index] ?? $parameter->getDefaultValue();
+            $value = $values[$index] ?? $parameter->getDefaultValue();
+            $inputArguments = $this->getInputArguments($parameter, $value);
+            if ($inputArguments !== null) {
+                $arguments = array_replace($arguments, $inputArguments);
+
+                continue;
+            }
+
+            /** @psalm-suppress MixedAssignment */
+            $arguments[$parameter->name] = $value;
         }
 
         return $arguments;
+    }
+
+    /** @return Query|null */
+    private function getInputArguments(ReflectionParameter $parameter, mixed $value): array|null
+    {
+        $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
+        if ($inputAttributes === [] || ! is_object($value)) {
+            return null;
+        }
+
+        return (new ToArray())($value);
     }
 }
