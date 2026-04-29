@@ -112,6 +112,13 @@ class JsonSchemaInterceptorTest extends TestCase
         $this->assertSame(['slug' => 'default-title', 'title' => 'Default Title'], $ro->body);
     }
 
+    public function testMultipleInputDtoParametersAreFlattenedForRequestValidation(): void
+    {
+        $ro = $this->invokeInputDtoResource('onOptions', [new ArticleInput('Hello', 'hello'), new SeoInput('Hello SEO')]);
+
+        $this->assertSame(['metaTitle' => 'Hello SEO', 'slug' => 'hello', 'title' => 'Hello'], $ro->body);
+    }
+
     /** @param list<mixed> $arguments */
     private function invokeInputDtoResource(string $method, array $arguments): ResourceObject
     {

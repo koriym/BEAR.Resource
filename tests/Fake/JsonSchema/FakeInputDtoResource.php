@@ -61,4 +61,17 @@ final class FakeInputDtoResource extends ResourceObject
 
         return $this;
     }
+
+    #[JsonSchema(params: 'input-dto.multiple.json')]
+    public function onOptions(#[Input] ArticleInput $article, #[Input] SeoInput $seo): static
+    {
+        $this->code = Code::NO_CONTENT;
+        $this->body = [
+            'metaTitle' => $seo->metaTitle,
+            'slug' => $article->slug,
+            'title' => $article->title,
+        ];
+
+        return $this;
+    }
 }
