@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.31.1] - 2026-04-29
+
+### Fixed
+- Allow `JsonSchemaInterceptor` request validation to flatten Ray.InputQuery `#[Input]` DTO arguments before JSON Schema validation
+
 ## [1.31.0] - 2026-02-03
 
 ### Added
@@ -150,7 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.1...HEAD
+[1.31.1]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.0...1.31.1
 [1.31.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.30.0...1.31.0
 [1.30.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.29.0...1.30.0
 [1.29.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...1.29.0
