@@ -1,0 +1,17 @@
+{
+  "title": "Input DTO With Scalar",
+  "type": "object",
+  "properties": {
+    "extra": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": ["extra", "slug", "title"],
+  "additionalProperties": false
+}

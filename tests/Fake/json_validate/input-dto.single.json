@@ -1,0 +1,14 @@
+{
+  "title": "Input DTO",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": ["slug", "title"],
+  "additionalProperties": false
+}

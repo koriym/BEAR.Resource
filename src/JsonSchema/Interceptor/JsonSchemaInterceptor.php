@@ -18,6 +18,9 @@ use JsonSchema\Validator;
 use Override;
 use Ray\Aop\MethodInvocation;
 use Ray\Di\Di\Named;
+use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\ToArray;
+use ReflectionAttribute;
 use ReflectionClass;
 use stdClass;
 
@@ -218,10 +221,24 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         $parameters = $invocation->getMethod()->getParameters();
         $values = $invocation->getArguments();
+        $toArray = new ToArray();
+        /** @var Query $arguments */
         $arguments = [];
         foreach ($parameters as $index => $parameter) {
             /** @psalm-suppress MixedAssignment */
-            $arguments[$parameter->name] = $values[$index] ?? $parameter->getDefaultValue();
+            $value = $values[$index] ?? $parameter->getDefaultValue();
+            $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
+            if ($inputAttributes !== [] && is_object($value)) {
+                /** @psalm-suppress MixedAssignment */
+                foreach ($toArray($value) as $name => $inputValue) {
+                    $arguments[$name] = $inputValue;
+                }
+
+                continue;
+            }
+
+            /** @psalm-suppress MixedAssignment */
+            $arguments[$parameter->name] = $value;
         }
 
         return $arguments;
