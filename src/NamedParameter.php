@@ -33,8 +33,9 @@ final readonly class NamedParameter implements NamedParameterInterface
             try {
                 $parameters[$varName] = $param($varName, $query, $this->injector);
             } catch (InvalidArgumentException $e) {
-                // handle missing query parameter in Ray.InputQuery
-                throw new ParameterException($varName, $e->getCode(), $e);
+                $code = $e->getCode() !== 0 ? $e->getCode() : Code::BAD_REQUEST;
+
+                throw new ParameterException($varName, $code, $e);
             }
         }
 
