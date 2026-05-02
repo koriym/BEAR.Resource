@@ -17,4 +17,13 @@ final class NativeArrayResource extends ResourceObject
 
         return $this;
     }
+
+    public function onPut(#[Input] NullableNativeArrayInput $input): static
+    {
+        $this->body = [
+            'tagIds' => $input->tagIds,
+        ];
+
+        return $this;
+    }
 }
