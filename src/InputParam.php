@@ -28,6 +28,8 @@ final readonly class InputParam implements ParamInterface
     /**
      * {@inheritDoc}
      *
+     * @throws InvalidArgumentException When input query rejects request parameters or a required built-in parameter is missing.
+     *
      * @psalm-taint-source input
      */
     #[Override]

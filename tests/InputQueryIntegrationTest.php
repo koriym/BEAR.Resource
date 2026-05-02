@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
+use BEAR\Resource\Exception\ParameterException;
+use BEAR\Resource\Fake\NativeArrayResource;
 use BEAR\Resource\Fake\UserInput;
 use BEAR\Resource\Fake\UserResource;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\Exception\InvalidInputTypeException;
 use Ray\InputQuery\FileUploadFactory;
 use Ray\InputQuery\InputQuery;
+use Ray\InputQuery\InputQueryInterface;
 use ReflectionMethod;
+use TypeError;
 
 class InputQueryIntegrationTest extends TestCase
 {
@@ -72,6 +77,113 @@ class InputQueryIntegrationTest extends TestCase
         $this->assertInstanceOf(UserInput::class, $parameters['user']);
         $this->assertSame('Jane Smith', $parameters['user']->name);
         $this->assertSame('jane@example.com', $parameters['user']->email);
+    }
+
+    public function testNativeArrayInputEndToEndIntegration(): void
+    {
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
+        $namedParameter = new NamedParameter($namedParamMetas, $injector);
+        $resource = new NativeArrayResource();
+
+        $parameters = $namedParameter->getParameters([$resource, 'onPost'], ['tagIds' => [1, 2]]);
+        $ro = $resource->onPost(...$parameters);
+
+        $this->assertSame(['tagIds' => [1, 2]], $ro->body);
+    }
+
+    public function testNativeArrayInputScalarValueThrowsParameterException(): void
+    {
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
+        $namedParameter = new NamedParameter($namedParamMetas, $injector);
+        $resource = new NativeArrayResource();
+
+        try {
+            $namedParameter->getParameters([$resource, 'onPost'], ['tagIds' => 1]);
+            $this->fail('Expected ParameterException for scalar native array input.');
+        } catch (ParameterException $e) {
+            $this->assertSame(Code::BAD_REQUEST, $e->getCode());
+            $this->assertInstanceOf(InvalidInputTypeException::class, $e->getPrevious());
+        }
+    }
+
+    public function testNullableNativeArrayInputScalarValueThrowsParameterException(): void
+    {
+        $injector = new Injector();
+        $inputQuery = new InputQuery($injector, new FileUploadFactory());
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
+        $namedParameter = new NamedParameter($namedParamMetas, $injector);
+        $resource = new NativeArrayResource();
+
+        try {
+            $namedParameter->getParameters([$resource, 'onPut'], ['tagIds' => 1]);
+            $this->fail('Expected ParameterException for scalar nullable native array input.');
+        } catch (ParameterException $e) {
+            $this->assertSame(Code::BAD_REQUEST, $e->getCode());
+            $this->assertInstanceOf(InvalidInputTypeException::class, $e->getPrevious());
+        }
+    }
+
+    public function testInputQueryInvalidArgumentThrowsParameterExceptionWithBadRequestCode(): void
+    {
+        $injector = new Injector();
+        $inputQuery = new class implements InputQueryInterface {
+            public function getArguments(ReflectionMethod $method, array $query): array
+            {
+                unset($method, $query);
+
+                return [];
+            }
+
+            public function newInstance(string $class, array $query): object
+            {
+                unset($class, $query);
+
+                throw new InvalidArgumentException();
+            }
+        };
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
+        $namedParameter = new NamedParameter($namedParamMetas, $injector);
+        $resource = new NativeArrayResource();
+
+        try {
+            $namedParameter->getParameters([$resource, 'onPost'], ['tagIds' => 1]);
+            $this->fail('Expected ParameterException for invalid input query.');
+        } catch (ParameterException $e) {
+            $this->assertSame(Code::BAD_REQUEST, $e->getCode());
+            $this->assertInstanceOf(InvalidArgumentException::class, $e->getPrevious());
+        }
+    }
+
+    public function testNamedParameterPropagatesHydrationTypeError(): void
+    {
+        $injector = new Injector();
+        $inputQuery = new class implements InputQueryInterface {
+            public function getArguments(ReflectionMethod $method, array $query): array
+            {
+                unset($method, $query);
+
+                return [];
+            }
+
+            public function newInstance(string $class, array $query): object
+            {
+                unset($class, $query);
+
+                throw new TypeError('typed DTO hydration failed');
+            }
+        };
+        $namedParamMetas = new NamedParamMetas($inputQuery, new FileUploadFactory());
+        $namedParameter = new NamedParameter($namedParamMetas, $injector);
+        $resource = new NativeArrayResource();
+
+        $this->expectException(TypeError::class);
+        $this->expectExceptionMessage('typed DTO hydration failed');
+
+        $namedParameter->getParameters([$resource, 'onPost'], []);
     }
 
     public function testMissingRequiredParameterThrowsException(): void
