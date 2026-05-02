@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.32.0] - 2026-05-02
+
+### Added
+- Support Ray.InputQuery native `array` and `array|null` DTO inputs at the resource parameter boundary
+
+### Changed
+- Require `ray/input-query` ^1.1
+- Normalize input query `InvalidArgumentException` code `0` to `Code::BAD_REQUEST` when wrapping it as `ParameterException`
+
 ## [1.31.1] - 2026-04-29
 
 ### Fixed
@@ -155,7 +164,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.1...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.32.0...HEAD
+[1.32.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.1...1.32.0
 [1.31.1]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.0...1.31.1
 [1.31.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.30.0...1.31.0
 [1.30.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.29.0...1.30.0
