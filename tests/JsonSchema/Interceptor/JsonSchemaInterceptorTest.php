@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\JsonSchema\Interceptor;
 
+use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Interceptor\JsonSchemaInterceptor;
 use BEAR\Resource\JsonSchema\ArticleInput;
@@ -17,8 +18,10 @@ use BEAR\Resource\JsonSchemaRequestExceptionNullHandler;
 use BEAR\Resource\ResourceObject;
 use PHPUnit\Framework\TestCase;
 use Ray\Aop\MethodInterceptor;
+use Ray\Aop\MethodInvocation;
 use Ray\Aop\ReflectiveMethodInvocation;
 
+use function assert;
 use function dirname;
 
 class JsonSchemaInterceptorTest extends TestCase
@@ -81,6 +84,41 @@ class JsonSchemaInterceptorTest extends TestCase
         $this->assertInstanceOf(ResourceObject::class, $ro);
     }
 
+    public function testBodyValidationIsSkippedForCachedRenderedResponse(): void
+    {
+        $object = new FakeUser();
+        $invocation = new ReflectiveMethodInvocation($object, 'onGet', [20], [
+            $this->cachedRenderedResponse('{"name":{"firstName":"mucha","lastName":"alfons"},"age":20}'),
+        ]);
+
+        $ro = $this->jsonSchemaIntercetor->invoke($invocation);
+
+        $this->assertSame($object, $ro);
+        $this->assertSame('<http://example.com/schema/user.json>; rel="describedby"', $ro->headers['Link']);
+    }
+
+    public function testValidationRunsWhenBodyIsPresent(): void
+    {
+        $this->expectException(JsonSchemaException::class);
+        $object = new FakeUser();
+        $invocation = new ReflectiveMethodInvocation($object, 'onGet', [20], [
+            $this->cachedRenderedResponseWithBody('{"age":20}', ['age' => 20]),
+        ]);
+
+        $this->jsonSchemaIntercetor->invoke($invocation);
+    }
+
+    public function testViewValidationStillRunsForCachedRenderedResponse(): void
+    {
+        $this->expectException(JsonSchemaException::class);
+        $object = new FakeView();
+        $invocation = new ReflectiveMethodInvocation($object, 'onGet', [20], [
+            $this->cachedRenderedResponse('{"age":20}'),
+        ]);
+
+        $this->jsonSchemaIntercetor->invoke($invocation);
+    }
+
     public function testInputDtoParameterIsFlattenedForRequestValidation(): void
     {
         $ro = $this->invokeInputDtoResource('onPost', [new ArticleInput('Hello', 'hello')]);
@@ -128,5 +166,40 @@ class JsonSchemaInterceptorTest extends TestCase
         $invocation = new ReflectiveMethodInvocation($object, $method, $arguments, $interceptrs);
 
         return $this->jsonSchemaIntercetor->invoke($invocation);
+    }
+
+    private function cachedRenderedResponse(string $view): MethodInterceptor
+    {
+        return $this->renderedResponse($view);
+    }
+
+    private function cachedRenderedResponseWithBody(string $view, mixed $body): MethodInterceptor
+    {
+        return $this->renderedResponse($view, $body, true);
+    }
+
+    private function renderedResponse(string $view, mixed $body = null, bool $hasBody = false): MethodInterceptor
+    {
+        return new class ($view, $body, $hasBody) implements MethodInterceptor {
+            public function __construct(
+                private readonly string $view,
+                private readonly mixed $body,
+                private readonly bool $hasBody,
+            ) {
+            }
+
+            public function invoke(MethodInvocation $invocation): ResourceObject
+            {
+                $ro = $invocation->getThis();
+                assert($ro instanceof ResourceObject);
+                $ro->headers['ETag'] = '"cached"';
+                $ro->view = $this->view;
+                if ($this->hasBody) {
+                    $ro->body = $this->body;
+                }
+
+                return $ro;
+            }
+        };
     }
 }

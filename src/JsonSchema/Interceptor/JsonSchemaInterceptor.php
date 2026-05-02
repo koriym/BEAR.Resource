@@ -44,6 +44,8 @@ use const JSON_THROW_ON_ERROR;
  */
 final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
+    private const HEADER_ETAG = 'ETag';
+
     public function __construct(
         #[Named('json_schema_dir')]
         private string $schemaDir,
@@ -105,7 +107,10 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         $schemaFile = $this->getSchemaFile($jsonSchema, $ro);
         try {
-            $this->validateRo($ro, $schemaFile, $jsonSchema);
+            if (! $this->isCachedRenderedBodyResponse($ro, $jsonSchema)) {
+                $this->validateRo($ro, $schemaFile, $jsonSchema);
+            }
+
             if (is_string($this->schemaHost)) {
                 $ro->headers['Link'] = sprintf('<%s%s>; rel="describedby"', $this->schemaHost, $jsonSchema->schema);
             }
@@ -122,6 +127,16 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         /** @var array<stdClass>|stdClass $target */
         $target = is_object($json) ? $this->getTarget($json, $jsonSchema) : $json;
         $this->validate($target, $schemaFile);
+    }
+
+    private function isCachedRenderedBodyResponse(ResourceObject $ro, JsonSchema $jsonSchema): bool
+    {
+        if ($jsonSchema->target !== 'body' || ! isset($ro->headers[self::HEADER_ETAG]) || ! is_string($ro->view)) {
+            return false;
+        }
+
+        // BEAR.QueryRepository restores cached rendered responses as headers/view only.
+        return $ro->body === null;
     }
 
     private function getTarget(object $json, JsonSchema $jsonSchema): mixed
