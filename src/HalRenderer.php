@@ -95,7 +95,17 @@ final readonly class HalRenderer implements RenderInterface
 
             // @codeCoverageIgnoreEnd
             unset($ro->body[$key]);
-            $view = $this->render($embeded());
+            // Render the embed via __toString() so that lazy/batch decorators
+            // (e.g. BEAR.Async's AsyncRequest) get a chance to short-circuit
+            // before the underlying resource is invoked. AbstractRequest's
+            // own __toString() then drives evaluation and rendering of the
+            // result. We pre-seed the embed's resourceObject with this
+            // HalRenderer to guarantee HAL output even when setter injection
+            // has not run (e.g. ad-hoc test construction); for DI-wired
+            // resources this is a no-op since they already have HalRenderer
+            // bound via RenderInterface.
+            $embeded->resourceObject->setRenderer($this);
+            $view = (string) $embeded;
             $ro->body['_embedded'][$key] = json_decode($view, null, 512, JSON_THROW_ON_ERROR);
         }
     }
