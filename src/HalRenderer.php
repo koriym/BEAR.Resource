@@ -86,6 +86,8 @@ final readonly class HalRenderer implements RenderInterface
 
             assert(is_array($ro->body['_embedded']));
             // @codeCoverageIgnoreStart
+            // Different-schema embeds keep the existing direct __invoke() path,
+            // so decorators that flush in __toString() are not used here.
             if ($this->isDifferentSchema($ro, $embeded->resourceObject)) {
                 $ro->body['_embedded'][$key] = $embeded()->body;
                 unset($ro->body[$key]);
