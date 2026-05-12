@@ -73,6 +73,28 @@ final readonly class HalRenderer implements RenderInterface
     private function valuateElements(ResourceObject $ro): void
     {
         assert(is_array($ro->body));
+
+        // Pre-pass: seed every same-schema AbstractRequest embed with this
+        // renderer BEFORE any (string) cast. Lazy/batch decorators (e.g.
+        // BEAR.Async's AsyncRequest) flush the entire pending batch on the
+        // first __toString(), which renders embeds we have not visited yet
+        // in the loop below. Without this pre-pass those later embeds fall
+        // back to JsonRenderer and lose _links. For DI-wired resources this
+        // is a no-op since they already have HalRenderer bound via
+        // RenderInterface, but it also guards ad-hoc test construction
+        // where setter injection has not run.
+        foreach ($ro->body as $candidate) {
+            if (! ($candidate instanceof AbstractRequest)) {
+                continue;
+            }
+
+            if ($this->isDifferentSchema($ro, $candidate->resourceObject)) {
+                continue;
+            }
+
+            $candidate->resourceObject->setRenderer($this);
+        }
+
         /** @var mixed $embeded */
         foreach ($ro->body as $key => &$embeded) {
             if (! ($embeded instanceof AbstractRequest)) {
@@ -101,12 +123,9 @@ final readonly class HalRenderer implements RenderInterface
             // (e.g. BEAR.Async's AsyncRequest) get a chance to short-circuit
             // before the underlying resource is invoked. AbstractRequest's
             // own __toString() then drives evaluation and rendering of the
-            // result. We pre-seed the embed's resourceObject with this
-            // HalRenderer to guarantee HAL output even when setter injection
-            // has not run (e.g. ad-hoc test construction); for DI-wired
-            // resources this is a no-op since they already have HalRenderer
-            // bound via RenderInterface.
-            $embeded->resourceObject->setRenderer($this);
+            // result. The pre-pass above has already seeded every same-schema
+            // embed's renderer, so a batch flush triggered here still emits
+            // HAL for siblings we have not yet visited.
             $view = (string) $embeded;
             $ro->body['_embedded'][$key] = json_decode($view, null, 512, JSON_THROW_ON_ERROR);
         }
