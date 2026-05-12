@@ -74,15 +74,9 @@ final readonly class HalRenderer implements RenderInterface
     {
         assert(is_array($ro->body));
 
-        // Pre-pass: seed every same-schema AbstractRequest embed with this
-        // renderer BEFORE any (string) cast. Lazy/batch decorators (e.g.
-        // BEAR.Async's AsyncRequest) flush the entire pending batch on the
-        // first __toString(), which renders embeds we have not visited yet
-        // in the loop below. Without this pre-pass those later embeds fall
-        // back to JsonRenderer and lose _links. For DI-wired resources this
-        // is a no-op since they already have HalRenderer bound via
-        // RenderInterface, but it also guards ad-hoc test construction
-        // where setter injection has not run.
+        // Batch decorators (e.g. BEAR.Async's AsyncRequest) flush the whole
+        // pending batch on the first __toString(), so siblings must already
+        // have HalRenderer set or they fall back to JsonRenderer and lose _links.
         foreach ($ro->body as $candidate) {
             if (! ($candidate instanceof AbstractRequest)) {
                 continue;
@@ -108,8 +102,7 @@ final readonly class HalRenderer implements RenderInterface
 
             assert(is_array($ro->body['_embedded']));
             // @codeCoverageIgnoreStart
-            // Different-schema embeds keep the existing direct __invoke() path,
-            // so decorators that flush in __toString() are not used here.
+            // Different-schema embeds bypass __toString() decorators.
             if ($this->isDifferentSchema($ro, $embeded->resourceObject)) {
                 $ro->body['_embedded'][$key] = $embeded()->body;
                 unset($ro->body[$key]);
@@ -119,13 +112,7 @@ final readonly class HalRenderer implements RenderInterface
 
             // @codeCoverageIgnoreEnd
             unset($ro->body[$key]);
-            // Render the embed via __toString() so that lazy/batch decorators
-            // (e.g. BEAR.Async's AsyncRequest) get a chance to short-circuit
-            // before the underlying resource is invoked. AbstractRequest's
-            // own __toString() then drives evaluation and rendering of the
-            // result. The pre-pass above has already seeded every same-schema
-            // embed's renderer, so a batch flush triggered here still emits
-            // HAL for siblings we have not yet visited.
+            // Use (string) so lazy decorators can short-circuit __invoke().
             $view = (string) $embeded;
             $ro->body['_embedded'][$key] = json_decode($view, null, 512, JSON_THROW_ON_ERROR);
         }
