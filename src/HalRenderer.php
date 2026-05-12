@@ -101,7 +101,6 @@ final readonly class HalRenderer implements RenderInterface
             }
 
             assert(is_array($ro->body['_embedded']));
-            // @codeCoverageIgnoreStart
             if ($this->isDifferentSchema($ro, $embeded->resourceObject)) {
                 $ro->body['_embedded'][$key] = $embeded()->body;
                 unset($ro->body[$key]);
@@ -109,7 +108,6 @@ final readonly class HalRenderer implements RenderInterface
                 continue;
             }
 
-            // @codeCoverageIgnoreEnd
             unset($ro->body[$key]);
             // Use (string) so lazy decorators can short-circuit __invoke().
             $view = (string) $embeded;
@@ -117,7 +115,6 @@ final readonly class HalRenderer implements RenderInterface
         }
     }
 
-    /** @codeCoverageIgnore */
     private function isDifferentSchema(ResourceObject $parentRo, ResourceObject $childRo): bool
     {
         return $parentRo->uri->scheme . $parentRo->uri->host !== $childRo->uri->scheme . $childRo->uri->host;

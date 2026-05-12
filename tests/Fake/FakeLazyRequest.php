@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
-use LogicException;
+use BadMethodCallException;
 use Override;
 
 /**
@@ -37,42 +37,42 @@ final class FakeLazyRequest extends AbstractRequest
     #[Override]
     public function withQuery(array $query): RequestInterface
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 
     #[Override]
     public function addQuery(array $query): RequestInterface
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 
     #[Override]
     public function toUri(): string
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 
     #[Override]
     public function toUriWithMethod(): string
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 
     #[Override]
     public function linkSelf(string $linkKey): RequestInterface
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 
     #[Override]
     public function linkNew(string $linkKey): RequestInterface
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 
     #[Override]
     public function linkCrawl(string $linkKey): RequestInterface
     {
-        throw new LogicException(__METHOD__);
+        throw new BadMethodCallException(__METHOD__);
     }
 }
