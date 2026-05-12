@@ -280,7 +280,7 @@ abstract class AbstractRequest implements RequestInterface, ArrayAccess, Iterato
     }
 
     #[Override]
-    public function jsonSerialize(): ResourceObject
+    public function jsonSerialize(): mixed
     {
         return $this->invoke();
     }

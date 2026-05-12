@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Renderer;
 
+use BEAR\Resource\FakeChild;
 use BEAR\Resource\FakeHal;
+use BEAR\Resource\FakeLazyRequest;
 use BEAR\Resource\HalLinker;
 use BEAR\Resource\HalRenderer;
+use BEAR\Resource\InvokerFactory;
 use BEAR\Resource\NullReverseLinker;
+use BEAR\Resource\Request;
 use BEAR\Resource\Uri;
 use PHPUnit\Framework\TestCase;
 
@@ -171,5 +175,51 @@ EOT;
         $actual = (string) $this->ro;
 
         $this->assertStringContainsString('"a": 1,', $actual);
+    }
+
+    /**
+     * Regression: HalRenderer must evaluate embedded AbstractRequest instances
+     * via __toString() so that lazy/batch decorators (e.g. bear/async's
+     * AsyncRequest) get a chance to short-circuit invoke(). FakeLazyRequest
+     * throws from its underlying invoker if invoke() is ever reached, so if
+     * the renderer bypassed __toString() this test would fail.
+     */
+    public function testEmbedEvaluationGoesThroughToString(): void
+    {
+        $child = new FakeChild();
+        $child->uri = new Uri('app://self/bear/resource/fakechild');
+        $lazy = new FakeLazyRequest('{"name": "stubbed"}', $child);
+
+        $this->ro->body = ['stub' => $lazy];
+
+        $halRenderer = new HalRenderer(new HalLinker(new NullReverseLinker()));
+        $halRenderer->renderHal($this->ro);
+
+        $this->assertIsArray($this->ro->body);
+        $this->assertArrayHasKey('_embedded', $this->ro->body);
+        $this->assertSame(
+            ['name' => 'stubbed'],
+            (array) $this->ro->body['_embedded']['stub'],
+        );
+    }
+
+    public function testDifferentSchemaEmbedSkipsRendererPrePass(): void
+    {
+        $child = new FakeChild();
+        $child->uri = new Uri('page://self/bear/resource/fakechild');
+
+        $this->ro->body = [
+            'different' => new Request((new InvokerFactory())(), $child),
+        ];
+
+        $halRenderer = new HalRenderer(new HalLinker(new NullReverseLinker()));
+        $halRenderer->renderHal($this->ro);
+
+        $this->assertIsArray($this->ro->body);
+        $this->assertArrayHasKey('_embedded', $this->ro->body);
+        $this->assertSame(
+            ['tree' => 3],
+            $this->ro->body['_embedded']['different'],
+        );
     }
 }
