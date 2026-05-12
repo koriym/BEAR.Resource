@@ -77,16 +77,16 @@ final readonly class HalRenderer implements RenderInterface
         // Batch decorators (e.g. BEAR.Async's AsyncRequest) flush the whole
         // pending batch on the first __toString(), so siblings must already
         // have HalRenderer set or they fall back to JsonRenderer and lose _links.
-        foreach ($ro->body as $candidate) {
-            if (! ($candidate instanceof AbstractRequest)) {
+        foreach ($ro->body as $maybeRequest) {
+            if (! ($maybeRequest instanceof AbstractRequest)) {
                 continue;
             }
 
-            if ($this->isDifferentSchema($ro, $candidate->resourceObject)) {
+            if ($this->isDifferentSchema($ro, $maybeRequest->resourceObject)) {
                 continue;
             }
 
-            $candidate->resourceObject->setRenderer($this);
+            $maybeRequest->resourceObject->setRenderer($this);
         }
 
         /** @var mixed $embeded */
