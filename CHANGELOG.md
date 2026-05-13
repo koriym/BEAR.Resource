@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `HttpRequestException` for HTTP transport and response parsing failures
+
+### Changed
+- Set default cURL timeouts for HTTP resource requests: 5 seconds to connect and 30 seconds overall
+
 ## [1.31.2] - 2026-05-02
 
 ### Fixed
