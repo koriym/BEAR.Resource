@@ -14,21 +14,27 @@ interface RequestInterface
     /**
      * InvokerInterface resource request
      *
-     * @param Query $query
+     * @param Query $query Query parameters that may contain user input
+     *
+     * @psalm-taint-source input $query
      */
     public function __invoke(array|null $query = null): ResourceObject;
 
     /**
      * Set query
      *
-     * @param Query $query
+     * @param Query $query Query parameters that may contain user input
+     *
+     * @psalm-taint-source input $query
      */
     public function withQuery(array $query): self;
 
     /**
      * Merge query
      *
-     * @param Query $query
+     * @param Query $query Query parameters that may contain user input
+     *
+     * @psalm-taint-source input $query
      */
     public function addQuery(array $query): self;
 

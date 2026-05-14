@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `HttpRequestException` for HTTP transport and response parsing failures
+- Psalm taint-source annotations on `RequestInterface` query entry points
 
 ### Changed
 - Set default cURL timeouts for HTTP resource requests: 5 seconds to connect and 30 seconds overall
