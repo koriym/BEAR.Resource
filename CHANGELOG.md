@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Set default cURL timeouts for HTTP resource requests: 5 seconds to connect and 30 seconds overall
 
+### Fixed
+- Remove invalid Psalm taint-source annotation from `AbstractRequest::__invoke()`
+
 ## [1.31.2] - 2026-05-02
 
 ### Fixed
