@@ -12,8 +12,10 @@ use LogicException;
 use OutOfRangeException;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use ValueError;
 
+use function iterator_to_array;
 use function restore_error_handler;
 use function serialize;
 use function set_error_handler;
@@ -187,6 +189,22 @@ class RequestTest extends TestCase
             2 => ['id' => 102, 'title' => 'Entry3'],
         ];
         $this->assertSame($expected, $result);
+    }
+
+    public function testIteratorWithNonArrayBody(): void
+    {
+        $ro = new class extends ResourceObject {
+            public function onGet(): static
+            {
+                $this->body = new stdClass();
+
+                return $this;
+            }
+        };
+        $ro->uri = new Uri('app://self/object-body');
+        $request = new Request($this->invoker, $ro);
+
+        $this->assertSame([], iterator_to_array($request));
     }
 
     public function testArrayAccess(): void

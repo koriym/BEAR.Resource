@@ -13,6 +13,7 @@ use FakeVendor\Sandbox\Resource\App\Marshal\NullBody;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\Di\ProviderInterface;
+use ReflectionClass;
 
 class LinkerTest extends TestCase
 {
@@ -347,5 +348,58 @@ class LinkerTest extends TestCase
             'child' => null,
         ];
         $this->assertSame($expected, $result->body);
+    }
+
+    public function testNewLinkWithNullBody(): void
+    {
+        $current = new class extends ResourceObject {
+        };
+        $current->uri = new Uri('app://self/null-body');
+        $current->body = null;
+
+        $result = $this->invokePrivate(
+            $this->linker,
+            'nextLink',
+            [new LinkType('item', LinkType::NEW_LINK), $current, ['id' => 1]],
+        );
+
+        $this->assertSame(['item' => ['id' => 1]], $result->body);
+    }
+
+    public function testAnnotationCrawlWithListBody(): void
+    {
+        $current = new class extends ResourceObject {
+        };
+        $current->uri = new Uri('app://self/list-body');
+        $current->body = [
+            ['id' => 1],
+        ];
+        $linkCrawler = new class implements LinkCrawlerInterface {
+            public function crawl(array $annotations, LinkType $link, array &$bodyList): void
+            {
+                $bodyList[0]['linked'] = true;
+            }
+
+            public function isList(mixed $value): bool
+            {
+                return true;
+            }
+        };
+
+        $result = $this->invokePrivate(
+            $this->linker,
+            'annotationCrawl',
+            [[], new LinkType('tree', LinkType::CRAWL_LINK), $current, $linkCrawler],
+        );
+
+        $this->assertSame([['id' => 1, 'linked' => true]], $result->body);
+    }
+
+    /** @param list<mixed> $args */
+    private function invokePrivate(object $object, string $method, array $args): mixed
+    {
+        $refMethod = (new ReflectionClass($object))->getMethod($method);
+
+        return $refMethod->invokeArgs($object, $args);
     }
 }

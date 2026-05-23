@@ -834,6 +834,7 @@ Please check out [BEAR.Sunday web site](http://bearsunday.github.io/).
 
 ## See Also
 
+ * [BEAR.Async](https://github.com/bearsunday/BEAR.Async) - Async/coroutine integration for BEAR.Resource.
  * [BEAR.QueryRepository](https://github.com/bearsunday/BEAR.QueryRepository) - Segregates reads and writes into two separate repository.
  * [Ray.WebParamModule](https://github.com/ray-di/Ray.WebParamModule) - Binds the value(s) of a web context to method parameter.
 

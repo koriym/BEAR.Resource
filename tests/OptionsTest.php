@@ -16,6 +16,7 @@ use FakeVendor\Sandbox\Resource\App\DocUser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 /** @psalm-import-type Query from Types */
 class OptionsTest extends TestCase
@@ -460,5 +461,47 @@ class OptionsTest extends TestCase
 }
 ';
         $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+
+    public function testOptionsMethodWithInputAttributeArrayDefault(): void
+    {
+        $actual = (new OptionsMethodRequest())(
+            new ReflectionMethod(OptionsBranchResource::class, 'onPost'),
+            [],
+            [],
+        );
+
+        $this->assertSame(
+            [
+                'parameters' => [
+                    'tags' => [
+                        'type' => 'array',
+                        'default' => '[]',
+                    ],
+                ],
+            ],
+            $actual,
+        );
+    }
+
+    public function testOptionsMethodWithArrayDefault(): void
+    {
+        $actual = (new OptionsMethodRequest())(
+            new ReflectionMethod(OptionsBranchResource::class, 'onGet'),
+            [],
+            [],
+        );
+
+        $this->assertSame(
+            [
+                'parameters' => [
+                    'ids' => [
+                        'type' => 'array',
+                        'default' => '[]',
+                    ],
+                ],
+            ],
+            $actual,
+        );
     }
 }

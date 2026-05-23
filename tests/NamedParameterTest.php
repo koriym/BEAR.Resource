@@ -10,8 +10,10 @@ use BEAR\Resource\Exception\ParameterInvalidEnumException;
 use BEAR\Resource\Module\ResourceModule;
 use DateTime;
 use FakeVendor\Sandbox\Resource\Page\EnumParam;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
+use Ray\Di\InjectorInterface;
 use Ray\InputQuery\FileUploadFactory;
 use Ray\InputQuery\InputQuery;
 
@@ -58,6 +60,30 @@ class NamedParameterTest extends TestCase
         $object = new FakeParamResource();
         $namedArgs = [];
         $this->params->getParameters([$object, 'onGet'], $namedArgs);
+    }
+
+    public function testParameterExceptionKeepsNonZeroCode(): void
+    {
+        $this->expectException(ParameterException::class);
+        $this->expectExceptionCode(Code::ERROR);
+        $params = new NamedParameter(
+            new class implements NamedParamMetasInterface {
+                public function __invoke(callable $callable): array
+                {
+                    return [
+                        'id' => new class implements ParamInterface {
+                            public function __invoke(string $varName, array $query, InjectorInterface $injector): mixed
+                            {
+                                throw new InvalidArgumentException('invalid', Code::ERROR);
+                            }
+                        },
+                    ];
+                }
+            },
+            new Injector(),
+        );
+
+        $params->getParameters(static fn () => null, []);
     }
 
     public function testParameterWebContext(): void
