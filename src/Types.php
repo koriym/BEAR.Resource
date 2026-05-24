@@ -123,6 +123,11 @@ use ReflectionParameter;
  * @psalm-type ClassNameList = list<class-string>
  * @psalm-type StatusMessageMap = array<int, string>
  *
+ * JSON Schema Types
+ * @psalm-type ConstraintName = 'type'|'required'|'pattern'|'minLength'|'maxLength'
+ *     |'minimum'|'maximum'|'multipleOf'|'enum'|'const'|'format'
+ *     |'minItems'|'maxItems'|'uniqueItems'|'minProperties'|'maxProperties'
+ *
  * @phpcs:enable
  */
 final class Types

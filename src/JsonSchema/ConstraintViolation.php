@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\JsonSchema;
 
+use BEAR\Resource\Types;
+
 /**
- * @psalm-type ConstraintName = 'type'|'required'|'pattern'|'minLength'|'maxLength'
- *     |'minimum'|'maximum'|'multipleOf'|'enum'|'const'|'format'
- *     |'minItems'|'maxItems'|'uniqueItems'|'minProperties'|'maxProperties'
+ * @psalm-import-type ConstraintName from Types
  * @psalm-immutable
  */
 final readonly class ConstraintViolation
