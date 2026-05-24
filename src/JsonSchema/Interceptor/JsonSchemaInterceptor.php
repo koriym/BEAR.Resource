@@ -185,10 +185,6 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     /**
      * Normalize one justinrainbow validator error row into a typed JsonSchemaError.
      *
-     * Accepts both upstream shapes:
-     *  - 5.x: `constraint` is a string keyword (extras flattened into the row)
-     *  - 6.x: `constraint` is `array{name: string, params: array<string, mixed>}`
-     *
      * @param array<string, mixed> $error
      *
      * @psalm-suppress MixedAssignment Upstream validator returns mixed-typed row values; each field is narrowed below.
@@ -198,30 +194,40 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         $propertyRaw = $error['property'] ?? null;
         $pointerRaw = $error['pointer'] ?? null;
         $messageRaw = $error['message'] ?? null;
-        $property = is_string($propertyRaw) ? $propertyRaw : '';
-        $pointer = is_string($pointerRaw) ? $pointerRaw : '';
-        $message = is_string($messageRaw) ? $messageRaw : '';
-        $constraint = $error['constraint'] ?? null;
-
-        if (is_string($constraint)) {
-            $name = $constraint;
-            $params = [];
-        } elseif (is_array($constraint)) {
-            $constraintNameRaw = $constraint['name'] ?? null;
-            $name = is_string($constraintNameRaw) ? $constraintNameRaw : 'unknown';
-            $paramsRaw = $constraint['params'] ?? null;
-            /** @var array<string, mixed> $params */
-            $params = is_array($paramsRaw) ? $paramsRaw : [];
-        } else {
-            $name = 'unknown';
-            $params = [];
-        }
 
         return new JsonSchemaError(
-            $property,
-            $pointer,
-            $message,
-            new ConstraintViolation($name, $params),
+            is_string($propertyRaw) ? $propertyRaw : '',
+            is_string($pointerRaw) ? $pointerRaw : '',
+            is_string($messageRaw) ? $messageRaw : '',
+            $this->toConstraintViolation($error['constraint'] ?? null),
+        );
+    }
+
+    /**
+     * Accepts both upstream shapes:
+     *  - 5.x: a string keyword (params flattened into the parent row)
+     *  - 6.x: `array{name: string, params: array<string, mixed>}`
+     *
+     * @psalm-suppress MixedAssignment Upstream constraint is mixed; each field is narrowed below.
+     */
+    private function toConstraintViolation(mixed $constraint): ConstraintViolation
+    {
+        if (is_string($constraint)) {
+            return new ConstraintViolation($constraint, []);
+        }
+
+        if (! is_array($constraint)) {
+            return new ConstraintViolation('unknown', []);
+        }
+
+        $nameRaw = $constraint['name'] ?? null;
+        $paramsRaw = $constraint['params'] ?? null;
+        /** @var array<string, mixed> $params */
+        $params = is_array($paramsRaw) ? $paramsRaw : [];
+
+        return new ConstraintViolation(
+            is_string($nameRaw) ? $nameRaw : 'unknown',
+            $params,
         );
     }
 
