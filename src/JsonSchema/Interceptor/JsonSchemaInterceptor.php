@@ -9,6 +9,8 @@ use BEAR\Resource\Code;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
+use BEAR\Resource\JsonSchema\ConstraintViolation;
+use BEAR\Resource\JsonSchema\JsonSchemaError;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
@@ -165,16 +167,31 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
 
     private function throwJsonSchemaException(Validator $validator, string $schemaFile): JsonSchemaException
     {
-        /** @var array<array<string, string>> $errors */
+        /** @var list<array<string, mixed>> $errors */
         $errors = $validator->getErrors();
         $msg = '';
+        $structured = [];
         foreach ($errors as $error) {
-            $msg .= sprintf('[%s] %s; ', $error['property'], $error['message']);
+            $property = is_string($error['property'] ?? null) ? $error['property'] : '';
+            $pointer = is_string($error['pointer'] ?? null) ? $error['pointer'] : '';
+            $message = is_string($error['message'] ?? null) ? $error['message'] : '';
+            $constraint = is_array($error['constraint'] ?? null) ? $error['constraint'] : [];
+            $name = is_string($constraint['name'] ?? null) ? $constraint['name'] : 'unknown';
+            /** @var array<string, mixed> $params */
+            $params = is_array($constraint['params'] ?? null) ? $constraint['params'] : [];
+
+            $msg .= sprintf('[%s] %s; ', $property, $message);
+            $structured[] = new JsonSchemaError(
+                $property,
+                $pointer,
+                $message,
+                new ConstraintViolation($name, $params),
+            );
         }
 
         $msg .= "by {$schemaFile}";
 
-        return new JsonSchemaException($msg, Code::ERROR);
+        return new JsonSchemaException($msg, Code::ERROR, $structured);
     }
 
     private function getSchemaFile(JsonSchema $jsonSchema, ResourceObject $ro): string

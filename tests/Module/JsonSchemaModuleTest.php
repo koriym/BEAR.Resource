@@ -7,9 +7,11 @@ namespace BEAR\Resource\Module;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
 use BEAR\Resource\Interceptor\JsonSchemaInterceptorInterface;
+use BEAR\Resource\JsonSchema\ConstraintViolation;
 use BEAR\Resource\JsonSchema\FakePerson;
 use BEAR\Resource\JsonSchema\FakeUser;
 use BEAR\Resource\JsonSchema\FakeUsers;
+use BEAR\Resource\JsonSchema\JsonSchemaError;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Uri;
 use LogicException;
@@ -58,8 +60,26 @@ class JsonSchemaModuleTest extends TestCase
     #[Depends('testValidateException')]
     public function testBCValidateErrorException(JsonSchemaException $e): void
     {
-        $this->assertStringContainsString('[age]', $e->getMessage());
-        $this->assertStringContainsString('20', $e->getMessage());
+        $message = $e->getMessage();
+        $this->assertStringContainsString('[age]', $message);
+        $this->assertStringContainsString('20', $message);
+        // Pin the full flat-string format: `[property] message; ... by /path/to/schema.json`
+        $this->assertStringContainsString('; ', $message);
+        $this->assertMatchesRegularExpression('#by .+/user\.json$#', $message);
+    }
+
+    #[Depends('testValidateException')]
+    public function testStructuredErrors(JsonSchemaException $e): void
+    {
+        $errors = $e->getErrors();
+        $this->assertNotEmpty($errors);
+
+        $first = $errors[0];
+        $this->assertInstanceOf(JsonSchemaError::class, $first);
+        $this->assertSame('age', $first->property);
+        $this->assertInstanceOf(ConstraintViolation::class, $first->constraint);
+        $this->assertSame('minimum', $first->constraint->name);
+        $this->assertSame(20, $first->constraint->params['minimum'] ?? null);
     }
 
     public function testException(): void
