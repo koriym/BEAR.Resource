@@ -6,6 +6,7 @@ namespace BEAR\Resource;
 
 use BEAR\Resource\Annotation\Embed;
 use BEAR\Resource\Annotation\Link;
+use BEAR\Resource\DataLoader\DataLoaderInterface;
 use Ray\WebContextParam\Annotation\AbstractWebContextParam;
 use ReflectionParameter;
 
@@ -22,6 +23,7 @@ use ReflectionParameter;
  * @psalm-type QueryList = list<Query>
  * @psalm-type StringList = list<string>
  * @psalm-type Body = array<array-key, mixed>
+ * @psalm-type BodyList = array<array-key, array<string, mixed>|string>
  * @psalm-type BodyOrStringList = array<Body|string>
  * @psalm-type Schema = array<array-key, mixed>
  * @psalm-type ObjectList = list<object>
@@ -122,6 +124,13 @@ use ReflectionParameter;
  * @psalm-type MetaMap = array<string, Meta>
  * @psalm-type ClassNameList = list<class-string>
  * @psalm-type StatusMessageMap = array<int, string>
+ *
+ * DataLoader Types
+ * @psalm-type DataLoaderQuery = array<string, string>
+ * @psalm-type DataLoaderRow = array<string, mixed>
+ * @psalm-type DataLoaderQueries = list<DataLoaderQuery>
+ * @psalm-type DataLoaderRows = list<DataLoaderRow>
+ * @psalm-type DataLoaderClass = class-string<DataLoaderInterface>
  *
  * JSON Schema Types
  * @psalm-type ConstraintName = 'type'|'required'|'pattern'|'minLength'|'maxLength'

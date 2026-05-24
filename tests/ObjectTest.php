@@ -89,7 +89,6 @@ class ObjectTest extends TestCase
 
     public function testAppend(): void
     {
-        // @phpstan-ignore-next-line
         $this->ro[] = 'entry_append'; // same as $this->ro->boddy[] ='entry_append'
         assert(is_array($this->ro->body));
         $this->assertCount(4, $this->ro->body);

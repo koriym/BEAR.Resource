@@ -17,12 +17,12 @@
         "justinrainbow/json-schema": "^5.3 || ^6.0",
         "koriym/http-constants": "^1.1",
         "koriym/hal": "^1.1",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^6.0",
         "psr/log": "^1.1 || ^2.0 || ^3.0",
         "ray/aop": "^2.18.0",
         "ray/di": "^2.18.0",
-        "rize/uri-template": "^0.4",
-        "ray/input-query": "^1.0",
+        "rize/uri-template": "^0.4.1",
+        "ray/input-query": "^1.1",
         "koriym/file-upload": "^1.0"
     },
     "require-dev": {

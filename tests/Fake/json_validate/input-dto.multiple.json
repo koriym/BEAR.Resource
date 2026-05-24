@@ -1,0 +1,17 @@
+{
+  "title": "Multiple Input DTO",
+  "type": "object",
+  "properties": {
+    "metaTitle": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": ["metaTitle", "slug", "title"],
+  "additionalProperties": false
+}

@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `HttpRequestException` for HTTP transport and response parsing failures
+
+### Changed
+- Set default cURL timeouts for HTTP resource requests: 5 seconds to connect and 30 seconds overall
+
+### Fixed
+- Remove invalid Psalm taint-source annotation from `AbstractRequest::__invoke()`
+
+## [1.31.2] - 2026-05-02
+
+### Fixed
+- Support Ray.InputQuery native `array` and `array|null` DTO inputs at the resource parameter boundary
+
+### Changed
+- Require `ray/input-query` ^1.1
+- Normalize input query `InvalidArgumentException` code `0` to `Code::BAD_REQUEST` when wrapping it as `ParameterException`
+
+## [1.31.1] - 2026-04-29
+
+### Fixed
+- Allow `JsonSchemaInterceptor` request validation to flatten Ray.InputQuery `#[Input]` DTO arguments before JSON Schema validation
+
+## [1.31.0] - 2026-02-03
+
+### Added
+- `ResourceClient` class — stateless `ResourceInterface` implementation safe for coroutine/async environments
+- `Method` enum for type-safe HTTP method parameters
+- `ResourceClient::newRequest()` for direct request creation without fluent interface
+- `LinkCrawler` extracted from `Linker` for coroutine safety
+
+### Changed
+- `Linker` delegates list detection to `LinkCrawler` for shared logic
+
+## [1.30.0] - 2026-01-24
+
+### Added
+- `EmbedInterceptorInterface` for swappable embed implementations
+  - Allows alternative implementations (e.g., async/parallel embed resolution) to be injected via DI
+  - `EmbedInterceptor` now implements this interface
+  - `EmbedResourceModule` binds via the interface for extensibility
+
+## [1.29.0] - 2026-01-20
+
+### Added
+- Psalm taint annotations for improved security analysis
+  - Added `@psalm-taint-specialize` to `AbstractUri::__toString()`
+  - Enhanced static analysis for detecting potential security issues
+
 ## [1.28.0] - 2024-12-09
 
 ### Added
@@ -124,7 +173,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Please refer to the git history for changes in earlier versions.
 
-[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...HEAD
+[Unreleased]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.2...HEAD
+[1.31.2]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.1...1.31.2
+[1.31.1]: https://github.com/bearsunday/BEAR.Resource/compare/1.31.0...1.31.1
+[1.31.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.30.0...1.31.0
+[1.30.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.29.0...1.30.0
+[1.29.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.28.0...1.29.0
 [1.28.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.27.0...1.28.0
 [1.27.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.26.3...1.27.0
 [1.26.0]: https://github.com/bearsunday/BEAR.Resource/compare/1.25.0...1.26.0

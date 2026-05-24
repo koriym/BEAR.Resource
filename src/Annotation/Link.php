@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\Annotation;
 
 use Attribute;
+use BEAR\Resource\DataLoader\DataLoaderInterface;
 use JsonSerializable;
 use Override;
 
@@ -47,6 +48,13 @@ final class Link implements JsonSerializable
     public $crawl;
 
     /**
+     * DataLoader class for bulk processing
+     *
+     * @var class-string<DataLoaderInterface>|null
+     */
+    public $dataLoader;
+
+    /**
      * @return string[]
      * @psalm-return array{rel: string, href: string, method: string, title?: string}
      */
@@ -65,7 +73,7 @@ final class Link implements JsonSerializable
         return $json;
     }
 
-    /** @param array{rel?: string, href?: string, method?: string, title?: string, crawl?:string} $values */
+    /** @param array{rel?: string, href?: string, method?: string, title?: string, crawl?: string, dataLoader?: class-string<DataLoaderInterface>|null} $values */
     public function __construct(
         array $values = [],
         string $rel = '',
@@ -73,11 +81,15 @@ final class Link implements JsonSerializable
         string $method = 'get',
         string $title = '',
         string $crawl = '',
+        string|null $dataLoader = null,
     ) {
         $this->rel = $values['rel'] ?? $rel;
         $this->href = $values['href'] ?? $href;
         $this->method = $values['method'] ?? $method;
         $this->title = $values['title'] ?? $title;
         $this->crawl = $values['crawl'] ?? $crawl;
+        /** @var class-string<DataLoaderInterface>|null $resolvedDataLoader */
+        $resolvedDataLoader = $values['dataLoader'] ?? $dataLoader;
+        $this->dataLoader = $resolvedDataLoader;
     }
 }

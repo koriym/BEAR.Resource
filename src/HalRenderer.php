@@ -73,6 +73,22 @@ final readonly class HalRenderer implements RenderInterface
     private function valuateElements(ResourceObject $ro): void
     {
         assert(is_array($ro->body));
+
+        // Batch decorators (e.g. BEAR.Async's AsyncRequest) flush the whole
+        // pending batch on the first __toString(), so siblings must already
+        // have HalRenderer set or they fall back to JsonRenderer and lose _links.
+        foreach ($ro->body as $maybeRequest) {
+            if (! ($maybeRequest instanceof AbstractRequest)) {
+                continue;
+            }
+
+            if ($this->isDifferentSchema($ro, $maybeRequest->resourceObject)) {
+                continue;
+            }
+
+            $maybeRequest->resourceObject->setRenderer($this);
+        }
+
         /** @var mixed $embeded */
         foreach ($ro->body as $key => &$embeded) {
             if (! ($embeded instanceof AbstractRequest)) {
@@ -85,7 +101,6 @@ final readonly class HalRenderer implements RenderInterface
             }
 
             assert(is_array($ro->body['_embedded']));
-            // @codeCoverageIgnoreStart
             if ($this->isDifferentSchema($ro, $embeded->resourceObject)) {
                 $ro->body['_embedded'][$key] = $embeded()->body;
                 unset($ro->body[$key]);
@@ -93,14 +108,13 @@ final readonly class HalRenderer implements RenderInterface
                 continue;
             }
 
-            // @codeCoverageIgnoreEnd
             unset($ro->body[$key]);
-            $view = $this->render($embeded());
+            // Use (string) so lazy decorators can short-circuit __invoke().
+            $view = (string) $embeded;
             $ro->body['_embedded'][$key] = json_decode($view, null, 512, JSON_THROW_ON_ERROR);
         }
     }
 
-    /** @codeCoverageIgnore */
     private function isDifferentSchema(ResourceObject $parentRo, ResourceObject $childRo): bool
     {
         return $parentRo->uri->scheme . $parentRo->uri->host !== $childRo->uri->scheme . $childRo->uri->host;

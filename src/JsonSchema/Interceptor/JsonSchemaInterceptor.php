@@ -19,6 +19,9 @@ use JsonSchema\Validator;
 use Override;
 use Ray\Aop\MethodInvocation;
 use Ray\Di\Di\Named;
+use Ray\InputQuery\Attribute\Input;
+use Ray\InputQuery\ToArray;
+use ReflectionAttribute;
 use ReflectionClass;
 use stdClass;
 
@@ -42,6 +45,8 @@ use const JSON_THROW_ON_ERROR;
  */
 final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
+    private const HEADER_ETAG = 'ETag';
+
     public function __construct(
         #[Named('json_schema_dir')]
         private string $schemaDir,
@@ -103,7 +108,10 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         $schemaFile = $this->getSchemaFile($jsonSchema, $ro);
         try {
-            $this->validateRo($ro, $schemaFile, $jsonSchema);
+            if (! $this->isCachedRenderedBodyResponse($ro, $jsonSchema)) {
+                $this->validateRo($ro, $schemaFile, $jsonSchema);
+            }
+
             if (is_string($this->schemaHost)) {
                 $ro->headers['Link'] = sprintf('<%s%s>; rel="describedby"', $this->schemaHost, $jsonSchema->schema);
             }
@@ -120,6 +128,16 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         /** @var array<stdClass>|stdClass $target */
         $target = is_object($json) ? $this->getTarget($json, $jsonSchema) : $json;
         $this->validate($target, $schemaFile);
+    }
+
+    private function isCachedRenderedBodyResponse(ResourceObject $ro, JsonSchema $jsonSchema): bool
+    {
+        if ($jsonSchema->target !== 'body' || ! isset($ro->headers[self::HEADER_ETAG]) || ! is_string($ro->view)) {
+            return false;
+        }
+
+        // BEAR.QueryRepository restores cached rendered responses as headers/view only.
+        return $ro->body === null;
     }
 
     private function getTarget(object $json, JsonSchema $jsonSchema): mixed
@@ -223,10 +241,24 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         $parameters = $invocation->getMethod()->getParameters();
         $values = $invocation->getArguments();
+        $toArray = new ToArray();
+        /** @var Query $arguments */
         $arguments = [];
         foreach ($parameters as $index => $parameter) {
             /** @psalm-suppress MixedAssignment */
-            $arguments[$parameter->name] = $values[$index] ?? $parameter->getDefaultValue();
+            $value = $values[$index] ?? $parameter->getDefaultValue();
+            $inputAttributes = $parameter->getAttributes(Input::class, ReflectionAttribute::IS_INSTANCEOF);
+            if ($inputAttributes !== [] && is_object($value)) {
+                /** @psalm-suppress MixedAssignment */
+                foreach ($toArray($value) as $name => $inputValue) {
+                    $arguments[$name] = $inputValue;
+                }
+
+                continue;
+            }
+
+            /** @psalm-suppress MixedAssignment */
+            $arguments[$parameter->name] = $value;
         }
 
         return $arguments;

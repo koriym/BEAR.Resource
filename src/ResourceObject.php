@@ -32,7 +32,7 @@ use const E_USER_WARNING;
 /**
  * @psalm-import-type Headers from Types
  * @psalm-import-type Body from Types
- * @phpstan-implements ArrayAccess<string, mixed>
+ * @phpstan-implements ArrayAccess<array-key, mixed>
  * @phpstan-implements IteratorAggregate<(int|string), mixed>
  */
 abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Stringable, InvokeRequestInterface
@@ -122,8 +122,8 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
     /**
      * Sets the body value at the specified index to renew
      *
-     * @param array-key $offset offset
-     * @param mixed     $value  value
+     * @param array-key|null $offset offset
+     * @param mixed          $value  value
      *
      * @return void
      */
@@ -137,6 +137,12 @@ abstract class ResourceObject implements AcceptTransferInterface, ArrayAccess, C
 
         if (! is_array($this->body)) {
             throw new IlligalAccessException((string) $offset);
+        }
+
+        if ($offset === null) {
+            $this->body[] = $value;
+
+            return;
         }
 
         $this->body[$offset] = $value;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
-use BEAR\Resource\Exception\MethodException;
 use BEAR\Resource\Exception\OutOfBoundsException;
 use BEAR\Resource\Renderer\FakeErrorRenderer;
 use BEAR\Resource\Renderer\FakeTestRenderer;
@@ -13,6 +12,7 @@ use LogicException;
 use OutOfRangeException;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
+use ValueError;
 
 use function restore_error_handler;
 use function serialize;
@@ -47,7 +47,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->fake,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $actual = $request->toUriWithMethod();
@@ -59,7 +59,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->fake,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $actual = $request->toUri();
@@ -71,7 +71,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->nop,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $this->assertSame(['koriym', 25], $request()->body);
@@ -83,7 +83,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->nop,
-            Request::GET,
+            Method::GET,
             ['key' => 'animal', 'value' => 'kuma'],
         );
         $request['animal'] = 'cause_exception';
@@ -95,7 +95,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->nop,
-            Request::PUT,
+            Method::PUT,
             ['key' => 'animal', 'value' => 'kuma'],
         );
         unset($request['animal']);
@@ -106,7 +106,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->nop,
-            'get',
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $this->assertSame(['koriym', 30], $request(['b' => 30])->body);
@@ -117,7 +117,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->fake,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
 
@@ -132,7 +132,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $ro,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $this->assertSame(['koriym', 30], $request(['b' => 30])->body['posts']);  // @phpstan-ignore-line
@@ -147,7 +147,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $ro,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         set_error_handler(static function (int $errno, string $errstr) use (&$no, &$str): bool {
@@ -166,7 +166,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->fake,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $result = (string) $request;
@@ -244,8 +244,8 @@ class RequestTest extends TestCase
 
     public function testInvalidMethod(): void
     {
-        $this->expectException(MethodException::class);
-        new Request($this->invoker, $this->entry, 'invalid-method');
+        $this->expectException(ValueError::class);
+        Method::from('invalid-method');
     }
 
     public function testHash(): void
@@ -258,7 +258,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->nop,
-            Request::PUT,
+            Method::PUT,
             ['key' => 'animal', 'value' => 'kuma'],
         );
         $no = $str = '';
@@ -285,7 +285,7 @@ class RequestTest extends TestCase
         $request = new Request(
             $this->invoker,
             $this->fake,
-            Request::GET,
+            Method::GET,
             ['a' => 'koriym', 'b' => 25],
         );
         $newRequest = clone $request;

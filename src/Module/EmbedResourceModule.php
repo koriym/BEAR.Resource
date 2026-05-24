@@ -6,6 +6,7 @@ namespace BEAR\Resource\Module;
 
 use BEAR\Resource\Annotation\Embed;
 use BEAR\Resource\EmbedInterceptor;
+use BEAR\Resource\EmbedInterceptorInterface;
 use Override;
 use Ray\Di\AbstractModule;
 
@@ -20,10 +21,11 @@ final class EmbedResourceModule extends AbstractModule
     #[Override]
     protected function configure(): void
     {
+        $this->bind(EmbedInterceptorInterface::class)->to(EmbedInterceptor::class);
         $this->bindInterceptor(
             $this->matcher->any(),
             $this->matcher->annotatedWith(Embed::class),
-            [EmbedInterceptor::class],
+            [EmbedInterceptorInterface::class],
         );
     }
 }

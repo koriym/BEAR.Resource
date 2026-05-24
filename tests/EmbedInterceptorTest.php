@@ -79,7 +79,7 @@ class EmbedInterceptorTest extends TestCase
 
     public function testEmbedAnnotation(): Request
     {
-        $request = $this->resource->get->uri('app://self/bird/birds')->withQuery(['id' => 1])->request();
+        $request = $this->resource->newRequest(Method::GET, 'app://self/bird/birds', ['id' => 1])->request();
         assert($request instanceof Request);
         $this->assertSame('app://self/bird/birds?id=1', $request->toUri());
         $ro = $request();
@@ -107,23 +107,22 @@ class EmbedInterceptorTest extends TestCase
     public function testNotFoundSrc(): void
     {
         $this->expectException(EmbedException::class);
-        $this->resource->uri('app://self/bird/not-found-bird')(['id' => 1]);
+        $this->resource->newRequest(Method::GET, 'app://self/bird/not-found-bird')(['id' => 1]);
     }
 
     public function testNotInvalidSrc(): void
     {
         $this->expectException(EmbedException::class);
-        $this->resource->uri('app://self/bird/invalid-bird')(['id' => 1]);
+        $this->resource->newRequest(Method::GET, 'app://self/bird/invalid-bird')(['id' => 1]);
     }
 
     public function testEmbedAnnotationResource(): void
     {
-        $request = $this
-            ->resource
-            ->get
-            ->uri('app://self/bird/sparrows')
-            ->withQuery(['id_request' => 3, 'id_object' => 5, 'id_eager_request' => 7])
-            ->request();
+        $request = $this->resource->newRequest(
+            Method::GET,
+            'app://self/bird/sparrows',
+            ['id_request' => 3, 'id_object' => 5, 'id_eager_request' => 7],
+        )->request();
         assert($request instanceof Request);
         $this->assertSame('app://self/bird/sparrows?id_request=3&id_object=5&id_eager_request=7', $request->toUri());
         assert($request instanceof Request);
