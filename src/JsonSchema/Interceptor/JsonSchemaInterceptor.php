@@ -172,26 +172,57 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         $msg = '';
         $structured = [];
         foreach ($errors as $error) {
-            $property = is_string($error['property'] ?? null) ? $error['property'] : '';
-            $pointer = is_string($error['pointer'] ?? null) ? $error['pointer'] : '';
-            $message = is_string($error['message'] ?? null) ? $error['message'] : '';
-            $constraint = is_array($error['constraint'] ?? null) ? $error['constraint'] : [];
-            $name = is_string($constraint['name'] ?? null) ? $constraint['name'] : 'unknown';
-            /** @var array<string, mixed> $params */
-            $params = is_array($constraint['params'] ?? null) ? $constraint['params'] : [];
-
-            $msg .= sprintf('[%s] %s; ', $property, $message);
-            $structured[] = new JsonSchemaError(
-                $property,
-                $pointer,
-                $message,
-                new ConstraintViolation($name, $params),
-            );
+            $jsonSchemaError = $this->toJsonSchemaError($error);
+            $msg .= sprintf('[%s] %s; ', $jsonSchemaError->property, $jsonSchemaError->message);
+            $structured[] = $jsonSchemaError;
         }
 
         $msg .= "by {$schemaFile}";
 
         return new JsonSchemaException($msg, Code::ERROR, $structured);
+    }
+
+    /**
+     * Normalize one justinrainbow validator error row into a typed JsonSchemaError.
+     *
+     * Accepts both upstream shapes:
+     *  - 5.x: `constraint` is a string keyword (extras flattened into the row)
+     *  - 6.x: `constraint` is `array{name: string, params: array<string, mixed>}`
+     *
+     * @param array<string, mixed> $error
+     *
+     * @psalm-suppress MixedAssignment Upstream validator returns mixed-typed row values; each field is narrowed below.
+     */
+    private function toJsonSchemaError(array $error): JsonSchemaError
+    {
+        $propertyRaw = $error['property'] ?? null;
+        $pointerRaw = $error['pointer'] ?? null;
+        $messageRaw = $error['message'] ?? null;
+        $property = is_string($propertyRaw) ? $propertyRaw : '';
+        $pointer = is_string($pointerRaw) ? $pointerRaw : '';
+        $message = is_string($messageRaw) ? $messageRaw : '';
+        $constraint = $error['constraint'] ?? null;
+
+        if (is_string($constraint)) {
+            $name = $constraint;
+            $params = [];
+        } elseif (is_array($constraint)) {
+            $constraintNameRaw = $constraint['name'] ?? null;
+            $name = is_string($constraintNameRaw) ? $constraintNameRaw : 'unknown';
+            $paramsRaw = $constraint['params'] ?? null;
+            /** @var array<string, mixed> $params */
+            $params = is_array($paramsRaw) ? $paramsRaw : [];
+        } else {
+            $name = 'unknown';
+            $params = [];
+        }
+
+        return new JsonSchemaError(
+            $property,
+            $pointer,
+            $message,
+            new ConstraintViolation($name, $params),
+        );
     }
 
     private function getSchemaFile(JsonSchema $jsonSchema, ResourceObject $ro): string

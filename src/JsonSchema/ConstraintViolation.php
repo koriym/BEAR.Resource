@@ -8,7 +8,6 @@ namespace BEAR\Resource\JsonSchema;
  * @psalm-type ConstraintName = 'type'|'required'|'pattern'|'minLength'|'maxLength'
  *     |'minimum'|'maximum'|'multipleOf'|'enum'|'const'|'format'
  *     |'minItems'|'maxItems'|'uniqueItems'|'minProperties'|'maxProperties'
- *
  * @psalm-immutable
  */
 final readonly class ConstraintViolation
