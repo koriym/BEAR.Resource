@@ -9,8 +9,7 @@ use BEAR\Resource\Code;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
-use BEAR\Resource\JsonSchema\ConstraintViolation;
-use BEAR\Resource\JsonSchema\JsonSchemaError;
+use BEAR\Resource\JsonSchema\JsonSchemaErrorMapper;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
@@ -169,10 +168,11 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         /** @var list<array<string, mixed>> $errors */
         $errors = $validator->getErrors();
+        $mapper = new JsonSchemaErrorMapper();
         $msg = '';
         $structured = [];
         foreach ($errors as $error) {
-            $jsonSchemaError = $this->toJsonSchemaError($error);
+            $jsonSchemaError = $mapper->toJsonSchemaError($error);
             $msg .= sprintf('[%s] %s; ', $jsonSchemaError->property, $jsonSchemaError->message);
             $structured[] = $jsonSchemaError;
         }
@@ -180,55 +180,6 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         $msg .= "by {$schemaFile}";
 
         return new JsonSchemaException($msg, Code::ERROR, $structured);
-    }
-
-    /**
-     * Normalize one justinrainbow validator error row into a typed JsonSchemaError.
-     *
-     * @param array<string, mixed> $error
-     *
-     * @psalm-suppress MixedAssignment Upstream validator returns mixed-typed row values; each field is narrowed below.
-     */
-    private function toJsonSchemaError(array $error): JsonSchemaError
-    {
-        $propertyRaw = $error['property'] ?? null;
-        $pointerRaw = $error['pointer'] ?? null;
-        $messageRaw = $error['message'] ?? null;
-
-        return new JsonSchemaError(
-            is_string($propertyRaw) ? $propertyRaw : '',
-            is_string($pointerRaw) ? $pointerRaw : '',
-            is_string($messageRaw) ? $messageRaw : '',
-            $this->toConstraintViolation($error['constraint'] ?? null),
-        );
-    }
-
-    /**
-     * Accepts both upstream shapes:
-     *  - 5.x: a string keyword (params flattened into the parent row)
-     *  - 6.x: `array{name: string, params: array<string, mixed>}`
-     *
-     * @psalm-suppress MixedAssignment Upstream constraint is mixed; each field is narrowed below.
-     */
-    private function toConstraintViolation(mixed $constraint): ConstraintViolation
-    {
-        if (is_string($constraint)) {
-            return new ConstraintViolation($constraint, []);
-        }
-
-        if (! is_array($constraint)) {
-            return new ConstraintViolation('unknown', []);
-        }
-
-        $nameRaw = $constraint['name'] ?? null;
-        $paramsRaw = $constraint['params'] ?? null;
-        /** @var array<string, mixed> $params */
-        $params = is_array($paramsRaw) ? $paramsRaw : [];
-
-        return new ConstraintViolation(
-            is_string($nameRaw) ? $nameRaw : 'unknown',
-            $params,
-        );
     }
 
     private function getSchemaFile(JsonSchema $jsonSchema, ResourceObject $ro): string
