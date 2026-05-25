@@ -627,12 +627,25 @@ try {
 
 ### Custom error message templates
 
-Each `JsonSchemaError` can render a `{key}` placeholder template against its
-own data — useful when the schema (or an ajv-errors-style `errorMessage` map)
-provides custom messages with placeholders:
+The template lives in the schema (ajv-errors style `errorMessage`), not the
+PHP code. `JsonSchemaError::render()` interpolates `{key}` placeholders
+against the error's data:
+
+```json
+// user.get.json
+{
+  "type": "object",
+  "properties": {
+    "age": {
+      "type": "integer", "minimum": 20,
+      "errorMessage": { "minimum": "年齢は{minimum}歳以上である必要があります" }
+    }
+  }
+}
+```
 
 ```php
-$tpl = '年齢は{minimum}歳以上である必要があります';
+$tpl = $schemaErrorMessages[$error->property][$error->constraint->name];
 $error->render($tpl); // '年齢は20歳以上である必要があります'
 ```
 

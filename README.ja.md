@@ -420,12 +420,24 @@ try {
 
 ### カスタムエラーメッセージテンプレート
 
-各 `JsonSchemaError` は `{key}` プレースホルダーテンプレートを自身のデータで
-レンダリングできます。スキーマ側 (あるいは ajv-errors 風の `errorMessage` マップ)
-でプレースホルダー入りのカスタムメッセージを定義しておくケースで便利です:
+テンプレートは PHP ではなく **スキーマ側** に置きます (ajv-errors の `errorMessage`)。
+`JsonSchemaError::render()` は `{key}` プレースホルダーをエラーのデータで補間します:
+
+```json
+// user.get.json
+{
+  "type": "object",
+  "properties": {
+    "age": {
+      "type": "integer", "minimum": 20,
+      "errorMessage": { "minimum": "年齢は{minimum}歳以上である必要があります" }
+    }
+  }
+}
+```
 
 ```php
-$tpl = '年齢は{minimum}歳以上である必要があります';
+$tpl = $schemaErrorMessages[$error->property][$error->constraint->name];
 $error->render($tpl); // '年齢は20歳以上である必要があります'
 ```
 
