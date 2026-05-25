@@ -28,17 +28,22 @@ class JsonSchemaErrorMapperTest extends TestCase
 
     public function testMapsJustinrainbow5xStringConstraintShape(): void
     {
+        // In justinrainbow 5.x, `constraint` is a string and per-keyword params
+        // (e.g. `minimum`, `maxLength`) are flattened onto the parent row.
         $row = [
             'property' => 'age',
             'pointer' => '/age',
             'message' => 'Must have a minimum value of 20',
             'constraint' => 'minimum',
+            'minimum' => 20,
+            'context' => 1,
         ];
 
         $error = (new JsonSchemaErrorMapper())->toJsonSchemaError($row);
 
         $this->assertSame('minimum', $error->constraint->name);
-        $this->assertSame([], $error->constraint->params);
+        // Flattened param is recovered; standard row keys (context, etc.) are excluded.
+        $this->assertSame(['minimum' => 20], $error->constraint->params);
     }
 
     public function testFallbacksWhenConstraintIsMissing(): void

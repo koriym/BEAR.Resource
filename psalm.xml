@@ -26,6 +26,7 @@
         <MissingPureAnnotation errorLevel="suppress" />
         <MissingAbstractPureAnnotation errorLevel="suppress" />
         <MissingInterfaceImmutableAnnotation errorLevel="suppress" />
+        <MissingOverrideAttribute errorLevel="suppress" />
         <TaintedSSRF errorLevel="suppress" />
     </issueHandlers>
 </psalm>

@@ -46,6 +46,18 @@ class JsonSchemaErrorTest extends TestCase
         $this->assertSame('field=age path=/age msg=msg', $error->render('field={property} path={pointer} msg={message}'));
     }
 
+    public function testRenderReservedKeysAreNotOverridableByConstraintParams(): void
+    {
+        $error = new JsonSchemaError(
+            'age',
+            '/age',
+            'msg',
+            new ConstraintViolation('minimum', ['property' => 'HIJACKED']),
+        );
+
+        $this->assertSame('age', $error->render('{property}'));
+    }
+
     public function testRenderLeavesUnknownPlaceholdersInPlace(): void
     {
         $error = new JsonSchemaError('age', '/age', 'msg', new ConstraintViolation('minimum', []));

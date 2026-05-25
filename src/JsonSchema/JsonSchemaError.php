@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\JsonSchema;
 
+use function array_merge;
 use function get_debug_type;
 use function is_array;
 use function is_bool;
@@ -40,12 +41,12 @@ final readonly class JsonSchemaError
      */
     public function render(string $template): string
     {
-        $vars = [
+        // Reserved keys win over constraint params if upstream collides on a name like 'property'.
+        $vars = array_merge($this->constraint->params, [
             'property' => $this->property,
             'pointer' => $this->pointer,
             'message' => $this->message,
-            ...$this->constraint->params,
-        ];
+        ]);
 
         /** @psalm-suppress MixedAssignment */
         foreach ($vars as $key => $value) {

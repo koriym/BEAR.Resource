@@ -7,7 +7,6 @@ namespace BEAR\Resource\JsonSchema;
 use Countable;
 use Generator;
 use IteratorAggregate;
-use Override;
 
 use function count;
 
@@ -34,14 +33,12 @@ final readonly class JsonSchemaErrors implements Countable, IteratorAggregate
         return $this->errors !== [];
     }
 
-    #[Override]
     public function count(): int
     {
         return count($this->errors);
     }
 
     /** @return Generator<int, JsonSchemaError> */
-    #[Override]
     public function getIterator(): Generator
     {
         yield from $this->errors;

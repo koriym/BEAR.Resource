@@ -11,6 +11,8 @@ use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
+use function iterator_to_array;
+
 class JsonSchemaExceptionTest extends TestCase
 {
     public function testDefaultsToEmptyErrors(): void
@@ -37,7 +39,7 @@ class JsonSchemaExceptionTest extends TestCase
 
         $this->assertSame($errors, $e->getErrors());
         $this->assertCount(1, $e->getErrors());
-        $this->assertSame($error, $e->getErrors()->errors[0]);
+        $this->assertSame([$error], iterator_to_array($e->getErrors(), false));
     }
 
     public function testIsLogicException(): void

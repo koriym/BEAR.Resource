@@ -22,6 +22,7 @@ use Ray\Di\Injector;
 
 use function assert;
 use function dirname;
+use function iterator_to_array;
 
 class JsonSchemaModuleTest extends TestCase
 {
@@ -74,7 +75,7 @@ class JsonSchemaModuleTest extends TestCase
         $errors = $e->getErrors();
         $this->assertTrue($errors->hasErrors());
 
-        $first = $errors->errors[0];
+        $first = iterator_to_array($errors, false)[0];
         $this->assertInstanceOf(JsonSchemaError::class, $first);
         $this->assertSame('age', $first->property);
         $this->assertInstanceOf(ConstraintViolation::class, $first->constraint);
