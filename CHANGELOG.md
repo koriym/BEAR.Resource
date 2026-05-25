@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   field-keyed error responses without re-running the validator (#364)
 - `JsonSchemaError::render(string $template)` interpolates `{key}` placeholders
   against the error's data — supports ajv-errors-style `errorMessage` overrides
+- `JsonSchemaErrors::combinedMessage(string $template = "{message}\n")` renders
+  every error through the template and concatenates the results
 
 ### Changed
 - Set default cURL timeouts for HTTP resource requests: 5 seconds to connect and 30 seconds overall

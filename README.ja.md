@@ -444,6 +444,14 @@ $error->render($tpl); // '年齢は20歳以上である必要があります'
 利用可能なプレースホルダー: `{property}` / `{pointer}` / `{message}` と、
 `$error->constraint->params` の全キー。未定義のプレースホルダーはそのまま残ります。
 
+連結された 1 つの文字列が欲しいときは `$errors->combinedMessage()`:
+
+```php
+$errors->combinedMessage();                            // 'minimum is 20\nis required\n'
+$errors->combinedMessage("<li>{property}: {message}</li>\n");
+// '<li>age: minimum is 20</li>\n<li>name: is required</li>\n'
+```
+
 ### カスタムハンドラ
 
 独自の `JsonSchemaExceptionHandlerInterface` /

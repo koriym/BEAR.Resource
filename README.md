@@ -652,6 +652,14 @@ $error->render($tpl); // '年齢は20歳以上である必要があります'
 Placeholders: `{property}`, `{pointer}`, `{message}`, plus every key in
 `$error->constraint->params`. Unknown placeholders are left in place.
 
+For a single concatenated string, use `$errors->combinedMessage()`:
+
+```php
+$errors->combinedMessage();                            // 'minimum is 20\nis required\n'
+$errors->combinedMessage("<li>{property}: {message}</li>\n");
+// '<li>age: minimum is 20</li>\n<li>name: is required</li>\n'
+```
+
 ### Custom handlers
 
 Bind your own `JsonSchemaExceptionHandlerInterface` /

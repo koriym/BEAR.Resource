@@ -64,4 +64,25 @@ final readonly class JsonSchemaErrors implements Countable, IteratorAggregate
 
         return $grouped;
     }
+
+    /**
+     * Concatenate all errors into a single string via a per-error template.
+     *
+     * Each error is rendered through `JsonSchemaError::render()` so any
+     * `{key}` placeholder available there (property, pointer, message, plus
+     * `$constraint->params` keys) can appear in the template. The template
+     * should include its own separator — e.g. `"{message}\n"` for one error
+     * per line, `"<li>{message}</li>"` for an HTML list.
+     *
+     * Returns an empty string when there are no errors.
+     */
+    public function combinedMessage(string $template = "{message}\n"): string
+    {
+        $out = '';
+        foreach ($this->errors as $error) {
+            $out .= $error->render($template);
+        }
+
+        return $out;
+    }
 }

@@ -46,4 +46,28 @@ class JsonSchemaErrorsTest extends TestCase
         $this->assertSame([$first, $second], $grouped['age']);
         $this->assertSame([$third], $grouped['name']);
     }
+
+    public function testCombinedMessageReturnsEmptyStringForEmptyCollection(): void
+    {
+        $this->assertSame('', (new JsonSchemaErrors([]))->combinedMessage());
+    }
+
+    public function testCombinedMessageDefaultTemplateJoinsMessages(): void
+    {
+        $a = new JsonSchemaError('age', '/age', 'minimum is 20', new ConstraintViolation('minimum', []));
+        $b = new JsonSchemaError('name', '/name', 'is required', new ConstraintViolation('required', []));
+
+        $this->assertSame("minimum is 20\nis required\n", (new JsonSchemaErrors([$a, $b]))->combinedMessage());
+    }
+
+    public function testCombinedMessageInterpolatesCustomTemplate(): void
+    {
+        $a = new JsonSchemaError('age', '/age', 'minimum is 20', new ConstraintViolation('minimum', ['minimum' => 20]));
+        $b = new JsonSchemaError('name', '/name', 'is required', new ConstraintViolation('required', []));
+
+        $this->assertSame(
+            "<li>age: minimum is 20</li>\n<li>name: is required</li>\n",
+            (new JsonSchemaErrors([$a, $b]))->combinedMessage("<li>{property}: {message}</li>\n"),
+        );
+    }
 }
