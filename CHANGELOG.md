@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `HttpRequestException` for HTTP transport and response parsing failures
+- `JsonSchemaException::getErrors()` now returns a structured `JsonSchemaErrors`
+  collection (`Countable`, `IteratorAggregate`, `hasErrors()`, `byProperty()`)
+  carrying typed `JsonSchemaError` / `ConstraintViolation` DTOs, so
+  `JsonSchemaRequestExceptionHandlerInterface` implementations can build
+  field-keyed error responses without re-running the validator (#364)
+- `JsonSchemaError::render(string $template)` interpolates `{key}` placeholders
+  against the error's data — supports ajv-errors-style `errorMessage` overrides
 
 ### Changed
 - Set default cURL timeouts for HTTP resource requests: 5 seconds to connect and 30 seconds overall
