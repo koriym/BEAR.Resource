@@ -43,6 +43,7 @@ use const JSON_THROW_ON_ERROR;
 /**
  * @psalm-import-type Query from Types
  * @psalm-import-type Body from Types
+ * @psalm-import-type JsonSchemaValidatorErrors from Types
  */
 final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
@@ -185,13 +186,14 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
 
     private function throwJsonSchemaException(Validator $validator, string $schemaFile): JsonSchemaException
     {
-        /** @var list<array<string, mixed>> $errors */
-        $errors = $validator->getErrors();
+        // Raw rows returned by justinrainbow/json-schema before BEAR.Resource maps them.
+        /** @var JsonSchemaValidatorErrors $rawErrors */
+        $rawErrors = $validator->getErrors();
         $mapper = new JsonSchemaErrorMapper();
         $msg = '';
         $structured = [];
-        foreach ($errors as $error) {
-            $jsonSchemaError = $mapper->toJsonSchemaError($error);
+        foreach ($rawErrors as $rawError) {
+            $jsonSchemaError = $mapper->toJsonSchemaError($rawError);
             $msg .= sprintf('[%s] %s; ', $jsonSchemaError->property, $jsonSchemaError->message);
             $structured[] = $jsonSchemaError;
         }

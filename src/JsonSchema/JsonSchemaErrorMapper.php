@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\JsonSchema;
 
+use BEAR\Resource\Types;
+
 use function is_array;
 use function is_string;
 
-/** @internal */
+/**
+ * @internal
+ * @psalm-import-type JsonSchemaValidatorError from Types
+ */
 final class JsonSchemaErrorMapper
 {
     /**
      * Normalize one justinrainbow validator error row into a typed JsonSchemaError.
      *
-     * @param array<string, mixed> $error
+     * @param JsonSchemaValidatorError $error
      *
      * @psalm-suppress MixedAssignment Upstream validator returns mixed-typed row values; each field is narrowed below.
      */

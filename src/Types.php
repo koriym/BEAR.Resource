@@ -136,6 +136,14 @@ use ReflectionParameter;
  * @psalm-type ConstraintName = 'type'|'required'|'pattern'|'minLength'|'maxLength'
  *     |'minimum'|'maximum'|'multipleOf'|'enum'|'const'|'format'
  *     |'minItems'|'maxItems'|'uniqueItems'|'minProperties'|'maxProperties'
+ * @psalm-type JsonSchemaValidatorError = array{
+ *     property?: mixed,
+ *     pointer?: mixed,
+ *     message?: mixed,
+ *     constraint?: mixed,
+ *     ...
+ * }
+ * @psalm-type JsonSchemaValidatorErrors = list<JsonSchemaValidatorError>
  *
  * @phpcs:enable
  */
