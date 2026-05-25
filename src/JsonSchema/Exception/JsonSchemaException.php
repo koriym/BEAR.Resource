@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Exception;
 
-use BEAR\Resource\JsonSchema\JsonSchemaError;
+use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use LogicException;
 
 final class JsonSchemaException extends LogicException implements ExceptionInterface
 {
-    /** @param list<JsonSchemaError> $errors */
+    private readonly JsonSchemaErrors $errors;
+
     public function __construct(
         string $message,
         int $code = 0,
-        private readonly array $errors = [],
+        JsonSchemaErrors|null $errors = null,
     ) {
         parent::__construct($message, $code);
+
+        $this->errors = $errors ?? new JsonSchemaErrors([]);
     }
 
-    /** @return list<JsonSchemaError> */
-    public function getErrors(): array
+    public function getErrors(): JsonSchemaErrors
     {
         return $this->errors;
     }

@@ -72,9 +72,9 @@ class JsonSchemaModuleTest extends TestCase
     public function testStructuredErrors(JsonSchemaException $e): void
     {
         $errors = $e->getErrors();
-        $this->assertNotEmpty($errors);
+        $this->assertTrue($errors->hasErrors());
 
-        $first = $errors[0];
+        $first = $errors->errors[0];
         $this->assertInstanceOf(JsonSchemaError::class, $first);
         $this->assertSame('age', $first->property);
         $this->assertInstanceOf(ConstraintViolation::class, $first->constraint);
@@ -82,6 +82,8 @@ class JsonSchemaModuleTest extends TestCase
         // params shape differs across justinrainbow versions (5.x flattens, 6.x nests
         // under constraint.params) — only assert the array type for cross-version BC.
         $this->assertIsArray($first->constraint->params);
+        // Property-keyed view for handlers (the core use case from #364).
+        $this->assertArrayHasKey('age', $errors->byProperty());
     }
 
     public function testException(): void

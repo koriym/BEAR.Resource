@@ -10,6 +10,7 @@ use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
 use BEAR\Resource\JsonSchema\JsonSchemaErrorMapper;
+use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
@@ -197,7 +198,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
 
         $msg .= "by {$schemaFile}";
 
-        return new JsonSchemaException($msg, Code::ERROR, $structured);
+        return new JsonSchemaException($msg, Code::ERROR, new JsonSchemaErrors($structured));
     }
 
     private function getSchemaFile(JsonSchema $jsonSchema, ResourceObject $ro): string

@@ -7,6 +7,7 @@ namespace BEAR\Resource\JsonSchema\Exception;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\JsonSchema\ConstraintViolation;
 use BEAR\Resource\JsonSchema\JsonSchemaError;
+use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,9 @@ class JsonSchemaExceptionTest extends TestCase
 
         $this->assertSame('message', $e->getMessage());
         $this->assertSame(500, $e->getCode());
-        $this->assertSame([], $e->getErrors());
+        $this->assertInstanceOf(JsonSchemaErrors::class, $e->getErrors());
+        $this->assertFalse($e->getErrors()->hasErrors());
+        $this->assertCount(0, $e->getErrors());
     }
 
     public function testCarriesStructuredErrors(): void
@@ -29,10 +32,12 @@ class JsonSchemaExceptionTest extends TestCase
             'Must have a minimum value of 20',
             new ConstraintViolation('minimum', ['minimum' => 20]),
         );
-        $e = new JsonSchemaException('message', 500, [$error]);
+        $errors = new JsonSchemaErrors([$error]);
+        $e = new JsonSchemaException('message', 500, $errors);
 
+        $this->assertSame($errors, $e->getErrors());
         $this->assertCount(1, $e->getErrors());
-        $this->assertSame($error, $e->getErrors()[0]);
+        $this->assertSame($error, $e->getErrors()->errors[0]);
     }
 
     public function testIsLogicException(): void
