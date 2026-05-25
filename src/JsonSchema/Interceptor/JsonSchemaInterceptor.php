@@ -186,7 +186,6 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
 
     private function throwJsonSchemaException(Validator $validator, string $schemaFile): JsonSchemaException
     {
-        // Raw rows returned by justinrainbow/json-schema before BEAR.Resource maps them.
         /** @var JsonSchemaValidatorErrors $rawErrors */
         $rawErrors = $validator->getErrors();
         $mapper = new JsonSchemaErrorMapper();
