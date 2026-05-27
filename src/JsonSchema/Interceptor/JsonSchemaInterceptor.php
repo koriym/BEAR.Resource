@@ -214,6 +214,9 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
      */
     private function schema(string $schemaFile): stdClass|null
     {
+        // An invalid / unreadable schema collapses to null here by design —
+        // validation itself has already parsed the same file, so this is a
+        // graceful fallback for `errorMessage` lookup, not error-swallowing.
         /** @psalm-suppress MixedAssignment json_decode() returns mixed by design; narrowed below. */
         $schema = json_decode((string) file_get_contents($schemaFile));
 

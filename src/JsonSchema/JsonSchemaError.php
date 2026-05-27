@@ -22,8 +22,10 @@ final readonly class JsonSchemaError
     public string $rawMessage;
 
     /**
-     * True when `$message` came from the schema's `errorMessage` (ajv-errors style).
-     * False when `$message` is the validator's own message (i.e. equals `$rawMessage`).
+     * True when `$message` differs from `$rawMessage` — typically because the
+     * mapper rendered a schema-side `errorMessage` (ajv-errors style) on top
+     * of the validator's original. False when the two are identical, i.e. no
+     * effective customization was applied.
      */
     public bool $isCustomMessage;
 
