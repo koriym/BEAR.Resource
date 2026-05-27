@@ -15,7 +15,6 @@ use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Types;
-use JsonException;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Override;
@@ -205,19 +204,18 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         return new JsonSchemaException($msg, Code::ERROR, new JsonSchemaErrors($structured));
     }
 
+    /**
+     * Load the schema for `errorMessage` lookup. Called only after the file
+     * has been verified to exist and after justinrainbow has already parsed
+     * it successfully, so the happy path is the only realistic one. Any
+     * non-object decode result (boolean schema, unreadable file, malformed
+     * JSON) is treated as "no schema-aware messages available" — the
+     * mapper just falls back to the validator's raw message.
+     */
     private function schema(string $schemaFile): stdClass|null
     {
-        $json = file_get_contents($schemaFile);
-        if (! is_string($json)) {
-            return null;
-        }
-
-        try {
-            /** @psalm-suppress MixedAssignment json_decode() returns mixed by design; narrowed below. */
-            $schema = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return null;
-        }
+        /** @psalm-suppress MixedAssignment json_decode() returns mixed by design; narrowed below. */
+        $schema = json_decode((string) file_get_contents($schemaFile));
 
         return $schema instanceof stdClass ? $schema : null;
     }
