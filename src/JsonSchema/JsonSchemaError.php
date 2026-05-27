@@ -19,12 +19,23 @@ use const JSON_UNESCAPED_UNICODE;
 /** @psalm-immutable */
 final readonly class JsonSchemaError
 {
+    public string $rawMessage;
+
+    /**
+     * True when `$message` came from the schema's `errorMessage` (ajv-errors style).
+     * False when `$message` is the validator's own message (i.e. equals `$rawMessage`).
+     */
+    public bool $isCustomMessage;
+
     public function __construct(
         public string $property,
         public string $pointer,
         public string $message,
         public ConstraintViolation $constraint,
+        string $rawMessage = '',
     ) {
+        $this->rawMessage = $rawMessage === '' ? $message : $rawMessage;
+        $this->isCustomMessage = $rawMessage !== '' && $rawMessage !== $message;
     }
 
     /**

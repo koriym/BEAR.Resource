@@ -652,13 +652,22 @@ $error->render($tpl); // '年齢は20歳以上である必要があります'
 Placeholders: `{property}`, `{pointer}`, `{message}`, plus every key in
 `$error->constraint->params`. Unknown placeholders are left in place.
 
-For a single concatenated string, use `$errors->combinedMessage()`:
+For a single concatenated string, use `$errors->format()`:
 
 ```php
-$errors->combinedMessage();                            // 'minimum is 20\nis required\n'
-$errors->combinedMessage("<li>{property}: {message}</li>\n");
+$errors->format();                            // 'minimum is 20\nis required\n'
+$errors->format("<li>{property}: {message}</li>\n");
 // '<li>age: minimum is 20</li>\n<li>name: is required</li>\n'
 ```
+
+`$errors->first()` returns the leading `JsonSchemaError` (or `null` when empty),
+which is handy when you only want to render a single error.
+
+When a schema declares a custom message via ajv-errors style `errorMessage`, the
+mapper renders it into `$error->message` automatically and sets
+`$error->isCustomMessage = true`. The validator's own message is preserved in
+`$error->rawMessage` so handlers can fall back to stable text for logs or
+debugging.
 
 ### Custom handlers
 

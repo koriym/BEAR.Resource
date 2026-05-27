@@ -20,6 +20,16 @@ class JsonSchemaErrorsTest extends TestCase
         $this->assertSame(0, $errors->count());
         $this->assertSame([], iterator_to_array($errors));
         $this->assertSame([], $errors->byProperty());
+        $this->assertNull($errors->first());
+    }
+
+    public function testFirstReturnsTheLeadingError(): void
+    {
+        $a = new JsonSchemaError('age', '/age', 'minimum is 20', new ConstraintViolation('minimum', []));
+        $b = new JsonSchemaError('name', '/name', 'is required', new ConstraintViolation('required', []));
+        $first = (new JsonSchemaErrors([$a, $b]))->first();
+
+        $this->assertSame($a, $first);
     }
 
     public function testIteratesAndCounts(): void
@@ -49,7 +59,7 @@ class JsonSchemaErrorsTest extends TestCase
 
     public function testCombinedMessageReturnsEmptyStringForEmptyCollection(): void
     {
-        $this->assertSame('', (new JsonSchemaErrors([]))->combinedMessage());
+        $this->assertSame('', (new JsonSchemaErrors([]))->format());
     }
 
     public function testCombinedMessageDefaultTemplateJoinsMessages(): void
@@ -57,7 +67,7 @@ class JsonSchemaErrorsTest extends TestCase
         $a = new JsonSchemaError('age', '/age', 'minimum is 20', new ConstraintViolation('minimum', []));
         $b = new JsonSchemaError('name', '/name', 'is required', new ConstraintViolation('required', []));
 
-        $this->assertSame("minimum is 20\nis required\n", (new JsonSchemaErrors([$a, $b]))->combinedMessage());
+        $this->assertSame("minimum is 20\nis required\n", (new JsonSchemaErrors([$a, $b]))->format());
     }
 
     public function testCombinedMessageInterpolatesCustomTemplate(): void
@@ -67,7 +77,7 @@ class JsonSchemaErrorsTest extends TestCase
 
         $this->assertSame(
             "<li>age: minimum is 20</li>\n<li>name: is required</li>\n",
-            (new JsonSchemaErrors([$a, $b]))->combinedMessage("<li>{property}: {message}</li>\n"),
+            (new JsonSchemaErrors([$a, $b]))->format("<li>{property}: {message}</li>\n"),
         );
     }
 }

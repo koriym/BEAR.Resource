@@ -444,13 +444,21 @@ $error->render($tpl); // '年齢は20歳以上である必要があります'
 利用可能なプレースホルダー: `{property}` / `{pointer}` / `{message}` と、
 `$error->constraint->params` の全キー。未定義のプレースホルダーはそのまま残ります。
 
-連結された 1 つの文字列が欲しいときは `$errors->combinedMessage()`:
+連結された 1 つの文字列が欲しいときは `$errors->format()`:
 
 ```php
-$errors->combinedMessage();                            // 'minimum is 20\nis required\n'
-$errors->combinedMessage("<li>{property}: {message}</li>\n");
+$errors->format();                            // 'minimum is 20\nis required\n'
+$errors->format("<li>{property}: {message}</li>\n");
 // '<li>age: minimum is 20</li>\n<li>name: is required</li>\n'
 ```
+
+先頭の `JsonSchemaError` だけ欲しい場合は `$errors->first()` (空のときは `null`)。
+
+スキーマが ajv-errors 風の `errorMessage` でカスタムメッセージを持つ場合、
+マッパーがそれをレンダリングして `$error->message` にセットし、
+`$error->isCustomMessage = true` を立てます。validator 本来の英語メッセージは
+`$error->rawMessage` に保持されるので、ログやデバッグ用には rawMessage を
+使えます。
 
 ### カスタムハンドラ
 

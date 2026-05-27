@@ -18,8 +18,23 @@ class JsonSchemaErrorTest extends TestCase
         $this->assertSame('age', $error->property);
         $this->assertSame('/age', $error->pointer);
         $this->assertSame('Must have a minimum value of 20', $error->message);
+        $this->assertSame('Must have a minimum value of 20', $error->rawMessage);
         $this->assertSame($constraint, $error->constraint);
         $this->assertSame('minimum', $error->constraint->name);
+    }
+
+    public function testRawMessageCanDifferFromRenderedMessage(): void
+    {
+        $error = new JsonSchemaError(
+            'age',
+            '/age',
+            'Age must be at least 20.',
+            new ConstraintViolation('minimum', ['minimum' => 20]),
+            'Must have a minimum value of 20',
+        );
+
+        $this->assertSame('Age must be at least 20.', $error->message);
+        $this->assertSame('Must have a minimum value of 20', $error->rawMessage);
     }
 
     public function testRenderInterpolatesConstraintParam(): void

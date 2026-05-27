@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\JsonSchema;
 
 use BEAR\Resource\Types;
+use stdClass;
 
 use function in_array;
 use function is_array;
@@ -19,6 +20,13 @@ final class JsonSchemaErrorMapper
     /** Standard row keys consumed by JsonSchemaError; everything else on a 5.x row is treated as a flattened constraint param. */
     private const ROW_KEYS = ['property', 'pointer', 'message', 'constraint', 'context'];
 
+    private SchemaErrorMessageResolver $resolver;
+
+    public function __construct(SchemaErrorMessageResolver|null $resolver = null)
+    {
+        $this->resolver = $resolver ?? new SchemaErrorMessageResolver();
+    }
+
     /**
      * Normalize one justinrainbow validator error row into a typed JsonSchemaError.
      *
@@ -26,17 +34,27 @@ final class JsonSchemaErrorMapper
      *
      * @psalm-suppress MixedAssignment Upstream validator returns mixed-typed row values; each field is narrowed below.
      */
-    public function toJsonSchemaError(array $error): JsonSchemaError
+    public function toJsonSchemaError(array $error, stdClass|null $schema = null): JsonSchemaError
     {
         $propertyRaw = $error['property'] ?? null;
         $pointerRaw = $error['pointer'] ?? null;
         $messageRaw = $error['message'] ?? null;
+        $constraint = $this->toConstraintViolation($error);
 
-        return new JsonSchemaError(
-            is_string($propertyRaw) ? $propertyRaw : '',
+        $jsonSchemaError = new JsonSchemaError(
+            $this->property(is_string($propertyRaw) ? $propertyRaw : '', $constraint),
             is_string($pointerRaw) ? $pointerRaw : '',
             is_string($messageRaw) ? $messageRaw : '',
-            $this->toConstraintViolation($error),
+            $constraint,
+        );
+        $template = $this->resolver->resolve($schema, $jsonSchemaError);
+
+        return $template === null ? $jsonSchemaError : new JsonSchemaError(
+            $jsonSchemaError->property,
+            $jsonSchemaError->pointer,
+            $jsonSchemaError->render($template),
+            $jsonSchemaError->constraint,
+            $jsonSchemaError->rawMessage,
         );
     }
 
@@ -93,5 +111,17 @@ final class JsonSchemaErrorMapper
         }
 
         return $params;
+    }
+
+    private function property(string $property, ConstraintViolation $constraint): string
+    {
+        if ($constraint->name !== 'required') {
+            return $property;
+        }
+
+        /** @psalm-suppress MixedAssignment Constraint params intentionally carry mixed upstream values. */
+        $missing = $constraint->params['property'] ?? null;
+
+        return is_string($missing) && $missing !== '' ? $missing : $property;
     }
 }
