@@ -18,18 +18,14 @@ use function count;
  * `iterator_to_array`), `first()`, or one of the named accessors.
  *
  * @psalm-immutable
- *
  * @implements IteratorAggregate<int, JsonSchemaError>
  */
 final readonly class JsonSchemaErrors implements Countable, IteratorAggregate
 {
-    /** @var list<JsonSchemaError> */
-    private array $errors;
-
     /** @param list<JsonSchemaError> $errors */
-    public function __construct(array $errors)
-    {
-        $this->errors = $errors;
+    public function __construct(
+        private array $errors,
+    ) {
     }
 
     public function hasErrors(): bool

@@ -15,6 +15,7 @@ use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Types;
+use JsonException;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Override;
@@ -28,6 +29,7 @@ use stdClass;
 
 use function assert;
 use function file_exists;
+use function file_get_contents;
 use function is_array;
 use function is_dir;
 use function is_object;
@@ -189,10 +191,11 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         /** @var JsonSchemaValidatorErrors $rawErrors */
         $rawErrors = $validator->getErrors();
         $mapper = new JsonSchemaErrorMapper();
+        $schema = $this->schema($schemaFile);
         $msg = '';
         $structured = [];
         foreach ($rawErrors as $rawError) {
-            $jsonSchemaError = $mapper->toJsonSchemaError($rawError);
+            $jsonSchemaError = $mapper->toJsonSchemaError($rawError, $schema);
             $msg .= sprintf('[%s] %s; ', $jsonSchemaError->property, $jsonSchemaError->message);
             $structured[] = $jsonSchemaError;
         }
@@ -200,6 +203,23 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         $msg .= "by {$schemaFile}";
 
         return new JsonSchemaException($msg, Code::ERROR, new JsonSchemaErrors($structured));
+    }
+
+    private function schema(string $schemaFile): stdClass|null
+    {
+        $json = file_get_contents($schemaFile);
+        if (! is_string($json)) {
+            return null;
+        }
+
+        try {
+            /** @psalm-suppress MixedAssignment json_decode() returns mixed by design; narrowed below. */
+            $schema = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return null;
+        }
+
+        return $schema instanceof stdClass ? $schema : null;
     }
 
     private function getSchemaFile(JsonSchema $jsonSchema, ResourceObject $ro): string

@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "ext-ctype": "*",
         "ext-filter": "*",
         "ext-curl": "*",
         "ext-fileinfo": "*",
