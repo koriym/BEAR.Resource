@@ -611,6 +611,7 @@ Google GuiceスタイルのDI/AOPシステムの[Ray](https://github.com/koriym/
 
 ## See Also
 
+ * [BEAR.Async](https://github.com/bearsunday/BEAR.Async) - BEAR.Resourceの非同期・コルーチン統合です。
  * [BEAR.QueryRepository](https://github.com/bearsunday/BEAR.QueryRepository) - 読み込みと書き込みのレポジトリを分離します。
  * [Ray.WebParamModule](https://github.com/ray-di/Ray.WebParamModule) - Webコンテキストをパラメーターにバインドします。
  

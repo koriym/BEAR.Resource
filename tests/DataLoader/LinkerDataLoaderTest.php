@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\DataLoader;
 
+use BEAR\Resource\Annotation\Link;
 use BEAR\Resource\AppAdapter;
 use BEAR\Resource\Factory;
 use BEAR\Resource\FactoryInterface;
@@ -16,6 +17,7 @@ use BEAR\Resource\Linker;
 use BEAR\Resource\LinkType;
 use BEAR\Resource\Method;
 use BEAR\Resource\Request;
+use BEAR\Resource\ResourceObject;
 use BEAR\Resource\SchemeCollection;
 use BEAR\Resource\UriFactory;
 use FakeVendor\Sandbox\DataLoader\LikeDataLoader;
@@ -23,6 +25,7 @@ use FakeVendor\Sandbox\Resource\App\Batch\Article;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\Injector;
 use Ray\Di\ProviderInterface;
+use ReflectionClass;
 
 class LinkerDataLoaderTest extends TestCase
 {
@@ -200,5 +203,27 @@ class LinkerDataLoaderTest extends TestCase
         $this->assertSame([], $result->body['comment']);
         // DataLoader is called once with empty URI list (handles gracefully)
         $this->assertSame(1, LikeDataLoader::$callCount);
+    }
+
+    public function testNestedCrawlSkipsNonMatchingAnnotationBeforeMatch(): void
+    {
+        $invoker = (new InvokerFactory())();
+        $factory = new Factory(new SchemeCollection(), new UriFactory());
+        $crawler = new LinkCrawler($invoker, $factory);
+        $ro = new class extends ResourceObject {
+            #[Link(rel: 'ignored', href: 'app://self/ignored', crawl: 'ignored-tree')]
+            #[Link(rel: 'matched', href: 'app://self/matched', crawl: 'tree')]
+            public function onGet(): static
+            {
+                return $this;
+            }
+        };
+        $body = ['child' => []];
+        $args = [$ro, 'get', new LinkType('tree', LinkType::CRAWL_LINK), 'child', &$body];
+        $method = (new ReflectionClass($crawler))->getMethod('processNestedCrawl');
+
+        $method->invokeArgs($crawler, $args);
+
+        $this->assertSame(['child' => []], $body);
     }
 }

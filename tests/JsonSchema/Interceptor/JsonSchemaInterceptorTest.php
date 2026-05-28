@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\JsonSchema\Interceptor;
 
+use AssertionError;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Interceptor\JsonSchemaInterceptor;
@@ -115,6 +116,22 @@ class JsonSchemaInterceptorTest extends TestCase
         $invocation = new ReflectiveMethodInvocation($object, 'onGet', [20], [
             $this->cachedRenderedResponse('{"age":20}'),
         ]);
+
+        $this->jsonSchemaIntercetor->invoke($invocation);
+    }
+
+    public function testMissingJsonSchemaAttributeTriggersAssertion(): void
+    {
+        $this->expectException(AssertionError::class);
+        $object = new class extends ResourceObject {
+            public function onGet(): static
+            {
+                return $this;
+            }
+        };
+        /** @var array<MethodInterceptor> $interceptrs */
+        $interceptrs = [$this->jsonSchemaIntercetor];
+        $invocation = new ReflectiveMethodInvocation($object, 'onGet', [], $interceptrs);
 
         $this->jsonSchemaIntercetor->invoke($invocation);
     }

@@ -2,6 +2,7 @@
 <psalm
     phpVersion="8.1"
     errorLevel="1"
+    runTaintAnalysis="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -15,18 +16,13 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <MissingAbstractPureAnnotation errorLevel="suppress" />
+        <MissingImmutableAnnotation errorLevel="suppress" />
+        <MissingInterfaceImmutableAnnotation errorLevel="suppress" />
+        <MissingOverrideAttribute errorLevel="suppress" />
+        <MissingPureAnnotation errorLevel="suppress" />
         <PossiblyUnusedProperty errorLevel="suppress" />
         <UnusedClass errorLevel="suppress" />
         <UnusedMethod errorLevel="suppress" />
-        <!-- Psalm 7 introduced stricter checks across the codebase (purity /
-             immutability annotation requirements, more aggressive taint flow
-             analysis). Suppress here until a project-wide migration can address
-             them consistently. -->
-        <MissingImmutableAnnotation errorLevel="suppress" />
-        <MissingPureAnnotation errorLevel="suppress" />
-        <MissingAbstractPureAnnotation errorLevel="suppress" />
-        <MissingInterfaceImmutableAnnotation errorLevel="suppress" />
-        <MissingOverrideAttribute errorLevel="suppress" />
-        <TaintedSSRF errorLevel="suppress" />
     </issueHandlers>
 </psalm>

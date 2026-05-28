@@ -7,6 +7,7 @@ namespace BEAR\Resource\Module;
 use BEAR\Resource\DevLogger;
 use BEAR\Resource\FakeResource;
 use BEAR\Resource\LoggerInterface;
+use BEAR\Resource\Uri;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -33,5 +34,9 @@ class DevLoggerModuleTest extends TestCase
         assert($logger instanceof LoggerInterface);
         $this->assertInstanceOf(DevLogger::class, $logger);
         $logger(new FakeResource());
+        $ro = new FakeResource();
+        $ro->uri = new Uri('app://self/index');
+        $ro->uri->method = 'post';
+        $logger($ro);
     }
 }

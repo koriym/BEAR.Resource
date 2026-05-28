@@ -269,7 +269,8 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     {
         $parent = (new ReflectionClass($ro))->getParentClass();
 
-        return $parent instanceof ReflectionClass ? (string) $parent->getFileName() : '';
+        /** @var ReflectionClass<object> $parent ResourceObject instances always have a parent class. */
+        return (string) $parent->getFileName();
     }
 
     private function validateFileExists(string $schemaFile): void

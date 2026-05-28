@@ -7,11 +7,13 @@ namespace BEAR\Resource\Renderer;
 use BEAR\Resource\FakeChild;
 use BEAR\Resource\FakeHal;
 use BEAR\Resource\FakeLazyRequest;
+use BEAR\Resource\FakeRo;
 use BEAR\Resource\HalLinker;
 use BEAR\Resource\HalRenderer;
 use BEAR\Resource\InvokerFactory;
 use BEAR\Resource\NullReverseLinker;
 use BEAR\Resource\Request;
+use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Uri;
 use PHPUnit\Framework\TestCase;
 
@@ -125,6 +127,46 @@ EOT;
         $this->assertSame('/foo', $ro->headers['Location']);
     }
 
+    public function testLocationHeaderWithQuery(): void
+    {
+        $ro = $this->ro->onGet();
+        $ro->headers['Location'] = '/foo?id=1';
+        (string) $ro; // @phpstan-ignore-line
+        $this->assertSame('/foo?id=1', $ro->headers['Location']);
+    }
+
+    public function testRenderResourceWithoutMethod(): void
+    {
+        $ro = new class extends ResourceObject {
+        };
+        $ro->uri = new Uri('app://self/no-method');
+        $ro->uri->method = 'post';
+        $ro->body = [];
+        $ro->setRenderer(new HalRenderer(new HalLinker(new NullReverseLinker())));
+
+        $this->assertStringContainsString('"self"', (string) $ro);
+    }
+
+    public function testEmbeddedRequestWithExistingEmbeddedArray(): void
+    {
+        $ro = $this->resourceWithEmbeddedBody([]);
+
+        (string) $ro;
+
+        $this->assertIsArray($ro->body['_embedded']);
+        $this->assertArrayHasKey('two', $ro->body['_embedded']);
+    }
+
+    public function testEmbeddedRequestWithInvalidEmbeddedValue(): void
+    {
+        $ro = $this->resourceWithEmbeddedBody('invalid');
+
+        (string) $ro;
+
+        $this->assertIsArray($ro->body['_embedded']);
+        $this->assertArrayHasKey('two', $ro->body['_embedded']);
+    }
+
     public function testNonArrayBody(): void
     {
         $ro = $this->ro->onGet();
@@ -221,5 +263,24 @@ EOT;
             ['tree' => 3],
             $this->ro->body['_embedded']['different'],
         );
+    }
+
+    private function resourceWithEmbeddedBody(mixed $embedded): ResourceObject
+    {
+        $ro = new class extends ResourceObject {
+            public function onGet(): static
+            {
+                return $this;
+            }
+        };
+        $child = (new FakeRo())(new FakeChild());
+        $ro->uri = new Uri('app://self/embedded');
+        $ro->body = [
+            '_embedded' => $embedded,
+            'two' => new Request((new InvokerFactory())(), $child),
+        ];
+        $ro->setRenderer(new HalRenderer(new HalLinker(new NullReverseLinker())));
+
+        return $ro;
     }
 }
