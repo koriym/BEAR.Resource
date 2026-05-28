@@ -575,6 +575,108 @@ $smarty->assign('user', $user);
 In a non `eager` `request()` not the resource request result but a request object is retrieved.
 When this is assigned to the template engine at the timing of the output of a resource request `{$user}` in the template the `resource request` and `resource rendering` is executed and is displayed as a string.
 
+## JSON Schema validation
+
+The `#[JsonSchema]` attribute validates a resource's request parameters and/or
+response body against a JSON Schema file. Install `JsonSchemaModule` with the
+schema and validation directories:
+
+```php
+$module->install(new JsonSchemaModule(
+    __DIR__ . '/var/json_schema',    // response body schemas
+    __DIR__ . '/var/json_validate',  // request parameter schemas
+));
+```
+
+```php
+class User extends ResourceObject
+{
+    #[JsonSchema(schema: 'user.json', params: 'user.get.json')]
+    public function onGet(int $age, string $gender = 'male'): static
+    {
+        $this->body = ['name' => ['firstName' => 'mucha'], 'age' => $age];
+
+        return $this;
+    }
+}
+```
+
+When validation fails, `JsonSchemaException` is thrown. The exception carries
+the original flat-string message **and** a typed `JsonSchemaErrors` collection
+so handlers can render field-keyed responses without re-running the validator:
+
+```php
+use BEAR\Resource\Exception\JsonSchemaException;
+
+try {
+    $ro->onGet(10); // age < minimum:20
+} catch (JsonSchemaException $e) {
+    $errors = $e->getErrors();          // JsonSchemaErrors (Countable, IteratorAggregate)
+    $errors->hasErrors();               // true
+    count($errors);                     // 1
+    foreach ($errors as $error) {
+        $error->property;               // 'age'
+        $error->pointer;                // '/age'
+        $error->message;                // 'Must have a minimum value of 20'
+        $error->constraint->name;       // 'minimum'
+        $error->constraint->params;     // ['minimum' => 20]
+    }
+    $errors->byProperty();              // ['age' => [JsonSchemaError, ...]]
+}
+```
+
+### Custom error message templates
+
+The template lives in the schema (ajv-errors style `errorMessage`), not the
+PHP code. `JsonSchemaError::render()` interpolates `{key}` placeholders
+against the error's data:
+
+```json
+// user.get.json
+{
+  "type": "object",
+  "properties": {
+    "age": {
+      "type": "integer", "minimum": 20,
+      "errorMessage": { "minimum": "年齢は{minimum}歳以上である必要があります" }
+    }
+  }
+}
+```
+
+```php
+$tpl = $schemaErrorMessages[$error->property][$error->constraint->name];
+$error->render($tpl); // '年齢は20歳以上である必要があります'
+```
+
+Placeholders: `{property}`, `{pointer}`, `{message}`, plus every key in
+`$error->constraint->params`. Unknown placeholders are left in place.
+
+For a single concatenated string, use `$errors->format()`:
+
+```php
+$errors->format();                            // 'minimum is 20\nis required\n'
+$errors->format("<li>{property}: {message}</li>\n");
+// '<li>age: minimum is 20</li>\n<li>name: is required</li>\n'
+```
+
+`$errors->first()` returns the leading `JsonSchemaError` (or `null` when empty),
+which is handy when you only want to render a single error.
+
+When a schema declares a custom message via ajv-errors style `errorMessage`, the
+mapper renders it into `$error->message` automatically and sets
+`$error->isCustomMessage = true`. The validator's own message is preserved in
+`$error->rawMessage` so handlers can fall back to stable text for logs or
+debugging.
+
+### Custom handlers
+
+Bind your own `JsonSchemaExceptionHandlerInterface` /
+`JsonSchemaRequestExceptionHandlerInterface` to format the validation failure
+into a 422 response, structured JSON error body, etc. — the handler receives
+the `JsonSchemaException` directly, so `$e->getErrors()` is the single source
+of truth for the structured failure data.
+
 ## Embedding resources
 
 `@Embed` annotations makes easier to embed external resource to its own. Like `<img src="image_url">` or `<iframe src="content_url">` in HTML, Embedded resource is specified by `src` field.

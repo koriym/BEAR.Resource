@@ -369,6 +369,105 @@ $templateEngine->assign('user', $user);
 テンプレートエンジンにアサインするとテンプレートにリソースリクエスト`{$user}`が現れたタイミングで`リソースリクエスト`と`リソースレンダリング`を行い文字列表現になります。
 リソース表現はAPI用の他にも、テンプレートエンジンを用いてHTMLにする事もできます。
 
+## JSON Schema バリデーション
+
+`#[JsonSchema]` 属性でリソースのリクエストパラメータ・レスポンスボディを JSON Schema で検証できます。
+スキーマディレクトリと検証ディレクトリを指定して `JsonSchemaModule` をインストールします:
+
+```php
+$module->install(new JsonSchemaModule(
+    __DIR__ . '/var/json_schema',    // レスポンスボディ用スキーマ
+    __DIR__ . '/var/json_validate',  // リクエストパラメータ用スキーマ
+));
+```
+
+```php
+class User extends ResourceObject
+{
+    #[JsonSchema(schema: 'user.json', params: 'user.get.json')]
+    public function onGet(int $age, string $gender = 'male'): static
+    {
+        $this->body = ['name' => ['firstName' => 'mucha'], 'age' => $age];
+
+        return $this;
+    }
+}
+```
+
+検証に失敗すると `JsonSchemaException` が投げられます。例外は従来のフラットな
+メッセージ文字列に加えて、型付きの `JsonSchemaErrors` コレクションを保持するため、
+validator を再実行することなくフィールド単位のエラーレスポンスを組み立てられます:
+
+```php
+use BEAR\Resource\Exception\JsonSchemaException;
+
+try {
+    $ro->onGet(10); // age が minimum:20 未満
+} catch (JsonSchemaException $e) {
+    $errors = $e->getErrors();          // JsonSchemaErrors (Countable, IteratorAggregate)
+    $errors->hasErrors();               // true
+    count($errors);                     // 1
+    foreach ($errors as $error) {
+        $error->property;               // 'age'
+        $error->pointer;                // '/age'
+        $error->message;                // 'Must have a minimum value of 20'
+        $error->constraint->name;       // 'minimum'
+        $error->constraint->params;     // ['minimum' => 20]
+    }
+    $errors->byProperty();              // ['age' => [JsonSchemaError, ...]]
+}
+```
+
+### カスタムエラーメッセージテンプレート
+
+テンプレートは PHP ではなく **スキーマ側** に置きます (ajv-errors の `errorMessage`)。
+`JsonSchemaError::render()` は `{key}` プレースホルダーをエラーのデータで補間します:
+
+```json
+// user.get.json
+{
+  "type": "object",
+  "properties": {
+    "age": {
+      "type": "integer", "minimum": 20,
+      "errorMessage": { "minimum": "年齢は{minimum}歳以上である必要があります" }
+    }
+  }
+}
+```
+
+```php
+$tpl = $schemaErrorMessages[$error->property][$error->constraint->name];
+$error->render($tpl); // '年齢は20歳以上である必要があります'
+```
+
+利用可能なプレースホルダー: `{property}` / `{pointer}` / `{message}` と、
+`$error->constraint->params` の全キー。未定義のプレースホルダーはそのまま残ります。
+
+連結された 1 つの文字列が欲しいときは `$errors->format()`:
+
+```php
+$errors->format();                            // 'minimum is 20\nis required\n'
+$errors->format("<li>{property}: {message}</li>\n");
+// '<li>age: minimum is 20</li>\n<li>name: is required</li>\n'
+```
+
+先頭の `JsonSchemaError` だけ欲しい場合は `$errors->first()` (空のときは `null`)。
+
+スキーマが ajv-errors 風の `errorMessage` でカスタムメッセージを持つ場合、
+マッパーがそれをレンダリングして `$error->message` にセットし、
+`$error->isCustomMessage = true` を立てます。validator 本来の英語メッセージは
+`$error->rawMessage` に保持されるので、ログやデバッグ用には rawMessage を
+使えます。
+
+### カスタムハンドラ
+
+独自の `JsonSchemaExceptionHandlerInterface` /
+`JsonSchemaRequestExceptionHandlerInterface` を束縛することで、検証失敗を
+422 レスポンスや構造化 JSON エラーボディに整形できます。ハンドラは
+`JsonSchemaException` を直接受け取るので、`$e->getErrors()` が構造化エラー情報の
+唯一の真実の情報源 (single source of truth) になります。
+
 ## 埋め込みリソース
 
 `@Embed`アノテーションを使って他のリソースを自身のリソースに埋め込む事が出来ます。`HTML`の`<img src="image_url">`や`<iframe src="content_url">`と同じ様に`src`で埋め込むリソースを指定します。

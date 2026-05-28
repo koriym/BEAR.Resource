@@ -9,6 +9,8 @@ use BEAR\Resource\Code;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
+use BEAR\Resource\JsonSchema\JsonSchemaErrorMapper;
+use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
@@ -26,6 +28,7 @@ use stdClass;
 
 use function assert;
 use function file_exists;
+use function file_get_contents;
 use function is_array;
 use function is_dir;
 use function is_object;
@@ -41,6 +44,7 @@ use const JSON_THROW_ON_ERROR;
 /**
  * @psalm-import-type Query from Types
  * @psalm-import-type Body from Types
+ * @psalm-import-type JsonSchemaValidatorErrors from Types
  */
 final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
 {
@@ -183,16 +187,40 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
 
     private function throwJsonSchemaException(Validator $validator, string $schemaFile): JsonSchemaException
     {
-        /** @var array<array<string, string>> $errors */
-        $errors = $validator->getErrors();
+        /** @var JsonSchemaValidatorErrors $rawErrors */
+        $rawErrors = $validator->getErrors();
+        $mapper = new JsonSchemaErrorMapper();
+        $schema = $this->schema($schemaFile);
         $msg = '';
-        foreach ($errors as $error) {
-            $msg .= sprintf('[%s] %s; ', $error['property'], $error['message']);
+        $structured = [];
+        foreach ($rawErrors as $rawError) {
+            $jsonSchemaError = $mapper->toJsonSchemaError($rawError, $schema);
+            $msg .= sprintf('[%s] %s; ', $jsonSchemaError->property, $jsonSchemaError->message);
+            $structured[] = $jsonSchemaError;
         }
 
         $msg .= "by {$schemaFile}";
 
-        return new JsonSchemaException($msg, Code::ERROR);
+        return new JsonSchemaException($msg, Code::ERROR, new JsonSchemaErrors($structured));
+    }
+
+    /**
+     * Load the schema for `errorMessage` lookup. Called only after the file
+     * has been verified to exist and after justinrainbow has already parsed
+     * it successfully, so the happy path is the only realistic one. Any
+     * non-object decode result (boolean schema, unreadable file, malformed
+     * JSON) is treated as "no schema-aware messages available" — the
+     * mapper just falls back to the validator's raw message.
+     */
+    private function schema(string $schemaFile): stdClass|null
+    {
+        // An invalid / unreadable schema collapses to null here by design —
+        // validation itself has already parsed the same file, so this is a
+        // graceful fallback for `errorMessage` lookup, not error-swallowing.
+        /** @psalm-suppress MixedAssignment json_decode() returns mixed by design; narrowed below. */
+        $schema = json_decode((string) file_get_contents($schemaFile));
+
+        return $schema instanceof stdClass ? $schema : null;
     }
 
     private function getSchemaFile(JsonSchema $jsonSchema, ResourceObject $ro): string

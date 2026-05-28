@@ -132,6 +132,19 @@ use ReflectionParameter;
  * @psalm-type DataLoaderRows = list<DataLoaderRow>
  * @psalm-type DataLoaderClass = class-string<DataLoaderInterface>
  *
+ * JSON Schema Types
+ * @psalm-type ConstraintName = 'type'|'required'|'pattern'|'minLength'|'maxLength'
+ *     |'minimum'|'maximum'|'multipleOf'|'enum'|'const'|'format'
+ *     |'minItems'|'maxItems'|'uniqueItems'|'minProperties'|'maxProperties'
+ * @psalm-type JsonSchemaValidatorError = array{
+ *     property?: mixed,
+ *     pointer?: mixed,
+ *     message?: mixed,
+ *     constraint?: mixed,
+ *     ...
+ * }
+ * @psalm-type JsonSchemaValidatorErrors = list<JsonSchemaValidatorError>
+ *
  * @phpcs:enable
  */
 final class Types

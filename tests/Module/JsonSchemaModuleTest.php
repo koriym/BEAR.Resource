@@ -7,9 +7,11 @@ namespace BEAR\Resource\Module;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
 use BEAR\Resource\Interceptor\JsonSchemaInterceptorInterface;
+use BEAR\Resource\JsonSchema\ConstraintViolation;
 use BEAR\Resource\JsonSchema\FakePerson;
 use BEAR\Resource\JsonSchema\FakeUser;
 use BEAR\Resource\JsonSchema\FakeUsers;
+use BEAR\Resource\JsonSchema\JsonSchemaError;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Uri;
 use LogicException;
@@ -20,6 +22,7 @@ use Ray\Di\Injector;
 
 use function assert;
 use function dirname;
+use function iterator_to_array;
 
 class JsonSchemaModuleTest extends TestCase
 {
@@ -58,8 +61,30 @@ class JsonSchemaModuleTest extends TestCase
     #[Depends('testValidateException')]
     public function testBCValidateErrorException(JsonSchemaException $e): void
     {
-        $this->assertStringContainsString('[age]', $e->getMessage());
-        $this->assertStringContainsString('20', $e->getMessage());
+        $message = $e->getMessage();
+        $this->assertStringContainsString('[age]', $message);
+        $this->assertStringContainsString('20', $message);
+        // Pin the full flat-string format: `[property] message; ... by /path/to/schema.json`
+        $this->assertStringContainsString('; ', $message);
+        $this->assertMatchesRegularExpression('#by .+/user\.json$#', $message);
+    }
+
+    #[Depends('testValidateException')]
+    public function testStructuredErrors(JsonSchemaException $e): void
+    {
+        $errors = $e->getErrors();
+        $this->assertTrue($errors->hasErrors());
+
+        $first = iterator_to_array($errors, false)[0];
+        $this->assertInstanceOf(JsonSchemaError::class, $first);
+        $this->assertSame('age', $first->property);
+        $this->assertInstanceOf(ConstraintViolation::class, $first->constraint);
+        $this->assertSame('minimum', $first->constraint->name);
+        // params shape differs across justinrainbow versions (5.x flattens, 6.x nests
+        // under constraint.params) — only assert the array type for cross-version BC.
+        $this->assertIsArray($first->constraint->params);
+        // Property-keyed view for handlers (the core use case from #364).
+        $this->assertArrayHasKey('age', $errors->byProperty());
     }
 
     public function testException(): void
