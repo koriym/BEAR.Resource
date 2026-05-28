@@ -460,7 +460,7 @@ $errors->format("<li>{property}: {message}</li>\n");
 `$error->rawMessage` に保持されるので、ログやデバッグ用には rawMessage を
 使えます。
 
-### リクエスト・レスポンス由来の区別
+### リクエスト/レスポンスの区別
 
 ```php
 try {
