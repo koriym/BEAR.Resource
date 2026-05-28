@@ -460,13 +460,36 @@ $errors->format("<li>{property}: {message}</li>\n");
 `$error->rawMessage` に保持されるので、ログやデバッグ用には rawMessage を
 使えます。
 
+### リクエスト・レスポンス由来の区別
+
+`JsonSchemaException` には 2 つの concrete subclass があり、直接 catch する
+コードはクライアント由来の不正入力とリソース由来の不正出力を判別できます:
+
+- `JsonSchemaRequestException` — リクエストパラメータの検証失敗
+  (`Code::BAD_REQUEST`, 400)
+- `JsonSchemaResponseException` — レスポンスボディの検証失敗
+  (`Code::ERROR`, 500)
+
+```php
+try {
+    $resource->get('app://self/user', ['id' => 'not-an-int']);
+} catch (JsonSchemaRequestException $e) {
+    // クライアント入力ミス → 4xx
+} catch (JsonSchemaResponseException $e) {
+    // リソースがスキーマ違反の出力をした → 5xx + アラート
+}
+```
+
+親 `JsonSchemaException` を catch すると両方マッチします。
+
 ### カスタムハンドラ
 
 独自の `JsonSchemaExceptionHandlerInterface` /
 `JsonSchemaRequestExceptionHandlerInterface` を束縛することで、検証失敗を
-422 レスポンスや構造化 JSON エラーボディに整形できます。ハンドラは
-`JsonSchemaException` を直接受け取るので、`$e->getErrors()` が構造化エラー情報の
-唯一の真実の情報源 (single source of truth) になります。
+422 レスポンスや構造化 JSON エラーボディに整形できます。ハンドラはそれぞれ
+の役割に対応する concrete subclass (`JsonSchemaResponseException` /
+`JsonSchemaRequestException`) を受け取るので、`$e->getErrors()` が構造化エラー
+情報の唯一の真実の情報源 (single source of truth) になります。
 
 ## 埋め込みリソース
 

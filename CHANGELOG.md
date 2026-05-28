@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `JsonSchemaError::$rawMessage` preserves the validator's original message,
   `$isCustomMessage` flags whether `$message` was overridden by the schema's
   ajv-errors-style `errorMessage`
+- `JsonSchemaRequestException` (Code::BAD_REQUEST, 400) and
+  `JsonSchemaResponseException` (Code::ERROR, 500) subclasses of
+  `JsonSchemaException` — request vs response validation failures are now
+  discriminable via `instanceof` at catch sites and carry semantic HTTP
+  status codes (#369)
 - Schema-side `errorMessage` overrides resolve through nested object/array
   schemas via JSON Pointer navigation (was: top-level only)
 

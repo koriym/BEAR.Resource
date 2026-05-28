@@ -669,13 +669,38 @@ mapper renders it into `$error->message` automatically and sets
 `$error->rawMessage` so handlers can fall back to stable text for logs or
 debugging.
 
+### Request vs response source
+
+`JsonSchemaException` has two concrete subclasses so direct-catch code can
+discriminate between client-supplied bad input and a resource producing bad
+output:
+
+- `JsonSchemaRequestException` — request-parameter validation failed
+  (`Code::BAD_REQUEST`, 400)
+- `JsonSchemaResponseException` — response-body validation failed
+  (`Code::ERROR`, 500)
+
+```php
+try {
+    $resource->get('app://self/user', ['id' => 'not-an-int']);
+} catch (JsonSchemaRequestException $e) {
+    // bad client input → 4xx
+} catch (JsonSchemaResponseException $e) {
+    // our resource produced something off-schema → 5xx + alert
+}
+```
+
+Catching the parent `JsonSchemaException` still matches both.
+
 ### Custom handlers
 
 Bind your own `JsonSchemaExceptionHandlerInterface` /
 `JsonSchemaRequestExceptionHandlerInterface` to format the validation failure
-into a 422 response, structured JSON error body, etc. — the handler receives
-the `JsonSchemaException` directly, so `$e->getErrors()` is the single source
-of truth for the structured failure data.
+into a 422 response, structured JSON error body, etc. The handlers receive
+the concrete subclass that matches their role (`JsonSchemaResponseException`
+and `JsonSchemaRequestException`, respectively), so
+`$e->getErrors()` is the single source of truth for the structured failure
+data.
 
 ## Embedding resources
 
