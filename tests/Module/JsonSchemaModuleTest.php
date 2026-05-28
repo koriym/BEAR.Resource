@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace BEAR\Resource\Module;
 
+use BEAR\Resource\Code;
 use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
+use BEAR\Resource\Exception\JsonSchemaRequestException;
+use BEAR\Resource\Exception\JsonSchemaResponseException;
 use BEAR\Resource\Interceptor\JsonSchemaInterceptorInterface;
 use BEAR\Resource\JsonSchema\ConstraintViolation;
 use BEAR\Resource\JsonSchema\FakePerson;
@@ -48,6 +51,32 @@ class JsonSchemaModuleTest extends TestCase
         $this->assertInstanceOf(JsonSchemaException::class, $e);
 
         return $e;
+    }
+
+    #[Depends('testValidateException')]
+    public function testResponseValidationThrowsResponseException(JsonSchemaException $e): void
+    {
+        // Response-body validation failure (resource returned data that doesn't match its schema)
+        // → 500 semantic. Subclass discriminates from request failures via `instanceof`.
+        $this->assertInstanceOf(JsonSchemaResponseException::class, $e);
+        $this->assertSame(Code::ERROR, $e->getCode());
+    }
+
+    public function testRequestValidationThrowsRequestException(): void
+    {
+        $ro = $this->getRo(FakeUser::class);
+        assert($ro instanceof FakeUser);
+        $caught = null;
+        try {
+            $ro->onGet(30, 'invalid gender');
+        } catch (JsonSchemaRequestException $e) {
+            $caught = $e;
+        }
+
+        $this->assertInstanceOf(JsonSchemaRequestException::class, $caught);
+        $this->assertSame(Code::BAD_REQUEST, $caught->getCode());
+        // BC: still catchable as the parent type.
+        $this->assertInstanceOf(JsonSchemaException::class, $caught);
     }
 
     public function testBCValidateException(): JsonSchemaException

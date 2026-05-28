@@ -669,13 +669,27 @@ mapper renders it into `$error->message` automatically and sets
 `$error->rawMessage` so handlers can fall back to stable text for logs or
 debugging.
 
+### Request vs response source
+
+```php
+try {
+    $resource->get('app://self/user', ['id' => 'not-an-int']);
+} catch (JsonSchemaRequestException $e) {   // request validation failed (4xx)
+} catch (JsonSchemaResponseException $e) {  // response validation failed (5xx)
+}
+```
+
+Both extend `JsonSchemaException` — catching the parent still matches both.
+
 ### Custom handlers
 
 Bind your own `JsonSchemaExceptionHandlerInterface` /
 `JsonSchemaRequestExceptionHandlerInterface` to format the validation failure
-into a 422 response, structured JSON error body, etc. — the handler receives
-the `JsonSchemaException` directly, so `$e->getErrors()` is the single source
-of truth for the structured failure data.
+into a 422 response, structured JSON error body, etc. The handlers receive
+the concrete subclass that matches their role (`JsonSchemaResponseException`
+and `JsonSchemaRequestException`, respectively), so
+`$e->getErrors()` is the single source of truth for the structured failure
+data.
 
 ## Embedding resources
 

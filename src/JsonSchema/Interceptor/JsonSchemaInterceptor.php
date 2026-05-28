@@ -6,9 +6,10 @@ namespace BEAR\Resource\Interceptor;
 
 use BEAR\Resource\Annotation\JsonSchema;
 use BEAR\Resource\Code;
-use BEAR\Resource\Exception\JsonSchemaException;
 use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
+use BEAR\Resource\Exception\JsonSchemaRequestException;
+use BEAR\Resource\Exception\JsonSchemaResponseException;
 use BEAR\Resource\JsonSchema\JsonSchemaErrorMapper;
 use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
@@ -98,8 +99,8 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         try {
             $schemaFile = $this->validateDir . '/' . $jsonSchema->params;
             $this->validateFileExists($schemaFile);
-            $this->validate($arguments, $schemaFile);
-        } catch (JsonSchemaException $e) {
+            $this->validateAsRequest($arguments, $schemaFile);
+        } catch (JsonSchemaRequestException $e) {
             $ro = $invocation->getThis();
             assert($ro instanceof ResourceObject);
             /** @psalm-suppress PossiblyUndefinedVariable */
@@ -118,7 +119,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
             if (is_string($this->schemaHost)) {
                 $ro->headers['Link'] = sprintf('<%s%s>; rel="describedby"', $this->schemaHost, $jsonSchema->schema);
             }
-        } catch (JsonSchemaException $e) {
+        } catch (JsonSchemaResponseException $e) {
             $this->handler->handle($ro, $e, $schemaFile);
         }
     }
@@ -130,7 +131,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         $json = json_decode($viewJson, null, 512, JSON_THROW_ON_ERROR);
         /** @var array<stdClass>|stdClass $target */
         $target = is_object($json) ? $this->getTarget($json, $jsonSchema) : $json;
-        $this->validate($target, $schemaFile);
+        $this->validateAsResponse($target, $schemaFile);
     }
 
     private function isCachedRenderedBodyResponse(ResourceObject $ro, JsonSchema $jsonSchema): bool
@@ -157,18 +158,40 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     }
 
     /** @param array<mixed>|stdClass $target */
-    private function validate(array|stdClass $target, string $schemaFile): void
+    private function validateAsRequest(array|stdClass $target, string $schemaFile): void
+    {
+        $validator = $this->validate($target, $schemaFile);
+        if ($validator->isValid()) {
+            return;
+        }
+
+        [$msg, $errors] = $this->buildValidationFailure($validator, $schemaFile);
+
+        throw new JsonSchemaRequestException($msg, Code::BAD_REQUEST, $errors);
+    }
+
+    /** @param array<mixed>|stdClass $target */
+    private function validateAsResponse(array|stdClass $target, string $schemaFile): void
+    {
+        $validator = $this->validate($target, $schemaFile);
+        if ($validator->isValid()) {
+            return;
+        }
+
+        [$msg, $errors] = $this->buildValidationFailure($validator, $schemaFile);
+
+        throw new JsonSchemaResponseException($msg, Code::ERROR, $errors);
+    }
+
+    /** @param array<mixed>|stdClass $target */
+    private function validate(array|stdClass $target, string $schemaFile): Validator
     {
         $validator = new Validator();
         $schema = (object) ['$ref' => 'file://' . $schemaFile];
         $scanArray = is_array($target) ? $target : $this->deepArray($target);
         $validator->validate($scanArray, $schema, Constraint::CHECK_MODE_TYPE_CAST);
-        $isValid = $validator->isValid();
-        if ($isValid) {
-            return;
-        }
 
-        throw $this->throwJsonSchemaException($validator, $schemaFile);
+        return $validator;
     }
 
     /** @return Body */
@@ -185,7 +208,8 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         return $result;
     }
 
-    private function throwJsonSchemaException(Validator $validator, string $schemaFile): JsonSchemaException
+    /** @return array{string, JsonSchemaErrors} */
+    private function buildValidationFailure(Validator $validator, string $schemaFile): array
     {
         /** @var JsonSchemaValidatorErrors $rawErrors */
         $rawErrors = $validator->getErrors();
@@ -201,7 +225,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
 
         $msg .= "by {$schemaFile}";
 
-        return new JsonSchemaException($msg, Code::ERROR, new JsonSchemaErrors($structured));
+        return [$msg, new JsonSchemaErrors($structured)];
     }
 
     /**

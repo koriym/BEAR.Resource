@@ -7,7 +7,7 @@ namespace BEAR\Resource\Exception;
 use BEAR\Resource\JsonSchema\JsonSchemaErrors;
 use LogicException;
 
-final class JsonSchemaException extends LogicException implements ExceptionInterface
+class JsonSchemaException extends LogicException implements ExceptionInterface
 {
     private readonly JsonSchemaErrors $errors;
 
