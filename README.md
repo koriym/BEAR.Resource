@@ -676,17 +676,19 @@ discriminate between client-supplied bad input and a resource producing bad
 output:
 
 - `JsonSchemaRequestException` — request-parameter validation failed
-  (`Code::BAD_REQUEST`, 400)
 - `JsonSchemaResponseException` — response-body validation failed
-  (`Code::ERROR`, 500)
+
+The interceptor throws them with `Code::BAD_REQUEST` and `Code::ERROR`
+respectively — the codes belong to the interceptor's policy, not to the
+exception class.
 
 ```php
 try {
     $resource->get('app://self/user', ['id' => 'not-an-int']);
 } catch (JsonSchemaRequestException $e) {
-    // bad client input → 4xx
+    // bad client input
 } catch (JsonSchemaResponseException $e) {
-    // our resource produced something off-schema → 5xx + alert
+    // our resource produced something off-schema
 }
 ```
 

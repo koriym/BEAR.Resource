@@ -466,17 +466,19 @@ $errors->format("<li>{property}: {message}</li>\n");
 コードはクライアント由来の不正入力とリソース由来の不正出力を判別できます:
 
 - `JsonSchemaRequestException` — リクエストパラメータの検証失敗
-  (`Code::BAD_REQUEST`, 400)
 - `JsonSchemaResponseException` — レスポンスボディの検証失敗
-  (`Code::ERROR`, 500)
+
+interceptor はそれぞれを `Code::BAD_REQUEST` / `Code::ERROR` で throw しますが、
+code はあくまで interceptor 側のポリシーであり、例外クラスが固定するもの
+ではありません。
 
 ```php
 try {
     $resource->get('app://self/user', ['id' => 'not-an-int']);
 } catch (JsonSchemaRequestException $e) {
-    // クライアント入力ミス → 4xx
+    // クライアント入力ミス
 } catch (JsonSchemaResponseException $e) {
-    // リソースがスキーマ違反の出力をした → 5xx + アラート
+    // リソースがスキーマ違反の出力をした
 }
 ```
 
