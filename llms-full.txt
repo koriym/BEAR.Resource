@@ -54,7 +54,7 @@ $user = $resource->get('app://self/user', ['id' => 1]);
 - [NamedParamMetas](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/NamedParamMetas.php): Parameter metadata builder for input, file upload, resource, web context, DI, and query parameters.
 - [Linker](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/Linker.php): Hypermedia link execution for `linkSelf`, `linkNew`, and crawl.
 - [LinkCrawler](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/LinkCrawler.php): Batch crawl/data-loader link traversal.
-- [JsonSchemaModule](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/JsonSchema/Module/JsonSchemaModule.php): JSON Schema validation module.
+- [JsonSchemaModule](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/JsonSchema/Module/JsonSchemaModule.php): JSON Schema validation module. Failures throw `JsonSchemaRequestException` (request input) or `JsonSchemaResponseException` (response body); both extend `JsonSchemaException` whose `getErrors()` returns a structured `JsonSchemaErrors` collection of typed `JsonSchemaError` / `ConstraintViolation` DTOs.
 
 ## Modules
 
@@ -521,6 +521,56 @@ public function __construct(
 
 The `params` schema validates input DTO arguments. Response validation targets the configured response body or key.
 
+#### Validation failures
+
+Validation failures throw subclasses of `BEAR\Resource\Exception\JsonSchemaException` so `catch` arms can discriminate the source:
+
+```php
+try {
+    $resource->get('app://self/user', ['id' => 'not-an-int']);
+} catch (JsonSchemaRequestException $e) {   // request validation failed (4xx)
+} catch (JsonSchemaResponseException $e) {  // response validation failed (5xx)
+}
+```
+
+`JsonSchemaException` is non-final; both subclasses live in `src/JsonSchema/Exception/`. Each constructor's `@param` is narrowed to a code range alias declared in `BEAR\Resource\Types`:
+
+- `JsonSchemaRequestException` → `ClientErrorCode = int<400, 499>`, defaults to `Code::BAD_REQUEST`
+- `JsonSchemaResponseException` → `ServerErrorCode = int<500, 599>`, defaults to `Code::ERROR`
+
+The exception class does not pin a specific HTTP-style code; it just constrains the range. The precise value is the caller's policy.
+
+#### Structured errors
+
+`JsonSchemaException::getErrors()` returns a `BEAR\Resource\JsonSchema\JsonSchemaErrors` collection — `Countable`, `IteratorAggregate`, plus named accessors:
+
+```php
+$errors = $e->getErrors();
+$errors->hasErrors();                            // bool
+$errors->first();                                // ?JsonSchemaError
+$errors->byProperty();                           // array<string, list<JsonSchemaError>>
+$errors->format("[{property}] {message}\n");     // concatenated string
+foreach ($errors as $error) {
+    $error->property;                            // 'age'
+    $error->pointer;                             // '/age'
+    $error->message;                              // schema's errorMessage if any, else validator's raw
+    $error->rawMessage;                          // validator's original (English, stable)
+    $error->isCustomMessage;                     // true when message != rawMessage
+    $error->constraint->name;                    // 'minimum'
+    $error->constraint->params;                  // ['minimum' => 20]
+    $error->render('age must be >= {minimum}');  // '{key}' placeholder interpolation
+}
+```
+
+When a schema declares `errorMessage` (ajv-errors style), the mapper resolves it via JSON Pointer navigation (supports nested objects and arrays) and renders it into `$error->message`. Originals stay on `$error->rawMessage`.
+
+Custom handlers receive the concrete subtype:
+
+- `JsonSchemaRequestExceptionHandlerInterface::handleRequestException(... JsonSchemaException $e ...)` — actually receives `JsonSchemaRequestException`
+- `JsonSchemaExceptionHandlerInterface::handle(... JsonSchemaException $e ...)` — actually receives `JsonSchemaResponseException`
+
+Runtime parameter types stay on the parent for BC; the PHPDoc `@param` is narrowed to the concrete subtype.
+
 ### OPTIONS Support
 
 OPTIONS method support is provided by `OptionsMethodModule`, `OptionsMethodHeaderModule`, `OptionsMethods`, `OptionsMethodRequest`, and `OptionsRenderer`.
@@ -643,6 +693,8 @@ These notes prevent common stale assumptions:
 - The current source tree has no `src/SemanticLog` directory.
 - The current source tree has no `JsonModule` class.
 - The `JsonSchema` attribute namespace is `BEAR\Resource\Annotation\JsonSchema`.
+- `JsonSchemaException` is non-final; `JsonSchemaRequestException` and `JsonSchemaResponseException` extend it.
+- `JsonSchemaException::getErrors()` returns a `JsonSchemaErrors` collection, not an array.
 - `ResourceInterface` defaults to `Resource` in 1.x, not `ResourceClient`.
 - Resource methods should return `static`, not `ResourceObject`.
 - Doctrine annotations have been removed from the current code path; PHP 8 attributes are the current API.

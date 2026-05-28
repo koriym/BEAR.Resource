@@ -54,7 +54,7 @@ $user = $resource->get('app://self/user', ['id' => 1]);
 - [NamedParamMetas](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/NamedParamMetas.php): Parameter metadata builder for input, file upload, resource, web context, DI, and query parameters.
 - [Linker](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/Linker.php): Hypermedia link execution for `linkSelf`, `linkNew`, and crawl.
 - [LinkCrawler](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/LinkCrawler.php): Batch crawl/data-loader link traversal.
-- [JsonSchemaModule](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/JsonSchema/Module/JsonSchemaModule.php): JSON Schema validation module.
+- [JsonSchemaModule](https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/JsonSchema/Module/JsonSchemaModule.php): JSON Schema validation module. Failures throw `JsonSchemaRequestException` (request input) or `JsonSchemaResponseException` (response body); both extend `JsonSchemaException` whose `getErrors()` returns a structured `JsonSchemaErrors` collection of typed `JsonSchemaError` / `ConstraintViolation` DTOs.
 
 ## Modules
 
