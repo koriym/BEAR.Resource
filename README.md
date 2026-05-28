@@ -674,8 +674,8 @@ debugging.
 ```php
 try {
     $resource->get('app://self/user', ['id' => 'not-an-int']);
-} catch (JsonSchemaRequestException $e) {   // request validation failed; @param int<400, 499>
-} catch (JsonSchemaResponseException $e) {  // response validation failed; @param int<500, 599>
+} catch (JsonSchemaRequestException $e) {   // request validation failed (4xx)
+} catch (JsonSchemaResponseException $e) {  // response validation failed (5xx)
 }
 ```
 

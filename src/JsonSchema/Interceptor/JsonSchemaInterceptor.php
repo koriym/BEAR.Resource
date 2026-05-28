@@ -160,7 +160,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     /** @param array<mixed>|stdClass $target */
     private function validateAsRequest(array|stdClass $target, string $schemaFile): void
     {
-        $validator = $this->runValidator($target, $schemaFile);
+        $validator = $this->validate($target, $schemaFile);
         if ($validator->isValid()) {
             return;
         }
@@ -173,7 +173,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     /** @param array<mixed>|stdClass $target */
     private function validateAsResponse(array|stdClass $target, string $schemaFile): void
     {
-        $validator = $this->runValidator($target, $schemaFile);
+        $validator = $this->validate($target, $schemaFile);
         if ($validator->isValid()) {
             return;
         }
@@ -184,7 +184,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     }
 
     /** @param array<mixed>|stdClass $target */
-    private function runValidator(array|stdClass $target, string $schemaFile): Validator
+    private function validate(array|stdClass $target, string $schemaFile): Validator
     {
         $validator = new Validator();
         $schema = (object) ['$ref' => 'file://' . $schemaFile];

@@ -465,8 +465,8 @@ $errors->format("<li>{property}: {message}</li>\n");
 ```php
 try {
     $resource->get('app://self/user', ['id' => 'not-an-int']);
-} catch (JsonSchemaRequestException $e) {   // リクエスト検証失敗; @param int<400, 499>
-} catch (JsonSchemaResponseException $e) {  // レスポンス検証失敗; @param int<500, 599>
+} catch (JsonSchemaRequestException $e) {   // リクエスト検証失敗 (4xx)
+} catch (JsonSchemaResponseException $e) {  // レスポンス検証失敗 (5xx)
 }
 ```
 
