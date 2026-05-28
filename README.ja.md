@@ -465,12 +465,16 @@ $errors->format("<li>{property}: {message}</li>\n");
 `JsonSchemaException` には 2 つの concrete subclass があり、直接 catch する
 コードはクライアント由来の不正入力とリソース由来の不正出力を判別できます:
 
-- `JsonSchemaRequestException` — リクエストパラメータの検証失敗
-- `JsonSchemaResponseException` — レスポンスボディの検証失敗
+- `JsonSchemaRequestException` — リクエストパラメータの検証失敗。
+  コンストラクタの `@param` は `ClientErrorCode = int<400, 499>` に narrow
+  されているので、4xx 系の任意の code を渡せます。
+- `JsonSchemaResponseException` — レスポンスボディの検証失敗。
+  コンストラクタの `@param` は `ServerErrorCode = int<500, 599>` に narrow
+  されているので、5xx 系の任意の code を渡せます。
 
-interceptor はそれぞれを `Code::BAD_REQUEST` / `Code::ERROR` で throw しますが、
-code はあくまで interceptor 側のポリシーであり、例外クラスが固定するもの
-ではありません。
+interceptor はデフォルトとして `Code::BAD_REQUEST` / `Code::ERROR` を渡します。
+例外クラスが固定値を強制するわけではなく、code は caller の判断に委ねつつ
+レンジだけは型システムで保証する形です。
 
 ```php
 try {

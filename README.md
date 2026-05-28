@@ -675,12 +675,17 @@ debugging.
 discriminate between client-supplied bad input and a resource producing bad
 output:
 
-- `JsonSchemaRequestException` — request-parameter validation failed
-- `JsonSchemaResponseException` — response-body validation failed
+- `JsonSchemaRequestException` — request-parameter validation failed.
+  Constructor `@param` is narrowed to `ClientErrorCode = int<400, 499>`,
+  so any 4xx is acceptable.
+- `JsonSchemaResponseException` — response-body validation failed.
+  Constructor `@param` is narrowed to `ServerErrorCode = int<500, 599>`,
+  so any 5xx is acceptable.
 
-The interceptor throws them with `Code::BAD_REQUEST` and `Code::ERROR`
-respectively — the codes belong to the interceptor's policy, not to the
-exception class.
+The interceptor throws them with `Code::BAD_REQUEST` / `Code::ERROR` as
+sensible defaults. The exception class doesn't pin a specific code —
+the precise value is the caller's policy, statically constrained to
+the right range.
 
 ```php
 try {

@@ -24,9 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ajv-errors-style `errorMessage`
 - `JsonSchemaRequestException` and `JsonSchemaResponseException` subclasses of
   `JsonSchemaException` — request vs response validation failures are now
-  discriminable via `instanceof` at catch sites. The interceptor throws them
-  with `Code::BAD_REQUEST` and `Code::ERROR` respectively; the codes are an
-  interceptor policy, not fixed by the exception class (#369)
+  discriminable via `instanceof` at catch sites. Constructor `@param` is
+  narrowed to `ClientErrorCode = int<400, 499>` and `ServerErrorCode = int<500,
+  599>` respectively (declared in `BEAR\Resource\Types`), so callers are
+  statically constrained to a code in the right range. The interceptor uses
+  `Code::BAD_REQUEST` / `Code::ERROR` as sensible defaults (#369)
 - Schema-side `errorMessage` overrides resolve through nested object/array
   schemas via JSON Pointer navigation (was: top-level only)
 

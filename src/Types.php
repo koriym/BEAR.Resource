@@ -145,6 +145,10 @@ use ReflectionParameter;
  * }
  * @psalm-type JsonSchemaValidatorErrors = list<JsonSchemaValidatorError>
  *
+ * Resource Code Ranges
+ * @psalm-type ClientErrorCode = int<400, 499>
+ * @psalm-type ServerErrorCode = int<500, 599>
+ *
  * @phpcs:enable
  */
 final class Types
