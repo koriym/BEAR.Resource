@@ -671,33 +671,15 @@ debugging.
 
 ### Request vs response source
 
-`JsonSchemaException` has two concrete subclasses so direct-catch code can
-discriminate between client-supplied bad input and a resource producing bad
-output:
-
-- `JsonSchemaRequestException` — request-parameter validation failed.
-  Constructor `@param` is narrowed to `ClientErrorCode = int<400, 499>`,
-  so any 4xx is acceptable.
-- `JsonSchemaResponseException` — response-body validation failed.
-  Constructor `@param` is narrowed to `ServerErrorCode = int<500, 599>`,
-  so any 5xx is acceptable.
-
-The interceptor throws them with `Code::BAD_REQUEST` / `Code::ERROR` as
-sensible defaults. The exception class doesn't pin a specific code —
-the precise value is the caller's policy, statically constrained to
-the right range.
-
 ```php
 try {
     $resource->get('app://self/user', ['id' => 'not-an-int']);
-} catch (JsonSchemaRequestException $e) {
-    // bad client input
-} catch (JsonSchemaResponseException $e) {
-    // our resource produced something off-schema
+} catch (JsonSchemaRequestException $e) {   // request validation failed; @param int<400, 499>
+} catch (JsonSchemaResponseException $e) {  // response validation failed; @param int<500, 599>
 }
 ```
 
-Catching the parent `JsonSchemaException` still matches both.
+Both extend `JsonSchemaException` — catching the parent still matches both.
 
 ### Custom handlers
 

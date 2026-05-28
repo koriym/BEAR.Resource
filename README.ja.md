@@ -462,31 +462,15 @@ $errors->format("<li>{property}: {message}</li>\n");
 
 ### リクエスト・レスポンス由来の区別
 
-`JsonSchemaException` には 2 つの concrete subclass があり、直接 catch する
-コードはクライアント由来の不正入力とリソース由来の不正出力を判別できます:
-
-- `JsonSchemaRequestException` — リクエストパラメータの検証失敗。
-  コンストラクタの `@param` は `ClientErrorCode = int<400, 499>` に narrow
-  されているので、4xx 系の任意の code を渡せます。
-- `JsonSchemaResponseException` — レスポンスボディの検証失敗。
-  コンストラクタの `@param` は `ServerErrorCode = int<500, 599>` に narrow
-  されているので、5xx 系の任意の code を渡せます。
-
-interceptor はデフォルトとして `Code::BAD_REQUEST` / `Code::ERROR` を渡します。
-例外クラスが固定値を強制するわけではなく、code は caller の判断に委ねつつ
-レンジだけは型システムで保証する形です。
-
 ```php
 try {
     $resource->get('app://self/user', ['id' => 'not-an-int']);
-} catch (JsonSchemaRequestException $e) {
-    // クライアント入力ミス
-} catch (JsonSchemaResponseException $e) {
-    // リソースがスキーマ違反の出力をした
+} catch (JsonSchemaRequestException $e) {   // リクエスト検証失敗; @param int<400, 499>
+} catch (JsonSchemaResponseException $e) {  // レスポンス検証失敗; @param int<500, 599>
 }
 ```
 
-親 `JsonSchemaException` を catch すると両方マッチします。
+どちらも `JsonSchemaException` のサブクラス — 親を catch すれば両方マッチ。
 
 ### カスタムハンドラ
 
