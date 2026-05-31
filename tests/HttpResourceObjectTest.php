@@ -10,9 +10,12 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\AbstractModule;
 use Ray\Di\Injector;
+use RuntimeException;
 
 use function assert;
 use function is_array;
+
+use const PHP_OS_FAMILY;
 
 class HttpResourceObjectTest extends TestCase
 {
@@ -25,6 +28,17 @@ class HttpResourceObjectTest extends TestCase
     {
         self::$server = new BuiltinServer(self::HOST, __DIR__ . '/Server/index.php');
         self::$server->start();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        try {
+            self::$server->stop();
+        } catch (RuntimeException $e) {
+            if (PHP_OS_FAMILY !== 'Windows') {
+                throw $e;
+            }
+        }
     }
 
     protected function setUp(): void
@@ -95,7 +109,6 @@ class HttpResourceObjectTest extends TestCase
         $this->assertFalse($isSet);
     }
 
-    /** @notest */
     public function testHtmlResponse(): void
     {
         $module = new ResourceModule('FakeVendor\Sandbox');
@@ -108,8 +121,6 @@ class HttpResourceObjectTest extends TestCase
         $injector = new Injector($module, __DIR__ . '/tmp');
 
         $this->resource = $injector->getInstance(ResourceInterface::class);
-        self::$server = new BuiltinServer(self::HOST, __DIR__ . '/Server/index.php?media=html');
-        self::$server->start();
         $response = $this->resource->get(self::URL);
         $this->assertSame(200, $response->code);
         $this->assertSame('<html></html>', (string) $response->view);

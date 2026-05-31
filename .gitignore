@@ -7,9 +7,10 @@
 /composer.lock
 /.phpcs-cache
 /coverage.xml
+/coverage-pcov.xml
+/gh-pages/
 /tests/log/error.log
 /tests-php8/*
 /.phpunit.cache
 /CLAUDE.md
 /memo.txt
-

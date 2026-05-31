@@ -1,4 +1,7 @@
 {
+    "name": "bear/resource-require-checker",
+    "description": "Composer require checker tools for BEAR.Resource",
+    "license": "MIT",
     "require-dev": {
         "maglnet/composer-require-checker": "^4.7"
     },
