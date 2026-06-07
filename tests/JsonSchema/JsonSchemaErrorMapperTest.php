@@ -88,6 +88,20 @@ JSON));
         $this->assertSame('The property name is required', $error->rawMessage);
     }
 
+    public function testRequiredConstraintWithEmptyMissingPropertyFallsBackToRowProperty(): void
+    {
+        $row = [
+            'property' => 'fallback',
+            'pointer' => '',
+            'message' => 'The property is required',
+            'constraint' => ['name' => 'required', 'params' => ['property' => '']],
+        ];
+
+        $error = (new JsonSchemaErrorMapper())->toJsonSchemaError($row);
+
+        $this->assertSame('fallback', $error->property);
+    }
+
     public function testMapsJustinrainbow5xStringConstraintShape(): void
     {
         // In justinrainbow 5.x, `constraint` is a string and per-keyword params

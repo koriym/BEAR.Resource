@@ -101,14 +101,15 @@ class JsonSchemaErrorTest extends TestCase
                 'expected' => 'integer',
                 'count' => 3,
                 'enabled' => true,
+                'disabled' => false,
                 'missing' => null,
                 'allowed' => ['a', 'b'],
             ]),
         );
 
         $this->assertSame(
-            'integer 3 true null ["a","b"]',
-            $error->render('{expected} {count} {enabled} {missing} {allowed}'),
+            'integer 3 true false null ["a","b"]',
+            $error->render('{expected} {count} {enabled} {disabled} {missing} {allowed}'),
         );
     }
 }

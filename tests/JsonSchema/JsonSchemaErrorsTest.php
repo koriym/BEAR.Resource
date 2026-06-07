@@ -44,6 +44,13 @@ class JsonSchemaErrorsTest extends TestCase
         $this->assertSame([$a, $b], iterator_to_array($errors));
     }
 
+    public function testGetIteratorCanBeConsumedDirectly(): void
+    {
+        $error = new JsonSchemaError('name', '/name', 'is required', new ConstraintViolation('required', []));
+
+        $this->assertSame([$error], iterator_to_array((new JsonSchemaErrors([$error]))->getIterator()));
+    }
+
     public function testByPropertyGroupsErrors(): void
     {
         $first = new JsonSchemaError('age', '/age', 'minimum is 20', new ConstraintViolation('minimum', []));
