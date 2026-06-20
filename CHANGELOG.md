@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-06-21
+
 ### Added
 - `HttpRequestException` for HTTP transport and response parsing failures
 - `JsonSchemaException::getErrors()` returning typed `JsonSchemaError` /
@@ -19,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Remove invalid Psalm taint-source annotation from `AbstractRequest::__invoke()`
+
+## [1.32.0] - 2026-05-12
+
+### Fixed
+- Skip body schema validation for cached rendered responses (#359)
+- Allow `HalRenderer` embed evaluation to handle `mixed` return from `jsonSerialize()` (#360)
 
 ## [1.31.2] - 2026-05-02
 

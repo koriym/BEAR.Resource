@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BEAR\Resource;
 
-use BEAR\Dev\Http\BuiltinServer;
 use BEAR\Resource\Module\ResourceModule;
+use Koriym\PhpServer\PhpServer;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Ray\Di\AbstractModule;
@@ -21,12 +21,12 @@ class HttpResourceObjectTest extends TestCase
 {
     private const HOST = '127.0.0.1:8099';
     private const URL = 'http://127.0.0.1:8099/';
-    private static BuiltinServer $server;
+    private static PhpServer $server;
     private ResourceInterface $resource;
 
     public static function setUpBeforeClass(): void
     {
-        self::$server = new BuiltinServer(self::HOST, __DIR__ . '/Server/index.php');
+        self::$server = new PhpServer(self::HOST, __DIR__ . '/Server/index.php');
         self::$server->start();
     }
 
