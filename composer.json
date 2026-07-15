@@ -30,7 +30,6 @@
         "phpunit/phpunit": "^11.0",
         "bear/devtools": "^1.0",
         "koriym/json-schema-faker": "^0.3.1",
-        "koriym/php-server": "^1.0.1",
         "ray/compiler": "^1.12",
         "koriym/php-server": "^1.0",
         "webmozart/assert": "^2.0",
