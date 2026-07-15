@@ -26,6 +26,10 @@ use ReflectionMethod;
 use function assert;
 use function dirname;
 use function file_put_contents;
+use function is_string;
+use function sys_get_temp_dir;
+use function tempnam;
+use function unlink;
 
 class JsonSchemaInterceptorTest extends TestCase
 {
@@ -140,12 +144,17 @@ class JsonSchemaInterceptorTest extends TestCase
 
     public function testNonObjectSchemaDecodeReturnsNull(): void
     {
-        $schemaFile = __DIR__ . '/../../tmp/non-object-schema.json';
+        $schemaFile = tempnam(sys_get_temp_dir(), 'non-object-schema-');
+        assert(is_string($schemaFile));
         file_put_contents($schemaFile, 'true');
 
-        $method = new ReflectionMethod(JsonSchemaInterceptor::class, 'schema');
+        try {
+            $method = new ReflectionMethod(JsonSchemaInterceptor::class, 'schema');
 
-        $this->assertNull($method->invoke($this->jsonSchemaIntercetor, $schemaFile));
+            $this->assertNull($method->invoke($this->jsonSchemaIntercetor, $schemaFile));
+        } finally {
+            unlink($schemaFile);
+        }
     }
 
     public function testInputDtoParameterIsFlattenedForRequestValidation(): void
