@@ -130,7 +130,7 @@ final readonly class EmbedInterceptor implements EmbedInterceptorInterface
         $result = $request();
         if (! is_array($result->body)) {
             throw new EmbedException(sprintf(
-                '"_self" embed of %s returned no body. #[CacheableResponse]/#[DonutCache] restore only the view on a cache hit, not the body; a resource embedded as "_self" must use #[Cacheable] (value cache).',
+                '"_self" embed of %s returned no body.',
                 (string) $result->uri,
             ));
         }

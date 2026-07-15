@@ -53,8 +53,6 @@ class EmbedInterceptorTest extends TestCase
             $this->resource->uri('app://self/bird/self-link-null-body')(['id' => 1]);
             $this->fail('EmbedException was not thrown');
         } catch (EmbedException $e) {
-            // The domain EmbedException is wrapped as it propagates; its diagnostic
-            // message is preserved in the exception chain.
             $messages = [];
             $current = $e;
             while ($current !== null) {
@@ -63,9 +61,7 @@ class EmbedInterceptorTest extends TestCase
             }
 
             $this->assertStringContainsString(
-                '"_self" embed of app://self/bird/null-body-child?id=1 returned no body. '
-                . '#[CacheableResponse]/#[DonutCache] restore only the view on a cache hit, '
-                . 'not the body; a resource embedded as "_self" must use #[Cacheable] (value cache).',
+                '"_self" embed of app://self/bird/null-body-child?id=1 returned no body.',
                 implode("\n", $messages),
             );
         }
