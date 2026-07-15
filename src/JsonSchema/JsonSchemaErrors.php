@@ -41,7 +41,9 @@ final readonly class JsonSchemaErrors implements Countable, IteratorAggregate
     /** @return Generator<int, JsonSchemaError> */
     public function getIterator(): Generator
     {
-        yield from $this->errors;
+        return (function (): Generator {
+            yield from $this->errors;
+        })();
     }
 
     /** First error if any, null on an empty collection. */

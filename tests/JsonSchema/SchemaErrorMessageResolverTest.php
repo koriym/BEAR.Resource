@@ -74,6 +74,13 @@ class SchemaErrorMessageResolverTest extends TestCase
         $this->assertSame('Name required', $this->resolver->resolve($schema, $error));
     }
 
+    public function testRequiredMessagePerPropertyIgnoresNonStringMessage(): void
+    {
+        $error = $this->error('', 'required', 'name');
+        $schema = $this->schema('{"errorMessage": {"required": {"name": 42}}, "properties": {"name": {}}}');
+        $this->assertNull($this->resolver->resolve($schema, $error));
+    }
+
     public function testRequiredMessageMissingPropertyKey(): void
     {
         $error = $this->error('', 'required', 'email');
@@ -133,11 +140,25 @@ JSON);
         $this->assertSame('second must be >= {minimum}', $this->resolver->resolve($schema, $error));
     }
 
+    public function testTupleItemsArrayIgnoresNonSchemaEntry(): void
+    {
+        $error = $this->error('/pair/0', 'minimum', 'pair[0]');
+        $schema = $this->schema('{"properties": {"pair": {"type": "array", "items": [false]}}}');
+        $this->assertNull($this->resolver->resolve($schema, $error));
+    }
+
     public function testNumericSegmentWithoutItems(): void
     {
         $error = $this->error('/age/0', 'minimum', 'age[0]');
         // age is an integer, not an array — no `items` to descend into.
         $schema = $this->schema('{"properties": {"age": {"type": "integer"}}}');
+        $this->assertNull($this->resolver->resolve($schema, $error));
+    }
+
+    public function testObjectPropertyThatIsNotSchemaCannotBeResolved(): void
+    {
+        $error = $this->error('/age', 'minimum', 'age');
+        $schema = $this->schema('{"properties": {"age": false}}');
         $this->assertNull($this->resolver->resolve($schema, $error));
     }
 
