@@ -17,6 +17,7 @@ use function array_shift;
 use function assert;
 use function is_array;
 use function is_string;
+use function sprintf;
 use function uri_template;
 
 /** @psalm-import-type Query from Types */
@@ -127,7 +128,13 @@ final readonly class EmbedInterceptor implements EmbedInterceptorInterface
     public function linkSelf(Request $request, ResourceObject $ro): void
     {
         $result = $request();
-        assert(is_array($result->body));
+        if (! is_array($result->body)) {
+            throw new EmbedException(sprintf(
+                '"_self" embed of %s returned no body.',
+                (string) $result->uri,
+            ));
+        }
+
         /** @var mixed $value */
         foreach ($result->body as $key => $value) {
             assert(is_string($key));
