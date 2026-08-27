@@ -6,6 +6,7 @@ namespace BEAR\Resource\Renderer;
 
 use BEAR\Resource\FakeChild;
 use BEAR\Resource\FakeHal;
+use BEAR\Resource\FakeHalLinkAttr;
 use BEAR\Resource\FakeLazyRequest;
 use BEAR\Resource\FakeRo;
 use BEAR\Resource\HalLinker;
@@ -16,6 +17,10 @@ use BEAR\Resource\Request;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Uri;
 use PHPUnit\Framework\TestCase;
+
+use function json_decode;
+
+use const JSON_THROW_ON_ERROR;
 
 class HalRendererTest extends TestCase
 {
@@ -282,5 +287,38 @@ EOT;
         $ro->setRenderer(new HalRenderer(new HalLinker(new NullReverseLinker())));
 
         return $ro;
+    }
+
+    /** @return array<string, array<string, string>> */
+    private function renderLinkAttrLinks(): array
+    {
+        $ro = new FakeHalLinkAttr();
+        $ro->uri = new Uri('app://self/dummy');
+        $ro->setRenderer(new HalRenderer(new HalLinker(new NullReverseLinker())));
+        /** @var array{_links: array<string, array<string, string>>} $hal */
+        $hal = json_decode((string) $ro->onGet(), true, 512, JSON_THROW_ON_ERROR);
+
+        return $hal['_links'];
+    }
+
+    public function testLinkAnnotationTitle(): void
+    {
+        $links = $this->renderLinkAttrLinks();
+
+        $this->assertSame('Edit this', $links['edit']['title']);
+    }
+
+    public function testLinkAnnotationMethod(): void
+    {
+        $links = $this->renderLinkAttrLinks();
+
+        $this->assertSame('put', $links['edit']['method']);
+    }
+
+    public function testLinkAnnotationDefaultMethodNotRendered(): void
+    {
+        $links = $this->renderLinkAttrLinks();
+
+        $this->assertSame(['href' => '/profile'], $links['profile']);
     }
 }

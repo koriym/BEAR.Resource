@@ -66,10 +66,25 @@ final readonly class HalLinker
                 continue;
             }
 
-            $hal->addLink($annotation->rel, $reverseUri);
+            $hal->addLink($annotation->rel, $reverseUri, $this->linkAttributes($annotation));
         }
 
         return $hal;
+    }
+
+    /** @return array{method?: non-empty-string, title?: non-empty-string} */
+    private function linkAttributes(Link $annotation): array
+    {
+        $attr = [];
+        if ($annotation->method !== '' && $annotation->method !== Link::DEFAULT_METHOD) {
+            $attr['method'] = $annotation->method;
+        }
+
+        if ($annotation->title !== '') {
+            $attr['title'] = $annotation->title;
+        }
+
+        return $attr;
     }
 
     /**
