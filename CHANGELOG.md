@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.0] - 2026-08-29
+
 ### Fixed
 - `#[Link]` now renders `title` and non-default `method` in HAL links
 
