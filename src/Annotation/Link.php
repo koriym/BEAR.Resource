@@ -12,6 +12,8 @@ use Override;
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final class Link implements JsonSerializable
 {
+    public const DEFAULT_METHOD = 'get';
+
     /**
      * Relation to the target resource of the link
      *
@@ -78,7 +80,7 @@ final class Link implements JsonSerializable
         array $values = [],
         string $rel = '',
         string $href = '',
-        string $method = 'get',
+        string $method = self::DEFAULT_METHOD,
         string $title = '',
         string $crawl = '',
         string|null $dataLoader = null,
