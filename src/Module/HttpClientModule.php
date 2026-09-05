@@ -7,6 +7,7 @@ namespace BEAR\Resource\Module;
 use BEAR\Resource\HttpRequestCurl;
 use BEAR\Resource\HttpRequestHeaders;
 use BEAR\Resource\HttpRequestInterface;
+use BEAR\Resource\HttpResourceObject;
 use Override;
 use Ray\Di\AbstractModule;
 
@@ -23,5 +24,6 @@ final class HttpClientModule extends AbstractModule
     {
         $this->bind(HttpRequestInterface::class)->to(HttpRequestCurl::class);
         $this->bind(HttpRequestHeaders::class);
+        $this->bind(HttpResourceObject::class);
     }
 }
