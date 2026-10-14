@@ -15,6 +15,9 @@
             <directory name="tests" />
         </ignoreFiles>
     </projectFiles>
+    <stubs>
+        <file name="stubs/corvus_json_schema.php"/>
+    </stubs>
     <issueHandlers>
         <MissingAbstractPureAnnotation errorLevel="suppress" />
         <MissingImmutableAnnotation errorLevel="suppress" />

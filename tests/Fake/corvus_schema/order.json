@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": ["id", "price"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "errorMessage": {"minimum": "Id must be at least {minimum}."}
+    },
+    "price": {"$ref": "common.json#/definitions/money"},
+    "note": {
+      "type": "string",
+      "maxLength": 5,
+      "errorMessage": {"maxLength": "Note must be at most {maxLength} characters."}
+    },
+    "rank": {"type": "number", "minimum": 1, "exclusiveMinimum": true},
+    "tags": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "contact": {"anyOf": [{"type": "string", "format": "email"}, {"type": "integer"}]},
+    "meta": {"type": "object"}
+  }
+}

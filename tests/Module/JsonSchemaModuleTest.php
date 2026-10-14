@@ -14,7 +14,9 @@ use BEAR\Resource\JsonSchema\ConstraintViolation;
 use BEAR\Resource\JsonSchema\FakePerson;
 use BEAR\Resource\JsonSchema\FakeUser;
 use BEAR\Resource\JsonSchema\FakeUsers;
+use BEAR\Resource\JsonSchema\JsonSchemaEngineInterface;
 use BEAR\Resource\JsonSchema\JsonSchemaError;
+use BEAR\Resource\JsonSchema\JustinrainbowEngine;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Uri;
 use LogicException;
@@ -204,7 +206,13 @@ class JsonSchemaModuleTest extends TestCase
         $jsonSchema = dirname(__DIR__) . '/Fake/json_schema';
         $jsonValidate = dirname(__DIR__) . '/Fake/json_validate';
 
-        return new JsonSchemaModule($jsonSchema, $jsonValidate);
+        return new JsonSchemaModule($jsonSchema, $jsonValidate, null, $this->engine());
+    }
+
+    /** @return class-string<JsonSchemaEngineInterface> */
+    protected function engine(): string
+    {
+        return JustinrainbowEngine::class;
     }
 
     public function testNullJsonSchemaModule(): void

@@ -10,14 +10,14 @@ use BEAR\Resource\Exception\JsonSchemaKeytNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaNotFoundException;
 use BEAR\Resource\Exception\JsonSchemaRequestException;
 use BEAR\Resource\Exception\JsonSchemaResponseException;
+use BEAR\Resource\JsonSchema\JsonSchemaEngineInterface;
 use BEAR\Resource\JsonSchema\JsonSchemaErrorMapper;
 use BEAR\Resource\JsonSchema\JsonSchemaErrors;
+use BEAR\Resource\JsonSchema\JustinrainbowEngine;
 use BEAR\Resource\JsonSchemaExceptionHandlerInterface;
 use BEAR\Resource\JsonSchemaRequestExceptionHandlerInterface;
 use BEAR\Resource\ResourceObject;
 use BEAR\Resource\Types;
-use JsonSchema\Constraints\Constraint;
-use JsonSchema\Validator;
 use Override;
 use Ray\Aop\MethodInvocation;
 use Ray\Di\Di\Named;
@@ -30,7 +30,6 @@ use stdClass;
 use function assert;
 use function file_exists;
 use function file_get_contents;
-use function is_array;
 use function is_dir;
 use function is_object;
 use function is_string;
@@ -44,7 +43,6 @@ use const JSON_THROW_ON_ERROR;
 
 /**
  * @psalm-import-type Query from Types
- * @psalm-import-type Body from Types
  * @psalm-import-type JsonSchemaValidatorErrors from Types
  */
 final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInterface
@@ -60,6 +58,7 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         private JsonSchemaRequestExceptionHandlerInterface $requestHandler,
         #[Named('json_schema_host')]
         private string|null $schemaHost = null,
+        private JsonSchemaEngineInterface $engine = new JustinrainbowEngine(),
     ) {
     }
 
@@ -157,15 +156,15 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
         return $json->{$jsonSchema->key};
     }
 
-    /** @param array<mixed>|stdClass $target */
-    private function validateAsRequest(array|stdClass $target, string $schemaFile): void
+    /** @param Query $arguments */
+    private function validateAsRequest(array $arguments, string $schemaFile): void
     {
-        $validator = $this->validate($target, $schemaFile);
-        if ($validator->isValid()) {
+        $rawErrors = $this->engine->validateRequest($arguments, $schemaFile);
+        if ($rawErrors === []) {
             return;
         }
 
-        [$msg, $errors] = $this->buildValidationFailure($validator, $schemaFile);
+        [$msg, $errors] = $this->buildValidationFailure($rawErrors, $schemaFile);
 
         throw new JsonSchemaRequestException($msg, Code::BAD_REQUEST, $errors);
     }
@@ -173,46 +172,23 @@ final readonly class JsonSchemaInterceptor implements JsonSchemaInterceptorInter
     /** @param array<mixed>|stdClass $target */
     private function validateAsResponse(array|stdClass $target, string $schemaFile): void
     {
-        $validator = $this->validate($target, $schemaFile);
-        if ($validator->isValid()) {
+        $rawErrors = $this->engine->validateResponse($target, $schemaFile);
+        if ($rawErrors === []) {
             return;
         }
 
-        [$msg, $errors] = $this->buildValidationFailure($validator, $schemaFile);
+        [$msg, $errors] = $this->buildValidationFailure($rawErrors, $schemaFile);
 
         throw new JsonSchemaResponseException($msg, Code::ERROR, $errors);
     }
 
-    /** @param array<mixed>|stdClass $target */
-    private function validate(array|stdClass $target, string $schemaFile): Validator
+    /**
+     * @param JsonSchemaValidatorErrors $rawErrors
+     *
+     * @return array{string, JsonSchemaErrors}
+     */
+    private function buildValidationFailure(array $rawErrors, string $schemaFile): array
     {
-        $validator = new Validator();
-        $schema = (object) ['$ref' => 'file://' . $schemaFile];
-        $scanArray = is_array($target) ? $target : $this->deepArray($target);
-        $validator->validate($scanArray, $schema, Constraint::CHECK_MODE_TYPE_CAST);
-
-        return $validator;
-    }
-
-    /** @return Body */
-    private function deepArray(object $values): array
-    {
-        $result = [];
-        // Iterating over object properties yields mixed key/value types
-        /** @psalm-suppress MixedAssignment */
-        foreach ($values as $key => $value) { // @phpstan-ignore-line
-            /** @psalm-suppress MixedArrayOffset */
-            $result[$key] = is_object($value) ? $this->deepArray($value) : $value; // @phpstan-ignore-line
-        }
-
-        return $result;
-    }
-
-    /** @return array{string, JsonSchemaErrors} */
-    private function buildValidationFailure(Validator $validator, string $schemaFile): array
-    {
-        /** @var JsonSchemaValidatorErrors $rawErrors */
-        $rawErrors = $validator->getErrors();
         $mapper = new JsonSchemaErrorMapper();
         $schema = $this->schema($schemaFile);
         $msg = '';

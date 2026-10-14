@@ -13,6 +13,8 @@ use BEAR\Resource\JsonSchema\ArticleWithSeoInput;
 use BEAR\Resource\JsonSchema\FakeInputDtoResource;
 use BEAR\Resource\JsonSchema\FakeUser;
 use BEAR\Resource\JsonSchema\FakeView;
+use BEAR\Resource\JsonSchema\JsonSchemaEngineInterface;
+use BEAR\Resource\JsonSchema\JustinrainbowEngine;
 use BEAR\Resource\JsonSchema\SeoInput;
 use BEAR\Resource\JsonSchemaExceptionNullHandler;
 use BEAR\Resource\JsonSchemaRequestExceptionNullHandler;
@@ -33,7 +35,12 @@ use function unlink;
 
 class JsonSchemaInterceptorTest extends TestCase
 {
-    private JsonSchemaInterceptor $jsonSchemaIntercetor;
+    protected JsonSchemaInterceptor $jsonSchemaIntercetor;
+
+    protected function engine(): JsonSchemaEngineInterface
+    {
+        return new JustinrainbowEngine();
+    }
 
     protected function setup(): void
     {
@@ -44,6 +51,7 @@ class JsonSchemaInterceptorTest extends TestCase
             new JsonSchemaExceptionNullHandler(),
             new JsonSchemaRequestExceptionNullHandler(),
             'http://example.com/schema/',
+            $this->engine(),
         );
     }
 

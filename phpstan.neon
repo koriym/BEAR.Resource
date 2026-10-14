@@ -1,5 +1,7 @@
 parameters:
   level: max
+  scanFiles:
+    - stubs/corvus_json_schema.php
   paths:
     - src
     - tests

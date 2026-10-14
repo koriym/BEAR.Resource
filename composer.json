@@ -35,6 +35,9 @@
         "webmozart/assert": "^2.0",
         "bamarni/composer-bin-plugin": "^1.4"
     },
+    "suggest": {
+        "ext-corvus_json_schema": "Spec-correct JSON Schema validation engine (draft-04 to 2020-12); opt in with JsonSchemaModule(engine: CorvusEngine::class)"
+    },
     "autoload": {
         "psr-4": {
             "BEAR\\Resource\\": ["src/", "src/JsonSchema", "src-deprecated"],
