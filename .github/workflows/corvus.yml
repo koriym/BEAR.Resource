@@ -14,6 +14,7 @@ jobs:
         with:
           php-version: '8.4'
           tools: composer, pie
+          ini-values: zend.assertions=1
       # PIE needs root to write the extension dir, and sudo drops the user's Composer auth.
       - run: sudo --preserve-env=COMPOSER_AUTH "$(command -v pie)" install corvus-dotnet/corvus-json-schema
         env:
@@ -21,4 +22,4 @@ jobs:
       - name: Assert the extension is loaded
         run: php -r 'extension_loaded("corvus_json_schema") || exit(1);'
       - run: composer install --no-interaction --prefer-dist
-      - run: vendor/bin/phpunit tests/JsonSchema tests/Module/JsonSchemaModuleTest.php
+      - run: vendor/bin/phpunit --display-warnings tests/JsonSchema tests/Module/JsonSchemaModuleTest.php
