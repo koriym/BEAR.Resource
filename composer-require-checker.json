@@ -5,6 +5,7 @@
     "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object",
     "Attribute", "ReflectionAttribute", "Stringable",
     "BEAR\\Resource\\HalLink", "BEAR\\Resource\\NullReverseLink", "BEAR\\Resource\\ReverseLinkInterface", "BEAR\\Resource\\Module\\AnnotationModule",
-    "JSONSchemaFaker\\Faker"
+    "JSONSchemaFaker\\Faker",
+    "Corvus\\JsonSchema\\Collector", "Corvus\\JsonSchema\\Dialect", "Corvus\\JsonSchema\\ResultsLevel", "Corvus\\JsonSchema\\Validator"
   ]
 }
