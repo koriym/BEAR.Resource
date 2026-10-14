@@ -89,7 +89,7 @@ final class CorvusEngine implements JsonSchemaEngineInterface
 
         $stamps = [];
         $resolver = function (string $uri) use (&$stamps): stdClass|bool|null {
-            $path = $this->documents->pathOf($uri);
+            $path = SchemaPath::of($uri);
             if ($path !== null) {
                 $stamps[$path] = (string) $this->documents->stamp($path);
             }

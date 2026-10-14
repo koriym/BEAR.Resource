@@ -11,7 +11,6 @@ use function is_array;
 use function is_numeric;
 use function is_string;
 use function preg_match;
-use function str_contains;
 
 /**
  * Turns string request arguments into the scalar type the schema declares for them.
@@ -72,18 +71,28 @@ final class RequestArgumentCoercer
             return $value;
         }
 
-        if (in_array('integer', $types, true) && preg_match('/^-?\d+$/', $value) === 1) {
-            return (int) $value;
+        return $this->integer($value, $types) ?? $this->number($value, $types) ?? $this->boolean($value, $types) ?? $value;
+    }
+
+    /** @param array<mixed> $types */
+    private function integer(string $value, array $types): int|null
+    {
+        return in_array('integer', $types, true) && preg_match('/^-?\d+$/', $value) === 1 ? (int) $value : null;
+    }
+
+    /** @param array<mixed> $types */
+    private function number(string $value, array $types): int|float|null
+    {
+        if (! in_array('number', $types, true) || ! is_numeric($value)) {
+            return null;
         }
 
-        if (in_array('number', $types, true) && is_numeric($value)) {
-            return str_contains($value, '.') || str_contains($value, 'e') || str_contains($value, 'E') ? (float) $value : (int) $value;
-        }
+        return preg_match('/[.eE]/', $value) === 1 ? (float) $value : (int) $value;
+    }
 
-        if (in_array('boolean', $types, true) && in_array($value, ['true', 'false'], true)) {
-            return $value === 'true';
-        }
-
-        return $value;
+    /** @param array<mixed> $types */
+    private function boolean(string $value, array $types): bool|null
+    {
+        return in_array('boolean', $types, true) && in_array($value, ['true', 'false'], true) ? $value === 'true' : null;
     }
 }

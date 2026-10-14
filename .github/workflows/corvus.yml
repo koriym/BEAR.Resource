@@ -14,7 +14,10 @@ jobs:
         with:
           php-version: '8.4'
           tools: composer, pie
-      - run: sudo "$(command -v pie)" install corvus-dotnet/corvus-json-schema
+      # PIE needs root to write the extension dir, and sudo drops the user's Composer auth.
+      - run: sudo --preserve-env=COMPOSER_AUTH "$(command -v pie)" install corvus-dotnet/corvus-json-schema
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ github.token }}"}}'
       - name: Assert the extension is loaded
         run: php -r 'extension_loaded("corvus_json_schema") || exit(1);'
       - run: composer install --no-interaction --prefer-dist

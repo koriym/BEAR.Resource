@@ -13,21 +13,15 @@ use function explode;
 use function file_get_contents;
 use function filemtime;
 use function filesize;
-use function implode;
-use function in_array;
 use function is_array;
 use function is_bool;
 use function is_file;
 use function is_string;
 use function json_decode;
-use function preg_match;
 use function preg_replace;
 use function rawurldecode;
 use function sprintf;
-use function str_replace;
 use function str_starts_with;
-use function strrpos;
-use function substr;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -42,16 +36,19 @@ use const JSON_THROW_ON_ERROR;
  */
 final class SchemaDocuments
 {
-    /** Keywords whose children are names, not keywords. */
-    private const NAME_CONTAINERS = ['properties', 'patternProperties', 'definitions', '$defs', 'dependentSchemas', 'dependencies'];
-
     /** @var array<string, array{string, mixed}> */
     private array $documents = [];
+    private Draft04BoundDetector $draft04;
+
+    public function __construct()
+    {
+        $this->draft04 = new Draft04BoundDetector();
+    }
 
     /** Corvus resolver callback: absolute `file://` URI to decoded document, or null. */
     public function resolve(string $uri): stdClass|bool|null
     {
-        $path = $this->pathOf($uri);
+        $path = SchemaPath::of($uri);
         if ($path === null) {
             return null;
         }
@@ -92,17 +89,6 @@ final class SchemaDocuments
         return is_file($path) ? sprintf('%d:%d', (int) filemtime($path), (int) filesize($path)) : null;
     }
 
-    /** Absolute filesystem path of a `file://` URI or absolute path (fragment stripped); null for other schemes. */
-    public function pathOf(string $uri): string|null
-    {
-        [$uri] = explode('#', $uri, 2);
-        if (str_starts_with($uri, 'file://')) {
-            return rawurldecode(substr($uri, 7));
-        }
-
-        return str_starts_with($uri, '/') ? $uri : null;
-    }
-
     /**
      * Walk an evaluation location (e.g. `/properties/name/$ref/required`) from the root
      * document and return the schema object that owns the last keyword.
@@ -111,7 +97,7 @@ final class SchemaDocuments
      */
     public function locate(string $rootPath, string $evaluationLocation): array|null
     {
-        $segments = $this->segments($evaluationLocation);
+        $segments = JsonPointer::segments($evaluationLocation);
         $keyword = array_pop($segments);
         if ($keyword === null) {
             return null;
@@ -175,21 +161,6 @@ final class SchemaDocuments
         return [$path, $node];
     }
 
-    /** @return list<string> unescaped JSON pointer segments */
-    public function segments(string $pointer): array
-    {
-        if ($pointer === '') {
-            return [];
-        }
-
-        $segments = [];
-        foreach (explode('/', substr($pointer, 1)) as $raw) {
-            $segments[] = str_replace(['~1', '~0'], ['/', '~'], $raw);
-        }
-
-        return $segments;
-    }
-
     /**
      * Corvus reads `$schema` at the document root only and does not recognise the
      * `https://` spelling of the draft-04/06/07 ids (it would fall back to 2020-12),
@@ -206,38 +177,9 @@ final class SchemaDocuments
             return;
         }
 
-        if ($this->usesBooleanExclusiveBound($document, true)) {
+        if ($this->draft04->usesBooleanBound($document)) {
             throw new UnsupportedSchemaException(sprintf('%s uses draft-04 boolean exclusiveMinimum/exclusiveMaximum without "$schema". Declare "$schema": "http://json-schema.org/draft-04/schema#".', $path));
         }
-    }
-
-    /** @param bool $isSchema whether the node's keys are keywords (false under a name container) */
-    private function usesBooleanExclusiveBound(mixed $node, bool $isSchema): bool
-    {
-        if (is_array($node)) {
-            $children = $node;
-            $isSchema = false;
-        } elseif ($node instanceof stdClass) {
-            if ($isSchema && (is_bool($node->exclusiveMinimum ?? null) || is_bool($node->exclusiveMaximum ?? null))) {
-                return true;
-            }
-
-            $children = (array) $node;
-        } else {
-            return false;
-        }
-
-        foreach ($children as $key => $child) {
-            if ($isSchema && in_array($key, ['enum', 'const', 'default', 'examples'], true)) {
-                continue;
-            }
-
-            if ($this->usesBooleanExclusiveBound($child, ! $isSchema || ! in_array($key, self::NAME_CONTAINERS, true))) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /** @return array{string, mixed} */
@@ -245,7 +187,7 @@ final class SchemaDocuments
     {
         [$ref, $fragment] = explode('#', $ref, 2) + [1 => ''];
 
-        $path = $ref === '' ? $basePath : $this->absolutePath($basePath, $ref);
+        $path = $ref === '' ? $basePath : SchemaPath::resolve($basePath, $ref);
         if ($path === null) {
             return [$basePath, null];
         }
@@ -257,7 +199,7 @@ final class SchemaDocuments
             return [$path, null]; // named anchors are not followed
         }
 
-        foreach ($this->segments($fragment) as $segment) {
+        foreach (JsonPointer::segments($fragment) as $segment) {
             $node = $this->child($node, $segment);
         }
 
@@ -270,34 +212,6 @@ final class SchemaDocuments
             return $node->{$segment} ?? null;
         }
 
-        if (is_array($node)) {
-            return $node[(int) $segment] ?? null;
-        }
-
-        return null;
-    }
-
-    private function absolutePath(string $basePath, string $ref): string|null
-    {
-        $path = $this->pathOf($ref);
-        if ($path !== null) {
-            return $path;
-        }
-
-        if (preg_match('#^[a-z][a-z0-9+.-]*:#i', $ref) === 1) {
-            return null;
-        }
-
-        $parts = explode('/', substr($basePath, 0, (int) strrpos($basePath, '/')) . '/' . $ref);
-        $resolved = [];
-        foreach ($parts as $part) {
-            if ($part === '..') {
-                array_pop($resolved);
-            } elseif ($part !== '.') {
-                $resolved[] = $part;
-            }
-        }
-
-        return implode('/', $resolved);
+        return is_array($node) ? $node[(int) $segment] ?? null : null;
     }
 }
