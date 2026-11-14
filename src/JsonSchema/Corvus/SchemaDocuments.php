@@ -18,6 +18,7 @@ use function is_bool;
 use function is_file;
 use function is_string;
 use function json_decode;
+use function preg_match;
 use function preg_replace;
 use function rawurldecode;
 use function sprintf;
@@ -93,7 +94,7 @@ final class SchemaDocuments
      * Walk an evaluation location (e.g. `/properties/name/$ref/required`) from the root
      * document and return the schema object that owns the last keyword.
      *
-     * @return array{stdClass, string}|null [schema object, keyword]; null when the walk leaves what can be resolved
+     * @return array{stdClass, string, string}|null [schema object, keyword, path of the document holding it]; null when the walk leaves what can be resolved
      */
     public function locate(string $rootPath, string $evaluationLocation): array|null
     {
@@ -113,9 +114,10 @@ final class SchemaDocuments
             }
 
             $node = $this->child($node, $segment);
+            [$path, $node] = $this->settle($path, $node, $segments[$i + 1] ?? $keyword);
         }
 
-        return $node instanceof stdClass ? [$node, $keyword] : null;
+        return $node instanceof stdClass ? [$node, $keyword, $path] : null;
     }
 
     /**
@@ -140,15 +142,16 @@ final class SchemaDocuments
     }
 
     /**
-     * Corvus leaves a `$ref` hop out of the location when the schema has nothing else to
-     * evaluate; follow such hops until the node can own the next segment.
+     * Corvus leaves a `$ref` hop out of the location when the `$ref` is the only thing
+     * evaluated: the schema has nothing else, or the dialect (draft-07 and earlier)
+     * ignores the siblings. Follow such hops until the node owns the next segment.
      *
      * @return array{string, mixed}
      */
     private function settle(string $path, mixed $node, string $next): array
     {
         $visited = [];
-        while ($node instanceof stdClass && $next !== '$ref' && ! isset($node->{$next})) {
+        while ($node instanceof stdClass && $next !== '$ref' && (! isset($node->{$next}) || $this->ignoresRefSiblings($path))) {
             $ref = $node->{'$ref'} ?? null;
             if (! is_string($ref) || isset($visited[$path . '#' . $ref])) {
                 break;
@@ -180,6 +183,15 @@ final class SchemaDocuments
         if ($this->draft04->usesBooleanBound($document)) {
             throw new UnsupportedSchemaException(sprintf('%s uses draft-04 boolean exclusiveMinimum/exclusiveMaximum without "$schema". Declare "$schema": "http://json-schema.org/draft-04/schema#".', $path));
         }
+    }
+
+    /** Draft-07 and earlier, which is also what Corvus compiles a document without `$schema` as. */
+    private function ignoresRefSiblings(string $path): bool
+    {
+        $document = $this->load($path);
+        $declared = $document instanceof stdClass ? $document->{'$schema'} ?? null : null;
+
+        return ! is_string($declared) || preg_match('#^http://json-schema\.org/draft-0[467]/schema#', $declared) === 1;
     }
 
     /** @return array{string, mixed} */

@@ -63,6 +63,11 @@ final class ConstraintParams
     public function of(string $keyword, stdClass $schema, mixed $value): array
     {
         $declared = $schema->{$keyword} ?? null;
+        // A failing `false` here is a boolean schema under a property named like a keyword.
+        if ($declared === false) {
+            return ['false', []];
+        }
+
         if (in_array($keyword, self::DECLARED, true)) {
             return [$keyword, [$keyword => $declared]];
         }
@@ -101,10 +106,6 @@ final class ConstraintParams
     /** @return array{string, array<string, mixed>} */
     private function generic(string $keyword, mixed $declared): array
     {
-        if ($declared === false) {
-            return ['false', []];
-        }
-
         return [$keyword, is_scalar($declared) ? [$keyword => $declared] : []];
     }
 

@@ -99,9 +99,19 @@ final class CorvusErrorMapper
             return $this->dependency($schema->{$keyword} ?? null, $pointer, $data);
         }
 
-        [$name, $params] = $this->params->of($keyword, $schema, JsonPointer::valueAt($data, $pointer));
+        [$name, $params] = $this->constraint($keyword, $schema, $located[2] ?? null, JsonPointer::valueAt($data, $pointer));
 
         return ErrorRow::build($pointer, $name, $params, $row['message']);
+    }
+
+    /** @return array{string, array<string, mixed>} [constraint name, params] */
+    private function constraint(string $keyword, stdClass $schema, string|null $documentPath, mixed $value): array
+    {
+        if ($keyword === '$ref' && $documentPath !== null && $this->documents->deref($documentPath, $schema)[1] === false) {
+            return ['false', []];
+        }
+
+        return $this->params->of($keyword, $schema, $value);
     }
 
     /**

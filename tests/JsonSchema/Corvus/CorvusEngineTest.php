@@ -259,6 +259,28 @@ class CorvusEngineTest extends TestCase
         $this->assertSame(['found' => 'string', 'expected' => 'an integer'], $errors[1]['constraint']['params']);
     }
 
+    public function testDraft07RefIgnoresShadowingSiblings(): void
+    {
+        $dir = $this->schemaDir([
+            'root.json' => '{"$schema":"http://json-schema.org/draft-07/schema#","$ref":"sub.json","properties":{"id":{"type":"string"}}}',
+            'sub.json' => '{"properties":{"id":{"type":"integer"},"n":{"$ref":"#/definitions/n","type":"string"}},"definitions":{"n":{"minimum":10}}}',
+        ]);
+        $errors = $this->response($this->body('{"id":"x","n":5}'), $dir . '/root.json');
+
+        $this->assertSame(['type', 'minimum'], $this->names($errors));
+        $this->assertSame(['found' => 'string', 'expected' => 'an integer'], $errors[0]['constraint']['params']);
+        $this->assertSame(['minimum' => 10], $errors[1]['constraint']['params']);
+    }
+
+    public function testFalseSchemaUnderAPropertyNamedLikeAKeyword(): void
+    {
+        $dir = $this->schemaDir(['root.json' => '{"properties":{"pattern":false,"a":{"$ref":"#/definitions/no"}},"definitions":{"no":false}}']);
+        $errors = $this->response($this->body('{"pattern":1,"a":1}'), $dir . '/root.json');
+
+        $this->assertSame(['false', 'false'], $this->names($errors));
+        $this->assertSame(['Boolean schema false', 'Boolean schema false'], array_column($errors, 'message'));
+    }
+
     public function testPropertyNamedExclusiveMinimumIsNotADraft04Bound(): void
     {
         $dir = $this->schemaDir(['root.json' => '{"properties":{"exclusiveMinimum":true},"$defs":{"exclusiveMaximum":false}}']);
