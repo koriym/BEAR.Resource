@@ -481,6 +481,27 @@ try {
 `JsonSchemaRequestException`) を受け取るので、`$e->getErrors()` が構造化エラー
 情報の唯一の真実の情報源 (single source of truth) になります。
 
+### 検証エンジン
+
+既定のエンジンは justinrainbow/json-schema です。PHP 拡張 `corvus_json_schema`
+（`pie install corvus-dotnet/corvus-json-schema`）で検証するには `CorvusEngine::class`
+を渡します。拡張が読み込まれていなければ `JsonSchemaEngineUnavailableException` を投げます。
+
+```php
+use BEAR\Resource\JsonSchema\Corvus\CorvusEngine;
+
+$module->install(new JsonSchemaModule($schemaDir, $validateDir, engine: CorvusEngine::class));
+```
+
+- 各スキーマファイルは `$schema` で宣言した draft（draft-04〜2020-12）に従います。
+  `$schema` のないファイルは draft-07 として読みます。そのファイルが draft-04 の真偽値の
+  `exclusiveMinimum` / `exclusiveMaximum` を使っていれば `UnsupportedSchemaException` を投げます。
+- 文字列のリクエスト引数は、トップレベルのプロパティが宣言する integer・number・boolean に
+  変換します。収まらない値（整数の桁あふれ、無限大になる数）は文字列のまま残り、型エラーになります。
+- コンパイルしたスキーマはプロセスごとに保持し、スキーマファイルか参照先のファイルの
+  更新時刻またはサイズが変わると作り直します。
+- `$ref` はプロセスが読めるどのファイルにも届きます。信頼できるスキーマを使ってください。
+
 ## 埋め込みリソース
 
 `@Embed`アノテーションを使って他のリソースを自身のリソースに埋め込む事が出来ます。`HTML`の`<img src="image_url">`や`<iframe src="content_url">`と同じ様に`src`で埋め込むリソースを指定します。

@@ -691,6 +691,29 @@ and `JsonSchemaRequestException`, respectively), so
 `$e->getErrors()` is the single source of truth for the structured failure
 data.
 
+### Validation engine
+
+The default engine is justinrainbow/json-schema. To validate with the
+`corvus_json_schema` PHP extension (`pie install corvus-dotnet/corvus-json-schema`)
+instead, pass `CorvusEngine::class`; `JsonSchemaEngineUnavailableException` is
+thrown when the extension is not loaded.
+
+```php
+use BEAR\Resource\JsonSchema\Corvus\CorvusEngine;
+
+$module->install(new JsonSchemaModule($schemaDir, $validateDir, engine: CorvusEngine::class));
+```
+
+- Each schema file follows the draft its `$schema` declares (draft-04 to 2020-12).
+  A file without `$schema` is read as draft-07; if it uses draft-04's boolean
+  `exclusiveMinimum` / `exclusiveMaximum`, `UnsupportedSchemaException` is thrown.
+- A string request argument is converted to the integer, number or boolean its
+  top-level property declares. A value that does not fit (integer overflow,
+  infinite number) stays a string and fails as a type error.
+- Compiled schemas are kept per process and recompiled when the schema file or a
+  file it references changes its modification time or size.
+- `$ref` can reach any file the process can read. Use schemas you trust.
+
 ## Embedding resources
 
 `@Embed` annotations makes easier to embed external resource to its own. Like `<img src="image_url">` or `<iframe src="content_url">` in HTML, Embedded resource is specified by `src` field.

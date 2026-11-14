@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `JsonSchemaModule` takes an `engine` argument. Pass `CorvusEngine::class` to validate with the
+  `corvus_json_schema` extension, which follows each schema's declared draft; justinrainbow stays the default.
+
 ### Security
 - Requires koriym/file-upload 1.0.1 or later, which checks an upload's MIME type against its content
   ([GHSA-9343-66h6-6cjr](https://github.com/koriym/Koriym.FileUpload/security/advisories/GHSA-9343-66h6-6cjr)).
