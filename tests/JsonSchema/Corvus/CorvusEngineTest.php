@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 
 use function array_column;
+use function array_fill;
+use function array_fill_keys;
+use function array_map;
 use function dirname;
 use function extension_loaded;
 use function file_get_contents;
@@ -19,6 +22,7 @@ use function filemtime;
 use function glob;
 use function is_dir;
 use function json_decode;
+use function json_encode;
 use function mkdir;
 use function rmdir;
 use function sys_get_temp_dir;
@@ -274,11 +278,56 @@ class CorvusEngineTest extends TestCase
 
     public function testFalseSchemaUnderAPropertyNamedLikeAKeyword(): void
     {
-        $dir = $this->schemaDir(['root.json' => '{"properties":{"pattern":false,"a":{"$ref":"#/definitions/no"}},"definitions":{"no":false}}']);
-        $errors = $this->response($this->body('{"pattern":1,"a":1}'), $dir . '/root.json');
+        $names = ['pattern', 'required', 'additionalProperties', 'unevaluatedProperties', 'additionalItems', 'items', 'dependencies', 'dependentRequired'];
+        $properties = (object) array_fill_keys($names, false);
+        $properties->a = (object) ['$ref' => '#/definitions/no'];
+        $dir = $this->schemaDir(['root.json' => (string) json_encode(['properties' => $properties, 'definitions' => ['no' => false]])]);
+        $errors = $this->response((object) array_fill_keys([...$names, 'a'], 1), $dir . '/root.json');
 
-        $this->assertSame(['false', 'false'], $this->names($errors));
-        $this->assertSame(['Boolean schema false', 'Boolean schema false'], array_column($errors, 'message'));
+        $pointers = array_map(static fn (string $name): string => '/' . $name, [...$names, 'a']);
+        $this->assertSame($pointers, array_column($errors, 'pointer'));
+        $this->assertSame(array_fill(0, 9, ['name' => 'false', 'params' => []]), array_column($errors, 'constraint'));
+    }
+
+    public function testConstFalseIsAConstFailure(): void
+    {
+        $dir = $this->schemaDir(['root.json' => '{"properties":{"a":{"const":false}}}']);
+        $errors = $this->response($this->body('{"a":true}'), $dir . '/root.json');
+
+        $this->assertSame([['name' => 'const', 'params' => ['const' => false]]], array_column($errors, 'constraint'));
+    }
+
+    public function testAnchorRefKeepsParamsAndCoercion(): void
+    {
+        $dir = $this->schemaDir(['root.json' => '{"$schema":"https://json-schema.org/draft/2020-12/schema","$defs":{"id":{"$anchor":"identifier","type":"integer","minimum":10}},"properties":{"id":{"$ref":"#identifier"}}}']);
+
+        $errors = $this->response($this->body('{"id":5}'), $dir . '/root.json');
+        $this->assertSame(['minimum' => 10], $errors[0]['constraint']['params']);
+        $this->assertSame([], $this->request(['id' => '15'], $dir . '/root.json'));
+    }
+
+    public function testEmbeddedIdRefKeepsParams(): void
+    {
+        $dir = $this->schemaDir(['root.json' => '{"$schema":"http://json-schema.org/draft-07/schema#","definitions":{"root":{"$id":"sub/base.json","definitions":{"id":{"minimum":10}},"properties":{"id":{"$ref":"#/definitions/id"}}}},"$ref":"sub/base.json"}']);
+        $errors = $this->response($this->body('{"id":5}'), $dir . '/root.json');
+
+        $this->assertSame([['name' => 'minimum', 'params' => ['minimum' => 10]]], array_column($errors, 'constraint'));
+    }
+
+    public function testUnknownAnnotationIsNotScannedForDraft04Bounds(): void
+    {
+        $dir = $this->schemaDir(['root.json' => '{"type":"object","x-example":{"exclusiveMinimum":true}}']);
+
+        $this->assertSame([], $this->response($this->body('{}'), $dir . '/root.json'));
+    }
+
+    public function testUnrepresentableNumericArgumentsStayStrings(): void
+    {
+        $dir = $this->schemaDir(['root.json' => '{"properties":{"i":{"type":"integer"},"n":{"type":"number","maximum":1}}}']);
+        $errors = $this->request(['i' => '9223372036854775808', 'n' => '1e999'], $dir . '/root.json');
+
+        $this->assertSame(['/i', '/n'], array_column($errors, 'pointer'));
+        $this->assertSame(['type', 'type'], $this->names($errors));
     }
 
     public function testPropertyNamedExclusiveMinimumIsNotADraft04Bound(): void

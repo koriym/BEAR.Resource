@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace BEAR\Resource\JsonSchema\Corvus;
 
 use function array_map;
-use function array_pop;
 use function array_values;
-use function end;
 use function in_array;
 use function str_starts_with;
 
@@ -25,9 +23,6 @@ final class ResultLeaves
 
     /** Keywords whose sub-results are alternatives, not errors of their own. */
     private const OPAQUE = ['anyOf', 'oneOf', 'not', 'contains', 'if'];
-
-    /** Parents whose children are names, not keywords. */
-    private const NAME_CONTAINERS = ['properties', 'patternProperties', 'definitions', '$defs', 'dependentSchemas', 'dependencies'];
 
     /**
      * @param list<Row> $rows
@@ -94,10 +89,7 @@ final class ResultLeaves
 
     private function isOpaque(string $location): bool
     {
-        $segments = JsonPointer::segments($location);
-        $keyword = array_pop($segments);
-
-        return in_array($keyword, self::OPAQUE, true) && ! in_array(end($segments), self::NAME_CONTAINERS, true);
+        return in_array(SchemaKeywords::keywordAt(JsonPointer::segments($location)), self::OPAQUE, true);
     }
 
     /** @param list<string> $prefixes */

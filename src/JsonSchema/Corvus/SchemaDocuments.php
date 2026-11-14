@@ -7,13 +7,11 @@ namespace BEAR\Resource\JsonSchema\Corvus;
 use BEAR\Resource\Exception\UnsupportedSchemaException;
 use stdClass;
 
-use function array_pop;
 use function clearstatcache;
 use function explode;
 use function file_get_contents;
 use function filemtime;
 use function filesize;
-use function is_array;
 use function is_bool;
 use function is_file;
 use function is_string;
@@ -91,33 +89,25 @@ final class SchemaDocuments
     }
 
     /**
-     * Walk an evaluation location (e.g. `/properties/name/$ref/required`) from the root
-     * document and return the schema object that owns the last keyword.
-     *
-     * @return array{stdClass, string, string}|null [schema object, keyword, path of the document holding it]; null when the walk leaves what can be resolved
+     * Path of the document a result row's schema location is relative to, found
+     * by walking its evaluation location (e.g. `/properties/name/$ref/required`) from the root document.
      */
-    public function locate(string $rootPath, string $evaluationLocation): array|null
+    public function documentOf(string $rootPath, string $evaluationLocation): string
     {
-        $segments = JsonPointer::segments($evaluationLocation);
-        $keyword = array_pop($segments);
-        if ($keyword === null) {
-            return null;
-        }
-
-        [$path, $node] = $this->settle($rootPath, $this->load($rootPath), $segments[0] ?? $keyword);
-        foreach ($segments as $i => $segment) {
+        $path = $rootPath;
+        $node = $this->load($rootPath);
+        foreach (JsonPointer::segments($evaluationLocation) as $segment) {
+            [$path, $node] = $this->settle($path, $node, $segment);
             if ($segment === '$ref' && $node instanceof stdClass && is_string($node->{'$ref'} ?? null)) {
                 [$path, $node] = $this->follow($path, $node->{'$ref'});
-                [$path, $node] = $this->settle($path, $node, $segments[$i + 1] ?? $keyword);
 
                 continue;
             }
 
-            $node = $this->child($node, $segment);
-            [$path, $node] = $this->settle($path, $node, $segments[$i + 1] ?? $keyword);
+            $node = JsonPointer::valueAt($node, '/' . JsonPointer::escape($segment));
         }
 
-        return $node instanceof stdClass ? [$node, $keyword, $path] : null;
+        return $path;
     }
 
     /**
@@ -194,36 +184,54 @@ final class SchemaDocuments
         return ! is_string($declared) || preg_match('#^http://json-schema\.org/draft-0[467]/schema#', $declared) === 1;
     }
 
-    /** @return array{string, mixed} */
+    /**
+     * Target of a `$ref`: a JSON pointer or a named anchor in a file, or a resource
+     * embedded with `$id` in the current document.
+     *
+     * @return array{string, mixed} document path and node
+     */
     private function follow(string $basePath, string $ref): array
     {
-        [$ref, $fragment] = explode('#', $ref, 2) + [1 => ''];
-
-        $path = $ref === '' ? $basePath : SchemaPath::resolve($basePath, $ref);
-        if ($path === null) {
-            return [$basePath, null];
-        }
-
-        /** @psalm-suppress MixedAssignment */
-        $node = $this->load($path);
+        [$uri, $fragment] = explode('#', $ref, 2) + [1 => ''];
         $fragment = rawurldecode($fragment);
-        if ($fragment !== '' && ! str_starts_with($fragment, '/')) {
-            return [$path, null]; // named anchors are not followed
+        $path = $uri === '' ? $basePath : SchemaPath::resolve($basePath, $uri);
+        if ($path !== null && $this->stamp($path) !== null) {
+            return [$path, $this->fragment($this->load($path), $fragment)];
         }
 
-        foreach (JsonPointer::segments($fragment) as $segment) {
-            $node = $this->child($node, $segment);
-        }
+        $resource = $this->find($this->load($basePath), static fn (stdClass $node): bool => is_string($node->{'$id'} ?? null)
+            && ($node->{'$id'} === $uri || SchemaPath::resolve($basePath, $node->{'$id'}) === $path));
 
-        return [$path, $node];
+        return [$basePath, $this->fragment($resource, $fragment)];
     }
 
-    private function child(mixed $node, string $segment): mixed
+    private function fragment(mixed $resource, string $fragment): mixed
     {
-        if ($node instanceof stdClass) {
-            return $node->{$segment} ?? null;
+        if ($fragment === '' || str_starts_with($fragment, '/')) {
+            return JsonPointer::valueAt($resource, $fragment);
         }
 
-        return is_array($node) ? $node[(int) $segment] ?? null : null;
+        return $this->find($resource, static fn (stdClass $node): bool => ($node->{'$anchor'} ?? null) === $fragment || ($node->{'$id'} ?? null) === '#' . $fragment);
+    }
+
+    /** @param callable(stdClass): bool $matches */
+    private function find(mixed $node, callable $matches): stdClass|null
+    {
+        if (! $node instanceof stdClass) {
+            return null;
+        }
+
+        if ($matches($node)) {
+            return $node;
+        }
+
+        foreach (SchemaKeywords::subschemas($node) as $child) {
+            $found = $this->find($child, $matches);
+            if ($found !== null) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 }

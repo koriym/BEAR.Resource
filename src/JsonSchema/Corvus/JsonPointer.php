@@ -39,6 +39,11 @@ final class JsonPointer
         return $segments;
     }
 
+    public static function escape(string $segment): string
+    {
+        return str_replace(['~', '/'], ['~0', '~1'], $segment);
+    }
+
     public static function last(string $pointer): string
     {
         $segments = self::segments($pointer);

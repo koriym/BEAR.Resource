@@ -8,6 +8,9 @@ use stdClass;
 
 use function in_array;
 use function is_array;
+use function is_finite;
+use function is_float;
+use function is_int;
 use function is_numeric;
 use function is_string;
 use function preg_match;
@@ -23,6 +26,8 @@ use function preg_match;
  * the root and on a property are followed, each against the file that holds it.
  *
  * Casting is strict: boolean accepts only `true` / `false`, integer only `^-?\d+$`.
+ * A value that does not fit (integer overflow, infinite number) stays a string,
+ * so validation reports it as a type error.
  *
  * @internal
  * @psalm-suppress MixedAssignment, MixedArgument, PossiblyNullArgument Schema nodes are decoded JSON; shapes are checked at the use sites.
@@ -77,7 +82,13 @@ final class RequestArgumentCoercer
     /** @param array<mixed> $types */
     private function integer(string $value, array $types): int|null
     {
-        return in_array('integer', $types, true) && preg_match('/^-?\d+$/', $value) === 1 ? (int) $value : null;
+        if (! in_array('integer', $types, true) || preg_match('/^-?\d+$/', $value) !== 1 || ! is_numeric($value)) {
+            return null;
+        }
+
+        $number = $this->numeric($value);
+
+        return is_int($number) ? $number : null;
     }
 
     /** @param array<mixed> $types */
@@ -87,7 +98,20 @@ final class RequestArgumentCoercer
             return null;
         }
 
-        return preg_match('/[.eE]/', $value) === 1 ? (float) $value : (int) $value;
+        $number = $this->numeric($value);
+
+        return is_float($number) && ! is_finite($number) ? null : $number;
+    }
+
+    /**
+     * The value as PHP reads a numeric literal: int, or float when it does not fit.
+     *
+     * @param numeric-string $value
+     */
+    private function numeric(string $value): int|float
+    {
+        /** @psalm-suppress InvalidOperand */
+        return 0 + $value;
     }
 
     /** @param array<mixed> $types */

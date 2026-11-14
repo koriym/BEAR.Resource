@@ -17,7 +17,7 @@ use function property_exists;
  * Converts Corvus `Detailed` result rows into justinrainbow-shaped error rows.
  *
  * Corvus reports no parameters, so they are recovered from the schema node the
- * row's evaluation location points at (following `$ref`) and from the data.
+ * row's schema location points at and from the data.
  *
  * @internal
  * @psalm-import-type JsonSchemaValidatorErrors from Types
@@ -73,11 +73,13 @@ final class CorvusErrorMapper
      */
     private function toError(array $row, string $schemaPath, mixed $data): array
     {
-        $located = $this->documents->locate($schemaPath, $row['evaluationLocation']);
-        $schema = $located[0] ?? new stdClass();
-        $keyword = $located[1] ?? JsonPointer::last($row['evaluationLocation']);
         $pointer = $row['instanceLocation'];
+        $keyword = SchemaKeywords::keywordAt(JsonPointer::segments($row['evaluationLocation']));
+        if ($keyword === null) {
+            return ErrorRow::build($pointer, 'false', []);
+        }
 
+        $schema = $this->schemaOf($row, $schemaPath);
         if ($keyword === 'required') {
             return ErrorRow::build($pointer, 'required', ['property' => JsonPointer::last($pointer)]);
         }
@@ -88,7 +90,7 @@ final class CorvusErrorMapper
             return ErrorRow::build(JsonPointer::parent($pointer), $name, ['property' => JsonPointer::last($pointer)]);
         }
 
-        if ($keyword === 'additionalItems' || ($keyword === 'items' && ($schema->items ?? null) === false)) {
+        if ($keyword === 'additionalItems' || $keyword === 'items') {
             $parent = JsonPointer::parent($pointer);
             $params = ['item' => JsonPointer::property($parent), 'property' => (int) JsonPointer::last($pointer), 'additionalItems' => false];
 
@@ -99,19 +101,23 @@ final class CorvusErrorMapper
             return $this->dependency($schema->{$keyword} ?? null, $pointer, $data);
         }
 
-        [$name, $params] = $this->constraint($keyword, $schema, $located[2] ?? null, JsonPointer::valueAt($data, $pointer));
+        [$name, $params] = $this->params->of($keyword, $schema, JsonPointer::valueAt($data, $pointer));
 
         return ErrorRow::build($pointer, $name, $params, $row['message']);
     }
 
-    /** @return array{string, array<string, mixed>} [constraint name, params] */
-    private function constraint(string $keyword, stdClass $schema, string|null $documentPath, mixed $value): array
+    /**
+     * Schema object owning the row's keyword. The schema location is relative to
+     * the document holding it, which the evaluation location tells.
+     *
+     * @param Row $row
+     */
+    private function schemaOf(array $row, string $schemaPath): stdClass
     {
-        if ($keyword === '$ref' && $documentPath !== null && $this->documents->deref($documentPath, $schema)[1] === false) {
-            return ['false', []];
-        }
+        $document = $this->documents->load($this->documents->documentOf($schemaPath, $row['evaluationLocation']));
+        $schema = JsonPointer::valueAt($document, JsonPointer::parent($row['schemaLocation']));
 
-        return $this->params->of($keyword, $schema, $value);
+        return $schema instanceof stdClass ? $schema : new stdClass();
     }
 
     /**
